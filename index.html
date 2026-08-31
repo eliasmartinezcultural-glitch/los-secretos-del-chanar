@@ -8,11 +8,6 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     >
 
-    <meta
-        name="theme-color"
-        content="#18251c"
-    >
-
     <title>Los Secretos del Chañar</title>
 
     <link rel="stylesheet" href="style.css">
@@ -20,20 +15,20 @@
 
 <body>
 
-    <!-- ==================================================
+    <!-- ==============================
          JUEGO
-    =================================================== -->
+    =============================== -->
 
     <canvas id="game"></canvas>
 
 
-    <!-- ==================================================
+    <!-- ==============================
          PANTALLA DE INICIO
-    =================================================== -->
+    =============================== -->
 
     <section id="start-screen" class="screen">
 
-        <div class="start-box">
+        <div class="title-card">
 
             <div class="small-title">
                 OCARINA PRODUCCIONES PRESENTA
@@ -45,21 +40,17 @@
             </h1>
 
             <p class="subtitle">
-                Una aventura de exploración,
-                memoria e historias.
+                Una aventura por la memoria,
+                los paisajes y las historias
+                de San Patricio del Chañar.
             </p>
 
-            <button id="start-button" class="main-button">
+            <button id="start-button">
                 COMENZAR
             </button>
 
-            <button id="continue-button" class="secondary-button">
-                CONTINUAR
-            </button>
-
             <p class="controls-info">
-                PC: WASD / Flechas<br>
-                Celular: joystick táctil
+                PC: WASD / Flechas · E interactuar · M inventario
             </p>
 
         </div>
@@ -67,129 +58,104 @@
     </section>
 
 
-    <!-- ==================================================
+    <!-- ==============================
          HUD
-    =================================================== -->
+    =============================== -->
 
-    <header id="hud">
+    <div id="hud">
 
-        <div class="game-title">
-            LOS SECRETOS DEL CHAÑAR
+        <div class="hud-top">
+
+            <div class="brand">
+                LOS SECRETOS DEL CHAÑAR
+            </div>
+
+            <div id="location-name">
+                SAN PATRICIO DEL CHAÑAR
+            </div>
+
         </div>
+
 
         <div id="mission-hud">
             Explorá el pueblo
         </div>
 
-        <button id="diary-button">
-            📖 DIARIO
-        </button>
 
-    </header>
+        <div class="hud-bottom">
+
+            <div class="stats">
+
+                <span>
+                    📷 <b id="photo-count">0</b>
+                </span>
+
+                <span>
+                    📜 <b id="document-count">0</b>
+                </span>
+
+                <span>
+                    ⭐ <b id="discovery-count">0</b>
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
 
 
-    <!-- ==================================================
+    <!-- ==============================
+         INDICADOR DE INTERACCIÓN
+    =============================== -->
+
+    <div id="interaction-hint">
+        <span class="key">E</span>
+        <span>Interactuar</span>
+    </div>
+
+
+    <!-- ==============================
          MINIMAPA
-    =================================================== -->
+    =============================== -->
 
     <div id="map-container">
 
-        <div class="map-title">
+        <canvas
+            id="minimap"
+            width="180"
+            height="120"
+        ></canvas>
+
+        <div class="map-label">
             MAPA
         </div>
 
-        <canvas
-            id="minimap"
-            width="190"
-            height="130"
-        ></canvas>
-
     </div>
 
 
-    <!-- ==================================================
-         INTERACCIÓN
-    =================================================== -->
-
-    <div id="interaction-hint" class="hidden">
-        <span>◉</span>
-        <b id="interaction-text">
-            EXPLORAR
-        </b>
-        <small>
-            E
-        </small>
-    </div>
-
-
-    <!-- ==================================================
-         JOYSTICK
-    =================================================== -->
-
-    <div id="joystick">
-
-        <div id="joystick-base">
-
-            <div id="joystick-stick"></div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ==================================================
-         BOTONES CELULAR
-    =================================================== -->
-
-    <div id="mobile-buttons">
-
-        <button
-            id="mobile-interact"
-            class="mobile-button"
-        >
-            E
-            <span>EXPLORAR</span>
-        </button>
-
-        <button
-            id="mobile-diary"
-            class="mobile-button"
-        >
-            📖
-            <span>DIARIO</span>
-        </button>
-
-    </div>
-
-
-    <!-- ==================================================
+    <!-- ==============================
          DIÁLOGO
-    =================================================== -->
+    =============================== -->
 
     <div
         id="dialogue"
         class="panel hidden"
     >
 
-        <div class="panel-box dialogue-box">
+        <div class="panel-inner">
 
             <div
                 id="dialogue-name"
-                class="panel-title"
-            >
-                PERSONAJE
-            </div>
+                class="dialogue-name"
+            ></div>
 
             <div
                 id="dialogue-text"
                 class="dialogue-text"
-            >
-            </div>
+            ></div>
 
-            <button
-                id="dialogue-close"
-                class="close-button"
-            >
+            <button id="dialogue-close">
                 CONTINUAR
             </button>
 
@@ -198,32 +164,26 @@
     </div>
 
 
-    <!-- ==================================================
+    <!-- ==============================
          MISIÓN
-    =================================================== -->
+    =============================== -->
 
     <div
         id="mission-panel"
         class="panel hidden"
     >
 
-        <div class="panel-box">
+        <div class="panel-inner">
 
-            <div class="panel-label">
-                NUEVA MISIÓN
+            <div class="mission-tag">
+                NUEVA HISTORIA
             </div>
 
-            <h2 id="mission-title">
-                La fotografía perdida
-            </h2>
+            <h2 id="mission-title"></h2>
 
-            <p id="mission-description">
-            </p>
+            <p id="mission-description"></p>
 
-            <button
-                id="mission-close"
-                class="close-button"
-            >
+            <button id="mission-close">
                 ENTENDIDO
             </button>
 
@@ -232,87 +192,27 @@
     </div>
 
 
-    <!-- ==================================================
-         DIARIO
-    =================================================== -->
-
-    <div
-        id="diary-panel"
-        class="panel hidden"
-    >
-
-        <div class="panel-box diary-box">
-
-            <div class="panel-label">
-                ARCHIVO DEL CHAÑAR
-            </div>
-
-            <h2>
-                Diario del explorador
-            </h2>
-
-            <div class="stats">
-
-                <div>
-                    <strong id="photo-count">0</strong>
-                    <span>Fotografías</span>
-                </div>
-
-                <div>
-                    <strong id="document-count">0</strong>
-                    <span>Documentos</span>
-                </div>
-
-                <div>
-                    <strong id="location-count">0</strong>
-                    <span>Lugares</span>
-                </div>
-
-            </div>
-
-            <div id="diary-items">
-                Todavía no descubriste nada.
-            </div>
-
-            <button
-                id="diary-close"
-                class="close-button"
-            >
-                CERRAR
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <!-- ==================================================
+    <!-- ==============================
          INVENTARIO
-    =================================================== -->
+    =============================== -->
 
     <div
         id="inventory-panel"
         class="panel hidden"
     >
 
-        <div class="panel-box">
-
-            <div class="panel-label">
-                INVENTARIO
-            </div>
+        <div class="panel-inner">
 
             <h2>
-                Objetos encontrados
+                MEMORIA DEL CHAÑAR
             </h2>
 
-            <div id="inventory-items">
-                Inventario vacío.
-            </div>
+            <div
+                id="inventory-items"
+                class="inventory-items"
+            ></div>
 
-            <button
-                id="inventory-close"
-                class="close-button"
-            >
+            <button id="inventory-close">
                 CERRAR
             </button>
 
@@ -321,17 +221,41 @@
     </div>
 
 
-    <!-- ==================================================
-         MENSAJES
-    =================================================== -->
+    <!-- ==============================
+         CONTROLES MÓVILES
+    =============================== -->
 
-    <div id="notification">
+    <div id="mobile-controls">
+
+        <div id="joystick">
+
+            <div id="joystick-knob"></div>
+
+        </div>
+
+        <button
+            id="mobile-interact"
+            class="mobile-button"
+        >
+            E
+        </button>
+
+        <button
+            id="mobile-inventory"
+            class="mobile-button inventory-button"
+        >
+            M
+        </button>
+
     </div>
 
 
-    <!-- ==================================================
-         JAVASCRIPT
-    =================================================== -->
+    <!-- ==============================
+         MENSAJE
+    =============================== -->
+
+    <div id="toast"></div>
+
 
     <script src="game.js"></script>
 
