@@ -1,7 +1,7 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -9,17 +9,10 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     >
 
-    <meta
-        name="theme-color"
-        content="#18231c"
-    >
-
     <title>Los Secretos del Chañar</title>
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+    <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
@@ -32,43 +25,42 @@
 
         <canvas id="game"></canvas>
 
+
         <!-- =================================================
-             HUD
+             HUD SUPERIOR
         ================================================== -->
 
         <section id="hud">
 
-            <div id="hud-top">
+            <div class="hud-left">
 
-                <div class="hud-box">
-                    <strong>LOS SECRETOS DEL CHAÑAR</strong>
-                    <span id="status-text">
-                        Explorá el pueblo
-                    </span>
+                <div class="game-title">
+                    LOS SECRETOS DEL CHAÑAR
                 </div>
 
-                <div class="hud-box">
-                    <span>📷 Fotos</span>
-                    <strong id="photo-count">0</strong>
+                <div id="mission-hud">
+                    Explorá el pueblo
                 </div>
 
-                <div class="hud-box">
-                    <span>📜 Documentos</span>
-                    <strong id="document-count">0</strong>
-                </div>
+            </div>
+
+
+            <div class="hud-right">
+
+                <button
+                    id="inventory-button"
+                    class="hud-button"
+                >
+                    🎒
+                </button>
 
                 <button
                     id="pause-button"
                     class="hud-button"
-                    type="button"
                 >
                     II
                 </button>
 
-            </div>
-
-            <div id="mission-hud">
-                Explorá el pueblo
             </div>
 
         </section>
@@ -86,8 +78,6 @@
                 height="120"
             ></canvas>
 
-            <span>MAPA</span>
-
         </div>
 
 
@@ -95,9 +85,13 @@
              MENSAJE DE INTERACCIÓN
         ================================================== -->
 
-        <div id="interaction-hint">
-            <strong>E</strong>
-            <span>Interactuar</span>
+        <div
+            id="interaction-hint"
+            class="hidden"
+        >
+            <span id="interaction-text">
+                E · Interactuar
+            </span>
         </div>
 
 
@@ -105,116 +99,31 @@
              CONTROLES CELULAR
         ================================================== -->
 
-        <section id="mobile-controls">
+        <div id="mobile-controls">
 
-            <div id="joystick-area">
+            <div id="joystick">
 
-                <div id="joystick-base">
-
-                    <div id="joystick-stick"></div>
-
-                </div>
+                <div id="joystick-knob"></div>
 
             </div>
 
 
-            <div id="mobile-actions">
-
-                <button
-                    id="mobile-interact"
-                    class="mobile-button"
-                    type="button"
-                >
-                    E
-                </button>
-
-                <button
-                    id="mobile-inventory"
-                    class="mobile-button"
-                    type="button"
-                >
-                    M
-                </button>
-
-            </div>
-
-        </section>
+            <button
+                id="mobile-interact"
+                class="action-button"
+            >
+                E
+            </button>
 
 
-        <!-- =================================================
-             PANTALLA DE INICIO
-        ================================================== -->
+            <button
+                id="mobile-inventory"
+                class="action-button"
+            >
+                🎒
+            </button>
 
-        <section
-            id="start-screen"
-            class="screen"
-        >
-
-            <div class="screen-card">
-
-                <div class="game-logo">
-                    OCARINA
-                </div>
-
-                <h1>
-                    LOS SECRETOS
-                    <br>
-                    DEL CHAÑAR
-                </h1>
-
-                <p>
-                    Una aventura de exploración,
-                    memoria e historias.
-                </p>
-
-                <button
-                    id="start-button"
-                    type="button"
-                >
-                    COMENZAR
-                </button>
-
-                <p class="controls-info">
-                    PC: WASD / Flechas
-                    <br>
-                    E: interactuar · M: inventario
-                </p>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             PAUSA
-        ================================================== -->
-
-        <section
-            id="pause-screen"
-            class="screen hidden"
-        >
-
-            <div class="screen-card">
-
-                <h2>PAUSA</h2>
-
-                <button
-                    id="resume-button"
-                    type="button"
-                >
-                    CONTINUAR
-                </button>
-
-                <button
-                    id="restart-button"
-                    type="button"
-                >
-                    REINICIAR
-                </button>
-
-            </div>
-
-        </section>
+        </div>
 
 
         <!-- =================================================
@@ -223,24 +132,30 @@
 
         <section
             id="dialogue"
-            class="modal hidden"
+            class="panel hidden"
         >
 
-            <div class="modal-card">
+            <div class="panel-inner">
 
-                <h2 id="dialogue-name">
-                    Personaje
-                </h2>
+                <div
+                    id="dialogue-name"
+                    class="dialogue-name"
+                >
+                    PERSONAJE
+                </div>
 
-                <p id="dialogue-text">
+                <div
+                    id="dialogue-text"
+                    class="dialogue-text"
+                >
                     ...
-                </p>
+                </div>
 
                 <button
                     id="dialogue-close"
-                    type="button"
+                    class="primary-button"
                 >
-                    CERRAR
+                    Continuar
                 </button>
 
             </div>
@@ -254,13 +169,17 @@
 
         <section
             id="mission-panel"
-            class="modal hidden"
+            class="panel hidden"
         >
 
-            <div class="modal-card">
+            <div class="panel-inner">
+
+                <div class="panel-label">
+                    NUEVA MISIÓN
+                </div>
 
                 <h2 id="mission-title">
-                    Misión
+                    La fotografía perdida
                 </h2>
 
                 <p id="mission-description">
@@ -269,9 +188,9 @@
 
                 <button
                     id="mission-close"
-                    type="button"
+                    class="primary-button"
                 >
-                    ENTENDIDO
+                    Entendido
                 </button>
 
             </div>
@@ -285,22 +204,45 @@
 
         <section
             id="inventory-panel"
-            class="modal hidden"
+            class="panel hidden"
         >
 
-            <div class="modal-card">
+            <div class="panel-inner">
 
-                <h2>INVENTARIO</h2>
+                <div class="panel-label">
+                    INVENTARIO
+                </div>
 
-                <div id="inventory-items">
+                <h2>
+                    Objetos encontrados
+                </h2>
+
+                <div
+                    id="inventory-items"
+                    class="inventory-items"
+                >
                     Inventario vacío.
+                </div>
+
+                <div class="inventory-stats">
+
+                    <div>
+                        📷 Fotografías:
+                        <strong id="photo-count">0</strong>
+                    </div>
+
+                    <div>
+                        📜 Documentos:
+                        <strong id="document-count">0</strong>
+                    </div>
+
                 </div>
 
                 <button
                     id="inventory-close"
-                    type="button"
+                    class="primary-button"
                 >
-                    CERRAR
+                    Cerrar
                 </button>
 
             </div>
@@ -309,10 +251,97 @@
 
 
         <!-- =================================================
-             MENSAJES DEL JUEGO
+             PAUSA
         ================================================== -->
 
-        <div id="game-message"></div>
+        <section
+            id="pause-panel"
+            class="panel hidden"
+        >
+
+            <div class="panel-inner">
+
+                <div class="panel-label">
+                    JUEGO PAUSADO
+                </div>
+
+                <h2>
+                    Los Secretos del Chañar
+                </h2>
+
+                <button
+                    id="resume-button"
+                    class="primary-button"
+                >
+                    Continuar
+                </button>
+
+                <button
+                    id="restart-button"
+                    class="secondary-button"
+                >
+                    Reiniciar partida
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PANTALLA INICIO
+        ================================================== -->
+
+        <section id="start-screen">
+
+            <div class="start-content">
+
+                <div class="start-kicker">
+                    UNA HISTORIA EN EL TERRITORIO
+                </div>
+
+                <h1>
+                    LOS SECRETOS
+                    <span>DEL CHAÑAR</span>
+                </h1>
+
+                <p>
+                    Explorá, encontrá objetos,
+                    conocé personajes y reconstruí
+                    las historias escondidas del pueblo.
+                </p>
+
+                <button
+                    id="start-button"
+                    class="start-button"
+                >
+                    COMENZAR
+                </button>
+
+                <div class="controls-info">
+
+                    <span>WASD / Flechas</span>
+
+                    <span>•</span>
+
+                    <span>E = Interactuar</span>
+
+                    <span>•</span>
+
+                    <span>M = Inventario</span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             NOTIFICACIONES
+        ================================================== -->
+
+        <div id="notification-container"></div>
 
     </main>
 
@@ -320,5 +349,5 @@
     <script src="game.js"></script>
 
 </body>
+
 </html>
-```
