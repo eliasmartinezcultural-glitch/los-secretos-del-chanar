@@ -1,154 +1,117 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
-        Los Secretos del Chañar
-    </title>
-
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Los Secretos del Chañar</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 
 <body>
 
-
-    <!-- =====================================================
-         JUEGO
-    ====================================================== -->
-
     <canvas id="game"></canvas>
 
+    <!-- PANTALLA INICIAL -->
+    <div id="start-screen" class="overlay">
+        <div class="start-card">
+            <div class="eyebrow">OCARINA PRODUCCIONES PRESENTA</div>
 
-    <!-- =====================================================
-         HUD
-    ====================================================== -->
-
-    <div id="hud">
-
-        <div class="hud-title">
-            LOS SECRETOS DEL CHAÑAR
-        </div>
-
-        <div id="mission-hud">
-            Explorá el pueblo
-        </div>
-
-        <div class="controls">
-            WASD / FLECHAS — Moverse
-            <br>
-            E — Interactuar
-            <br>
-            M — Inventario
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         MINIMAPA
-    ====================================================== -->
-
-    <div id="minimap-container">
-
-        <div class="minimap-title">
-            MAPA
-        </div>
-
-        <canvas
-            id="minimap"
-            width="220"
-            height="150"
-        ></canvas>
-
-    </div>
-
-
-    <!-- =====================================================
-         PANTALLA DE INICIO
-    ====================================================== -->
-
-    <div
-        id="start-screen"
-        class="overlay"
-    >
-
-        <div class="start-box">
-
-            <h1>
-                LOS SECRETOS<br>
-                DEL CHAÑAR
-            </h1>
+            <h1>LOS SECRETOS<br>DEL CHAÑAR</h1>
 
             <p>
-                Una aventura por la memoria,
-                las historias y los secretos
-                de San Patricio del Chañar.
+                Explorá un pueblo, encontrá historias
+                y reconstruí su memoria.
             </p>
 
             <button id="start-button">
                 COMENZAR
             </button>
 
+            <div class="controls">
+                <span>WASD / FLECHAS</span>
+                <span>E INTERACTUAR</span>
+                <span>M INVENTARIO</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- HUD -->
+    <div id="hud">
+
+        <div class="hud-top">
+
+            <div class="brand">
+                LOS SECRETOS DEL CHAÑAR
+            </div>
+
+            <div id="mission-hud">
+                Explorá el pueblo
+            </div>
+
+        </div>
+
+        <div id="discovery">
+            NUEVO LUGAR DESCUBIERTO
+        </div>
+
+        <div id="interaction-hint" class="hidden">
+            <strong>E</strong> Interactuar
+        </div>
+
+        <div id="stats">
+            <div>
+                📷 <span id="photo-count">0</span>
+            </div>
+
+            <div>
+                📜 <span id="document-count">0</span>
+            </div>
+
+            <div>
+                ⭐ <span id="reputation">0</span>
+            </div>
+        </div>
+
+        <canvas id="minimap" width="220" height="150"></canvas>
+
+        <div id="clock">
+            08:00
         </div>
 
     </div>
 
+    <!-- DIÁLOGO -->
+    <div id="dialogue" class="panel hidden">
 
-    <!-- =====================================================
-         DIÁLOGOS
-    ====================================================== -->
+        <div class="panel-inner">
 
-    <div
-        id="dialogue"
-        class="panel hidden"
-    >
+            <div id="dialogue-name">
+                PERSONAJE
+            </div>
 
-        <div class="panel-box">
-
-            <h2 id="dialogue-name">
-                Personaje
-            </h2>
-
-            <p id="dialogue-text">
+            <div id="dialogue-text">
                 ...
-            </p>
+            </div>
 
             <button id="dialogue-close">
-                CERRAR
+                CONTINUAR
             </button>
 
         </div>
 
     </div>
 
+    <!-- MISIÓN -->
+    <div id="mission-panel" class="panel hidden">
 
-    <!-- =====================================================
-         MISIÓN
-    ====================================================== -->
+        <div class="panel-inner">
 
-    <div
-        id="mission-panel"
-        class="panel hidden"
-    >
-
-        <div class="panel-box">
+            <div class="label">
+                NUEVA MISIÓN
+            </div>
 
             <h2 id="mission-title">
-                Misión
+                La fotografía perdida
             </h2>
 
             <p id="mission-description">
@@ -163,41 +126,20 @@
 
     </div>
 
+    <!-- INVENTARIO -->
+    <div id="inventory-panel" class="panel hidden">
 
-    <!-- =====================================================
-         INVENTARIO
-    ====================================================== -->
+        <div class="panel-inner">
 
-    <div
-        id="inventory-panel"
-        class="panel hidden"
-    >
+            <div class="label">
+                ARCHIVO PERSONAL
+            </div>
 
-        <div class="panel-box">
-
-            <h2>
-                INVENTARIO
-            </h2>
+            <h2>Objetos encontrados</h2>
 
             <div id="inventory-items">
                 Inventario vacío.
             </div>
-
-            <hr>
-
-            <p>
-                📷 Fotografías:
-                <strong id="photo-count">
-                    0
-                </strong>
-            </p>
-
-            <p>
-                📜 Documentos:
-                <strong id="document-count">
-                    0
-                </strong>
-            </p>
 
             <button id="inventory-close">
                 CERRAR
@@ -207,17 +149,7 @@
 
     </div>
 
-
-    <!-- =====================================================
-         JAVASCRIPT
-    ====================================================== -->
-
-<script
-    src="gamee.js"
-></script>
-
+    <script src="gamee.js"></script>
 
 </body>
-
 </html>
-```
