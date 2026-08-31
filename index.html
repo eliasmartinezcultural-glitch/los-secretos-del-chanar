@@ -1,40 +1,214 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Los Secretos del Chañar</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="style.css">
+    <title>
+        Los Secretos del Chañar
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
 
 <body>
 
-    <div id="game-container">
+<div id="game-container">
 
-        <canvas id="game"></canvas>
+    <canvas id="game"></canvas>
 
-        <div id="dialogue" class="hidden">
-            <div id="dialogue-text"></div>
-            <button id="close-dialogue">Continuar</button>
-        </div>
 
-        <div id="hud">
+    <!-- PANTALLA DE INICIO -->
 
-            <div id="player-name">
-                Elías
+    <div id="start-screen">
+
+        <div class="title">
+
+            <div class="small-title">
+                OCARINA PRESENTA
             </div>
 
-            <div id="inventory">
-                📷 Cámara
+            <h1>
+                LOS SECRETOS<br>
+                DEL CHAÑAR
+            </h1>
+
+            <p>
+                Una aventura por la memoria
+                de un pueblo.
+            </p>
+
+            <button id="start-button">
+                COMENZAR
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- HUD -->
+
+    <div id="hud">
+
+        <div class="hud-left">
+
+            <div class="hud-title">
+                LOS SECRETOS DEL CHAÑAR
+            </div>
+
+            <div id="mission-hud">
+                Misión: explorar el pueblo
+            </div>
+
+        </div>
+
+
+        <div class="hud-right">
+
+            <div class="hud-item">
+                📷
+                <span id="photo-count">
+                    0
+                </span>
+            </div>
+
+            <div class="hud-item">
+                📜
+                <span id="document-count">
+                    0
+                </span>
             </div>
 
         </div>
 
     </div>
 
-    <script src="game.js"></script>
+
+    <!-- MINIMAPA -->
+
+    <canvas
+        id="minimap"
+    ></canvas>
+
+
+    <!-- CONTROLES -->
+
+    <div id="controls">
+
+        <strong>CONTROLES</strong>
+
+        <br>
+
+        WASD / Flechas:
+        mover
+
+        <br>
+
+        E:
+        interactuar
+
+        <br>
+
+        M:
+        mapa
+
+    </div>
+
+
+    <!-- MISIÓN -->
+
+    <div
+        id="mission-panel"
+        class="hidden"
+    >
+
+        <div class="mission-header">
+
+            NUEVA MISIÓN
+
+        </div>
+
+        <h2 id="mission-title">
+            La fotografía perdida
+        </h2>
+
+        <p id="mission-description">
+            Encontrá la fotografía
+            que perdió Don Pedro.
+        </p>
+
+        <button
+            id="mission-close"
+        >
+            ACEPTAR
+        </button>
+
+    </div>
+
+
+    <!-- DIÁLOGO -->
+
+    <div
+        id="dialogue"
+        class="hidden"
+    >
+
+        <div
+            id="dialogue-name"
+        ></div>
+
+        <div
+            id="dialogue-text"
+        ></div>
+
+        <button
+            id="dialogue-close"
+        >
+            CONTINUAR
+        </button>
+
+    </div>
+
+
+    <!-- INVENTARIO -->
+
+    <div
+        id="inventory-panel"
+        class="hidden"
+    >
+
+        <h2>
+            INVENTARIO
+        </h2>
+
+        <div
+            id="inventory-items"
+        ></div>
+
+        <button
+            id="inventory-close"
+        >
+            CERRAR
+        </button>
+
+    </div>
+
+</div>
+
+
+<script src="game.js"></script>
 
 </body>
+
 </html>
