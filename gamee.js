@@ -1,7 +1,8 @@
-/* =====================================================
+/* =========================================================
    LOS SECRETOS DEL CHAÑAR
-   GAME.JS — VERSIÓN 0.5
-===================================================== */
+   V0.8
+   MAPA + HISTORIA + EXPLORACIÓN
+========================================================= */
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
@@ -9,238 +10,57 @@ const ctx = canvas.getContext("2d");
 const minimap = document.getElementById("minimap");
 const miniCtx = minimap.getContext("2d");
 
-
-/* =====================================================
+/* =========================================================
    CONFIGURACIÓN
-===================================================== */
+========================================================= */
 
-const WORLD_WIDTH = 3200;
-const WORLD_HEIGHT = 2200;
-
-const keys = {};
+const WORLD_WIDTH = 5200;
+const WORLD_HEIGHT = 3600;
 
 let gameStarted = false;
-let worldTime = 0;
 
-
-/* =====================================================
-   CANVAS
-===================================================== */
-
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-
-window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
-
-
-/* =====================================================
-   CÁMARA
-===================================================== */
+const keys = {};
 
 const camera = {
     x: 0,
     y: 0,
-    smooth: 0.10
+    smooth: 0.08
 };
 
-
-/* =====================================================
+/* =========================================================
    JUGADOR
-===================================================== */
+========================================================= */
 
 const player = {
-    x: 1400,
-    y: 1050,
+    x: 2500,
+    y: 1750,
 
     width: 30,
     height: 30,
 
-    speed: 4.5,
+    speed: 4.2,
 
     moving: false,
-    frame: 0
+    frame: 0,
+
+    direction: "down"
 };
 
-
-/* =====================================================
-   EDIFICIOS
-===================================================== */
-
-const buildings = [
-
-    {
-        x: 350,
-        y: 350,
-        width: 380,
-        height: 220,
-        color: "#b56c4d",
-        name: "ESCUELA"
-    },
-
-    {
-        x: 2150,
-        y: 400,
-        width: 420,
-        height: 220,
-        color: "#806b58",
-        name: "RADIO OCARINA"
-    },
-
-    {
-        x: 350,
-        y: 1400,
-        width: 330,
-        height: 210,
-        color: "#9d8068",
-        name: "ALMACÉN"
-    },
-
-    {
-        x: 2200,
-        y: 1450,
-        width: 360,
-        height: 210,
-        color: "#98725b",
-        name: "CASA"
-    },
-
-    {
-        x: 1200,
-        y: 100,
-        width: 380,
-        height: 210,
-        color: "#8e715d",
-        name: "MUSEO"
-    }
-
-];
-
-
-/* =====================================================
-   ÁRBOLES
-===================================================== */
-
-const trees = [
-
-    [150, 150],
-    [900, 180],
-    [1750, 160],
-    [2850, 200],
-
-    [180, 900],
-    [850, 600],
-    [1800, 700],
-    [2900, 900],
-
-    [200, 1900],
-    [900, 1850],
-    [1800, 1900],
-    [2900, 1850]
-
-];
-
-
-/* =====================================================
-   NPC
-===================================================== */
-
-const npcs = [
-
-    {
-        x: 1000,
-        y: 920,
-
-        name: "Don Pedro",
-
-        text:
-            "Hace años que vivo acá. " +
-            "Este pueblo guarda más historias " +
-            "de las que imaginás.",
-
-        mission: true
-    },
-
-    {
-        x: 1700,
-        y: 1100,
-
-        name: "María",
-
-        text:
-            "Si encontrás una fotografía antigua, " +
-            "no la dejes tirada. " +
-            "Puede contar una historia."
-    },
-
-    {
-        x: 2050,
-        y: 900,
-
-        name: "Julián",
-
-        text:
-            "La radio siempre fue una forma " +
-            "de unir a la gente del pueblo."
-    }
-
-];
-
-
-/* =====================================================
-   OBJETOS
-===================================================== */
-
-const objects = [
-
-    {
-        x: 760,
-        y: 1120,
-
-        type: "photo",
-
-        name: "Fotografía antigua",
-
-        collected: false
-    },
-
-    {
-        x: 1850,
-        y: 1250,
-
-        type: "document",
-
-        name: "Documento antiguo",
-
-        collected: false
-    },
-
-    {
-        x: 1500,
-        y: 500,
-
-        type: "photo",
-
-        name: "Fotografía del pueblo",
-
-        collected: false
-    }
-
-];
-
-
-/* =====================================================
-   INVENTARIO
-===================================================== */
+/* =========================================================
+   ESTADO
+========================================================= */
 
 const inventory = [];
 
+let reputation = 0;
 
-/* =====================================================
+let worldMinutes = 8 * 60;
+
+const discoveredZones = new Set();
+
+/* =========================================================
    MISIÓN
-===================================================== */
+========================================================= */
 
 const mission = {
 
@@ -251,88 +71,507 @@ const mission = {
     title: "La fotografía perdida",
 
     description:
-        "Encontrá la fotografía " +
-        "que perdió Don Pedro."
-
+        "Don Pedro perdió una fotografía antigua. " +
+        "Encontrala y descubrí qué historia guarda."
 };
 
+/* =========================================================
+   ZONAS
+========================================================= */
 
-/* =====================================================
-   UTILIDADES
-===================================================== */
+const zones = [
 
-function distance(a, b) {
+    {
+        id: "centro",
 
-    return Math.hypot(
-        a.x - b.x,
-        a.y - b.y
-    );
+        x: 2050,
+        y: 1350,
+        width: 1000,
+        height: 800,
+
+        name: "Centro de San Patricio del Chañar",
+
+        color: "#78985d"
+    },
+
+    {
+        id: "chacras",
+
+        x: 500,
+        y: 1250,
+        width: 1300,
+        height: 1500,
+
+        name: "Zona de chacras",
+
+        color: "#8ca56a"
+    },
+
+    {
+        id: "vinedos",
+
+        x: 3300,
+        y: 900,
+        width: 1500,
+        height: 1100,
+
+        name: "Zona de viñedos",
+
+        color: "#718c56"
+    },
+
+    {
+        id: "rio",
+
+        x: 0,
+        y: 3000,
+        width: WORLD_WIDTH,
+        height: 250,
+
+        name: "Río Neuquén",
+
+        color: "#4b879b"
+    },
+
+    {
+        id: "barda",
+
+        x: 0,
+        y: 0,
+        width: WORLD_WIDTH,
+        height: 700,
+
+        name: "Bardas y miradores",
+
+        color: "#8f7b61"
+    }
+
+];
+
+/* =========================================================
+   EDIFICIOS
+========================================================= */
+
+const buildings = [
+
+    {
+        x: 2360,
+        y: 1450,
+        width: 380,
+        height: 230,
+
+        name: "MUNICIPALIDAD",
+
+        color: "#9a765b"
+    },
+
+    {
+        x: 1500,
+        y: 1550,
+        width: 330,
+        height: 210,
+
+        name: "ESCUELA 273",
+
+        color: "#aa7658"
+    },
+
+    {
+        x: 2850,
+        y: 1550,
+        width: 390,
+        height: 220,
+
+        name: "CENTRO CULTURAL",
+
+        color: "#82705d"
+    },
+
+    {
+        x: 2550,
+        y: 2200,
+        width: 390,
+        height: 220,
+
+        name: "CLUB ATLÉTICO",
+
+        color: "#7c6656"
+    },
+
+    {
+        x: 3550,
+        y: 1100,
+        width: 450,
+        height: 230,
+
+        name: "BODEGA",
+
+        color: "#795c4b"
+    },
+
+    {
+        x: 750,
+        y: 1750,
+        width: 350,
+        height: 200,
+
+        name: "CHACRA",
+
+        color: "#987653"
+    },
+
+    {
+        x: 4200,
+        y: 2500,
+        width: 360,
+        height: 210,
+
+        name: "RADIO",
+
+        color: "#716458"
+    }
+
+];
+
+/* =========================================================
+   NPC
+========================================================= */
+
+const npcs = [
+
+    {
+        id: "pedro",
+
+        x: 2150,
+        y: 1900,
+
+        name: "Don Pedro",
+
+        text:
+            "Hace años que vivo acá. " +
+            "Si querés conocer el Chañar, " +
+            "tenés que aprender a mirar el agua, " +
+            "la tierra y las historias de su gente.",
+
+        mission: true
+    },
+
+    {
+        id: "maria",
+
+        x: 2750,
+        y: 2050,
+
+        name: "María",
+
+        text:
+            "Las fotografías viejas son como " +
+            "pequeñas ventanas. A veces muestran " +
+            "lugares que ya no existen."
+    },
+
+    {
+        id: "julian",
+
+        x: 4300,
+        y: 2600,
+
+        name: "Julián",
+
+        text:
+            "La radio siempre tuvo una función " +
+            "importante: hacer que la gente se entere " +
+            "de lo que pasa."
+    },
+
+    {
+        id: "productor",
+
+        x: 1100,
+        y: 2050,
+
+        name: "Don Ernesto",
+
+        text:
+            "Acá el agua cambia todo. " +
+            "Sin riego, esta tierra sería otra."
+    }
+
+];
+
+/* =========================================================
+   OBJETOS
+========================================================= */
+
+const objects = [
+
+    {
+        id: "foto1",
+
+        x: 1900,
+        y: 1900,
+
+        type: "photo",
+
+        name: "Fotografía antigua",
+
+        description:
+            "Una fotografía que parece mostrar " +
+            "una escena antigua del pueblo.",
+
+        collected: false
+    },
+
+    {
+        id: "documento1",
+
+        x: 1250,
+        y: 2600,
+
+        type: "document",
+
+        name: "Documento de riego",
+
+        description:
+            "Un documento relacionado con " +
+            "la transformación productiva del territorio.",
+
+        collected: false
+    },
+
+    {
+        id: "foto2",
+
+        x: 3100,
+        y: 1300,
+
+        type: "photo",
+
+        name: "Fotografía del pueblo",
+
+        description:
+            "Una imagen que parece pertenecer " +
+            "a los primeros años del pueblo.",
+
+        collected: false
+    },
+
+    {
+        id: "documento2",
+
+        x: 2700,
+        y: 2600,
+
+        type: "document",
+
+        name: "Documento histórico",
+
+        description:
+            "Un documento todavía sin investigar.",
+
+        collected: false
+    }
+
+];
+
+/* =========================================================
+   ÁRBOLES
+========================================================= */
+
+const trees = [];
+
+for (let i = 0; i < 130; i++) {
+
+    let x =
+        150 +
+        Math.random() *
+        (WORLD_WIDTH - 300);
+
+    let y =
+        800 +
+        Math.random() *
+        2100;
+
+    trees.push({
+        x,
+        y
+    });
+}
+
+/* =========================================================
+   VIÑEDOS
+========================================================= */
+
+const vineyards = [
+
+    {
+        x: 3450,
+        y: 1450,
+        rows: 14,
+        cols: 24
+    },
+
+    {
+        x: 700,
+        y: 900,
+        rows: 12,
+        cols: 18
+    },
+
+    {
+        x: 900,
+        y: 2800,
+        rows: 10,
+        cols: 20
+    }
+
+];
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+function resizeCanvas() {
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
 }
 
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+resizeCanvas();
+
+/* =========================================================
+   TECLADO
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    e => {
+
+        const key = e.key.toLowerCase();
+
+        keys[key] = true;
+
+        if (
+            [
+                "w",
+                "a",
+                "s",
+                "d",
+                "arrowup",
+                "arrowdown",
+                "arrowleft",
+                "arrowright",
+                " "
+            ].includes(key)
+        ) {
+
+            e.preventDefault();
+
+        }
+
+        if (key === "e") {
+
+            interact();
+
+        }
+
+        if (key === "m") {
+
+            toggleInventory();
+
+        }
+
+    }
+);
+
+document.addEventListener(
+    "keyup",
+    e => {
+
+        keys[
+            e.key.toLowerCase()
+        ] = false;
+
+    }
+);
+
+/* =========================================================
+   UTILIDADES
+========================================================= */
+
+function distance(a, b) {
+
+    const ax =
+        a.x + (a.width || 0) / 2;
+
+    const ay =
+        a.y + (a.height || 0) / 2;
+
+    const bx =
+        b.x + (b.width || 0) / 2;
+
+    const by =
+        b.y + (b.height || 0) / 2;
+
+    return Math.hypot(
+        ax - bx,
+        ay - by
+    );
+
+}
 
 function collision(a, b) {
 
     return (
 
-        a.x < b.x + b.width &&
-        a.x + a.width > b.x &&
-        a.y < b.y + b.height &&
-        a.y + a.height > b.y
+        a.x <
+        b.x + b.width &&
+
+        a.x + a.width >
+        b.x &&
+
+        a.y <
+        b.y + b.height &&
+
+        a.y + a.height >
+        b.y
 
     );
 
 }
 
-
-/* =====================================================
-   TECLADO
-===================================================== */
-
-document.addEventListener("keydown", function(e) {
-
-    const key = e.key.toLowerCase();
-
-    keys[key] = true;
-
-    if (key === "e") {
-        interact();
-    }
-
-    if (key === "m") {
-        toggleInventory();
-    }
-
-});
-
-
-document.addEventListener("keyup", function(e) {
-
-    keys[e.key.toLowerCase()] = false;
-
-});
-
-
-/* =====================================================
+/* =========================================================
    MOVIMIENTO
-===================================================== */
+========================================================= */
 
 function canMove(x, y) {
 
     const test = {
 
-        x: x,
-        y: y,
+        x,
+        y,
 
         width: player.width,
         height: player.height
 
     };
 
+    for (
+        const building of buildings
+    ) {
 
-    for (const building of buildings) {
-
-        if (collision(test, building)) {
+        if (
+            collision(
+                test,
+                building
+            )
+        ) {
 
             return false;
 
@@ -344,91 +583,119 @@ function canMove(x, y) {
 
 }
 
-
 function updatePlayer() {
 
     let dx = 0;
     let dy = 0;
 
+    if (
+        keys["w"] ||
+        keys["arrowup"]
+    ) {
 
-    if (keys["w"] || keys["arrowup"]) {
         dy -= player.speed;
+
+        player.direction = "up";
+
     }
 
-    if (keys["s"] || keys["arrowdown"]) {
+    if (
+        keys["s"] ||
+        keys["arrowdown"]
+    ) {
+
         dy += player.speed;
+
+        player.direction = "down";
+
     }
 
-    if (keys["a"] || keys["arrowleft"]) {
+    if (
+        keys["a"] ||
+        keys["arrowleft"]
+    ) {
+
         dx -= player.speed;
+
+        player.direction = "left";
+
     }
 
-    if (keys["d"] || keys["arrowright"]) {
+    if (
+        keys["d"] ||
+        keys["arrowright"]
+    ) {
+
         dx += player.speed;
+
+        player.direction = "right";
+
     }
-
-
-    /* Evita que diagonal sea más rápida */
 
     if (dx !== 0 && dy !== 0) {
 
-        const factor = 1 / Math.sqrt(2);
-
-        dx *= factor;
-        dy *= factor;
+        dx *= .707;
+        dy *= .707;
 
     }
-
 
     player.moving =
         dx !== 0 ||
         dy !== 0;
 
-
     if (player.moving) {
 
-        player.frame += 0.15;
+        player.frame += .18;
 
     }
 
-
-    if (canMove(player.x + dx, player.y)) {
+    if (
+        canMove(
+            player.x + dx,
+            player.y
+        )
+    ) {
 
         player.x += dx;
 
     }
 
-
-    if (canMove(player.x, player.y + dy)) {
+    if (
+        canMove(
+            player.x,
+            player.y + dy
+        )
+    ) {
 
         player.y += dy;
 
     }
 
+    player.x =
+        Math.max(
+            0,
+            Math.min(
+                WORLD_WIDTH -
+                player.width,
+                player.x
+            )
+        );
 
-    player.x = Math.max(
-        0,
-        Math.min(
-            WORLD_WIDTH - player.width,
-            player.x
-        )
-    );
-
-
-    player.y = Math.max(
-        0,
-        Math.min(
-            WORLD_HEIGHT - player.height,
-            player.y
-        )
-    );
+    player.y =
+        Math.max(
+            0,
+            Math.min(
+                WORLD_HEIGHT -
+                player.height,
+                player.y
+            )
+        );
 
 }
 
-
-/* =====================================================
+/* =========================================================
    CÁMARA
-===================================================== */
+========================================================= */
 
 function updateCamera() {
 
@@ -440,60 +707,49 @@ function updateCamera() {
         player.y -
         canvas.height / 2;
 
-
     camera.x +=
-        (targetX - camera.x) *
+        (
+            targetX -
+            camera.x
+        ) *
         camera.smooth;
-
 
     camera.y +=
-        (targetY - camera.y) *
+        (
+            targetY -
+            camera.y
+        ) *
         camera.smooth;
 
-
-    const maxCameraX =
+    camera.x =
         Math.max(
             0,
-            WORLD_WIDTH - canvas.width
+            Math.min(
+                WORLD_WIDTH -
+                canvas.width,
+                camera.x
+            )
         );
 
-
-    const maxCameraY =
+    camera.y =
         Math.max(
             0,
-            WORLD_HEIGHT - canvas.height
+            Math.min(
+                WORLD_HEIGHT -
+                canvas.height,
+                camera.y
+            )
         );
-
-
-    camera.x = Math.max(
-        0,
-        Math.min(
-            maxCameraX,
-            camera.x
-        )
-    );
-
-
-    camera.y = Math.max(
-        0,
-        Math.min(
-            maxCameraY,
-            camera.y
-        )
-    );
 
 }
 
-
-/* =====================================================
+/* =========================================================
    MUNDO
-===================================================== */
+========================================================= */
 
 function drawWorld() {
 
-    /* Tierra */
-
-    ctx.fillStyle = "#c9ac77";
+    ctx.fillStyle = "#c7aa76";
 
     ctx.fillRect(
         0,
@@ -502,115 +758,148 @@ function drawWorld() {
         WORLD_HEIGHT
     );
 
+    /* BARDAS */
 
-    /* Caminos */
-
-    ctx.fillStyle = "#9e8157";
+    ctx.fillStyle = "#8c775e";
 
     ctx.fillRect(
         0,
-        850,
+        0,
+        WORLD_WIDTH,
+        700
+    );
+
+    /* CAMINOS */
+
+    ctx.fillStyle = "#a0845a";
+
+    ctx.fillRect(
+        0,
+        1750,
         WORLD_WIDTH,
         180
     );
 
-
     ctx.fillRect(
-        1500,
+        2500,
         0,
         180,
         WORLD_HEIGHT
     );
 
-
-    /* Plaza */
-
-    ctx.fillStyle = "#709655";
-
     ctx.fillRect(
-        1250,
         700,
-        650,
-        380
+        900,
+        1300,
+        130
     );
 
+    /* PLAZA */
 
-    /* Fuente */
+    ctx.fillStyle = "#71965c";
 
-    ctx.fillStyle = "#7ba0a5";
+    ctx.fillRect(
+        2050,
+        1350,
+        1000,
+        800
+    );
+
+    /* FUENTE */
+
+    ctx.fillStyle = "#6997a2";
 
     ctx.beginPath();
 
     ctx.arc(
-        1575,
-        890,
-        65,
+        2550,
+        1750,
+        85,
         0,
         Math.PI * 2
     );
 
     ctx.fill();
 
+    /* RÍO */
 
-    /* Canal */
-
-    ctx.fillStyle = "#57899a";
+    ctx.fillStyle = "#4c899d";
 
     ctx.fillRect(
         0,
-        1750,
+        3000,
         WORLD_WIDTH,
-        45
+        250
     );
 
+    /* BARRANCA DEL RÍO */
+
+    ctx.fillStyle = "#6f6a51";
+
+    ctx.fillRect(
+        0,
+        2920,
+        WORLD_WIDTH,
+        80
+    );
+
+    /* MONTAÑAS */
 
     drawMountains();
 
+    /* VIÑEDOS */
 
-    for (const tree of trees) {
+    for (
+        const vineyard of vineyards
+    ) {
 
-        drawTree(
-            tree[0],
-            tree[1]
+        drawVineyard(
+            vineyard
         );
 
     }
 
+    /* ÁRBOLES */
 
-    drawVineyard(400, 720);
+    for (
+        const tree of trees
+    ) {
 
-    drawVineyard(2100, 750);
+        drawTree(
+            tree.x,
+            tree.y
+        );
+
+    }
 
 }
 
-
-/* =====================================================
-   CERROS
-===================================================== */
+/* =========================================================
+   MONTAÑAS
+========================================================= */
 
 function drawMountains() {
 
-    ctx.fillStyle = "#8e795f";
+    ctx.fillStyle = "#756957";
 
     ctx.beginPath();
 
-    ctx.moveTo(0, 300);
+    ctx.moveTo(0, 700);
 
-    ctx.lineTo(350, 80);
+    ctx.lineTo(450, 220);
+    ctx.lineTo(900, 620);
 
-    ctx.lineTo(700, 310);
+    ctx.lineTo(1400, 170);
+    ctx.lineTo(1900, 620);
 
-    ctx.lineTo(1100, 100);
+    ctx.lineTo(2450, 240);
+    ctx.lineTo(3000, 620);
 
-    ctx.lineTo(1450, 300);
+    ctx.lineTo(3650, 150);
+    ctx.lineTo(4300, 600);
 
-    ctx.lineTo(1800, 70);
-
-    ctx.lineTo(2200, 300);
-
-    ctx.lineTo(2700, 100);
-
-    ctx.lineTo(WORLD_WIDTH, 320);
+    ctx.lineTo(4800, 220);
+    ctx.lineTo(WORLD_WIDTH, 650);
 
     ctx.lineTo(WORLD_WIDTH, 0);
 
@@ -622,35 +911,43 @@ function drawMountains() {
 
 }
 
-
-/* =====================================================
+/* =========================================================
    ÁRBOLES
-===================================================== */
+========================================================= */
 
 function drawTree(x, y) {
 
-    /* Tronco */
-
-    ctx.fillStyle = "#65442f";
+    ctx.fillStyle = "#644631";
 
     ctx.fillRect(
-        x - 9,
+        x - 7,
         y,
-        18,
-        45
+        14,
+        40
     );
 
-
-    /* Copa */
-
-    ctx.fillStyle = "#41683c";
+    ctx.fillStyle = "#45683e";
 
     ctx.beginPath();
 
     ctx.arc(
         x,
-        y,
-        40,
+        y - 5,
+        32,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+    ctx.fillStyle = "#557b47";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x - 18,
+        y + 5,
+        23,
         0,
         Math.PI * 2
     );
@@ -659,53 +956,58 @@ function drawTree(x, y) {
 
 }
 
-
-/* =====================================================
+/* =========================================================
    VIÑEDOS
-===================================================== */
+========================================================= */
 
-function drawVineyard(x, y) {
+function drawVineyard(vineyard) {
 
-    for (let row = 0; row < 8; row++) {
+    for (
+        let row = 0;
+        row < vineyard.rows;
+        row++
+    ) {
 
-        for (let col = 0; col < 12; col++) {
+        for (
+            let col = 0;
+            col < vineyard.cols;
+            col++
+        ) {
 
-            const px =
-                x +
-                col * 34;
+            const x =
+                vineyard.x +
+                col * 45;
 
-            const py =
-                y +
-                row * 35;
+            const y =
+                vineyard.y +
+                row * 38;
 
-
-            ctx.strokeStyle = "#48643d";
+            ctx.strokeStyle = "#536a3e";
 
             ctx.lineWidth = 3;
 
             ctx.beginPath();
 
             ctx.moveTo(
-                px,
-                py
+                x,
+                y
             );
 
             ctx.lineTo(
-                px,
-                py + 22
+                x,
+                y + 25
             );
 
             ctx.stroke();
 
-
-            ctx.fillStyle = "#4f7a43";
+            ctx.fillStyle = "#4e753f";
 
             ctx.beginPath();
 
             ctx.arc(
-                px,
-                py,
-                9,
+                x,
+                y,
+                10,
                 0,
                 Math.PI * 2
             );
@@ -718,29 +1020,25 @@ function drawVineyard(x, y) {
 
 }
 
-
-/* =====================================================
+/* =========================================================
    EDIFICIOS
-===================================================== */
+========================================================= */
 
 function drawBuildings() {
 
-    for (const building of buildings) {
-
-        /* Sombra */
+    for (
+        const building of buildings
+    ) {
 
         ctx.fillStyle =
-            "rgba(0,0,0,0.2)";
+            "rgba(0,0,0,.25)";
 
         ctx.fillRect(
-            building.x + 8,
-            building.y + 10,
+            building.x + 12,
+            building.y + 12,
             building.width,
             building.height
         );
-
-
-        /* Edificio */
 
         ctx.fillStyle =
             building.color;
@@ -752,11 +1050,9 @@ function drawBuildings() {
             building.height
         );
 
+        /* techo */
 
-        /* Techo */
-
-        ctx.fillStyle =
-            "#49352d";
+        ctx.fillStyle = "#49372e";
 
         ctx.beginPath();
 
@@ -768,12 +1064,13 @@ function drawBuildings() {
         ctx.lineTo(
             building.x +
             building.width / 2,
-            building.y - 60
+            building.y - 65
         );
 
         ctx.lineTo(
             building.x +
-            building.width + 15,
+            building.width +
+            15,
             building.y
         );
 
@@ -781,58 +1078,50 @@ function drawBuildings() {
 
         ctx.fill();
 
+        /* puerta */
 
-        /* Puerta */
-
-        ctx.fillStyle =
-            "#49352d";
+        ctx.fillStyle = "#49372e";
 
         ctx.fillRect(
-
             building.x +
-            building.width / 2 - 20,
+            building.width / 2 -
+            20,
 
             building.y +
-            building.height - 70,
+            building.height -
+            75,
 
             40,
-            70
-
+            75
         );
 
+        /* ventanas */
 
-        /* Ventanas */
-
-        ctx.fillStyle =
-            "#b9d0c9";
-
+        ctx.fillStyle = "#b6d1cc";
 
         ctx.fillRect(
-            building.x + 35,
+            building.x + 40,
             building.y + 40,
-            45,
+            55,
             45
         );
-
 
         ctx.fillRect(
             building.x +
-            building.width - 80,
+            building.width -
+            95,
 
             building.y + 40,
 
-            45,
+            55,
             45
         );
 
+        /* cartel */
 
-        /* Nombre */
+        ctx.fillStyle = "#fff";
 
-        ctx.fillStyle =
-            "white";
-
-        ctx.font =
-            "bold 18px Arial";
+        ctx.font = "bold 17px Arial";
 
         ctx.fillText(
             building.name,
@@ -846,164 +1135,154 @@ function drawBuildings() {
 
 }
 
-
-/* =====================================================
+/* =========================================================
    NPC
-===================================================== */
+========================================================= */
 
 function drawNPC(npc) {
 
-    /* Sombra */
+    const near =
+        distance(
+            player,
+            npc
+        ) < 110;
 
-    ctx.fillStyle =
-        "rgba(0,0,0,0.2)";
+    /* cuerpo */
 
-    ctx.beginPath();
-
-    ctx.ellipse(
-        npc.x,
-        npc.y + 18,
-        18,
-        6,
-        0,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    /* Cuerpo */
-
-    ctx.fillStyle =
-        "#634261";
+    ctx.fillStyle = "#60435b";
 
     ctx.beginPath();
 
     ctx.arc(
         npc.x,
         npc.y,
-        15,
+        17,
         0,
         Math.PI * 2
     );
 
     ctx.fill();
 
+    /* cabeza */
 
-    /* Cabeza */
-
-    ctx.fillStyle =
-        "#e1b18b";
+    ctx.fillStyle = "#ddb08a";
 
     ctx.beginPath();
 
     ctx.arc(
         npc.x,
-        npc.y - 23,
-        10,
+        npc.y - 25,
+        11,
         0,
         Math.PI * 2
     );
 
     ctx.fill();
 
+    /* nombre */
 
-    /* Nombre */
+    ctx.fillStyle = "#fff";
 
-    ctx.fillStyle =
-        "white";
+    ctx.font = "14px Arial";
 
-    ctx.font =
-        "14px Arial";
+    ctx.textAlign = "center";
 
     ctx.fillText(
         npc.name,
-        npc.x - 35,
-        npc.y + 40
+        npc.x,
+        npc.y + 42
     );
 
-
-    /* Misión */
+    /* misión */
 
     if (
         npc.mission &&
         !mission.completed
     ) {
 
-        ctx.fillStyle =
-            "#f4c542";
+        ctx.fillStyle = "#f2c94c";
 
-        ctx.font =
-            "bold 22px Arial";
+        ctx.font = "bold 25px Arial";
 
         ctx.fillText(
             "!",
-            npc.x - 5,
-            npc.y - 45
+            npc.x,
+            npc.y - 48
         );
 
     }
 
+    ctx.textAlign = "left";
+
+    return near;
+
 }
 
-
-/* =====================================================
+/* =========================================================
    OBJETOS
-===================================================== */
+========================================================= */
 
 function drawObjects() {
 
-    for (const object of objects) {
+    for (
+        const object of objects
+    ) {
 
-        if (object.collected) {
+        if (
+            object.collected
+        ) {
+
             continue;
+
         }
 
+        const pulse =
+            Math.sin(
+                Date.now() / 250
+            ) * 3;
 
-        ctx.save();
+        ctx.font = "27px Arial";
 
-        ctx.font =
-            "26px Arial";
+        ctx.fillText(
+            object.type === "photo"
+                ? "📷"
+                : "📜",
 
-        ctx.shadowColor =
-            "rgba(0,0,0,0.4)";
+            object.x,
+            object.y + pulse
+        );
 
-        ctx.shadowBlur = 6;
+        if (
+            distance(
+                player,
+                object
+            ) < 100
+        ) {
 
+            ctx.fillStyle =
+                "rgba(255,220,130,.35)";
 
-        if (object.type === "photo") {
+            ctx.beginPath();
 
-            ctx.fillText(
-                "📷",
-                object.x,
-                object.y
+            ctx.arc(
+                object.x + 10,
+                object.y - 8,
+                27,
+                0,
+                Math.PI * 2
             );
 
-        }
-
-
-        if (object.type === "document") {
-
-            ctx.fillText(
-                "📜",
-                object.x,
-                object.y
-            );
+            ctx.fill();
 
         }
-
-
-        ctx.restore();
 
     }
 
 }
 
-
-/* =====================================================
+/* =========================================================
    JUGADOR
-===================================================== */
+========================================================= */
 
 function drawPlayer() {
 
@@ -1014,24 +1293,19 @@ function drawPlayer() {
             ) * 3
             : 0;
 
-
     const x = player.x;
+    const y = player.y + bob;
 
-    const y =
-        player.y +
-        bob;
-
-
-    /* Sombra */
+    /* sombra */
 
     ctx.fillStyle =
-        "rgba(0,0,0,0.25)";
+        "rgba(0,0,0,.3)";
 
     ctx.beginPath();
 
     ctx.ellipse(
         x + 15,
-        y + 32,
+        y + 33,
         22,
         7,
         0,
@@ -1041,49 +1315,43 @@ function drawPlayer() {
 
     ctx.fill();
 
+    /* cuerpo */
 
-    /* Cuerpo */
-
-    ctx.fillStyle =
-        "#263b4c";
+    ctx.fillStyle = "#263d50";
 
     ctx.fillRect(
         x,
         y,
         30,
-        30
+        32
     );
 
+    /* cabeza */
 
-    /* Cabeza */
-
-    ctx.fillStyle =
-        "#e1b18b";
+    ctx.fillStyle = "#dfae88";
 
     ctx.beginPath();
 
     ctx.arc(
         x + 15,
-        y - 10,
-        11,
+        y - 11,
+        12,
         0,
         Math.PI * 2
     );
 
     ctx.fill();
 
+    /* pelo */
 
-    /* Pelo */
-
-    ctx.fillStyle =
-        "#33251e";
+    ctx.fillStyle = "#30231d";
 
     ctx.beginPath();
 
     ctx.arc(
         x + 15,
-        y - 16,
-        11,
+        y - 17,
+        12,
         Math.PI,
         Math.PI * 2
     );
@@ -1092,26 +1360,29 @@ function drawPlayer() {
 
 }
 
-
-/* =====================================================
+/* =========================================================
    INTERACCIÓN
-===================================================== */
+========================================================= */
 
 function interact() {
 
     /* NPC */
 
-    for (const npc of npcs) {
+    for (
+        const npc of npcs
+    ) {
 
         if (
-            distance(player, npc) < 80
+            distance(
+                player,
+                npc
+            ) < 100
         ) {
 
             showDialogue(
                 npc.name,
                 npc.text
             );
-
 
             if (
                 npc.mission &&
@@ -1121,11 +1392,13 @@ function interact() {
 
                 mission.active = true;
 
-                setMissionHUD();
+                reputation += 1;
+
+                updateHUD();
 
                 setTimeout(
                     showMission,
-                    500
+                    400
                 );
 
             }
@@ -1136,21 +1409,30 @@ function interact() {
 
     }
 
+    /* OBJETOS */
 
-    /* Objetos */
-
-    for (const object of objects) {
-
-        if (object.collected) {
-            continue;
-        }
-
+    for (
+        const object of objects
+    ) {
 
         if (
-            distance(player, object) < 70
+            object.collected
         ) {
 
-            collectObject(object);
+            continue;
+
+        }
+
+        if (
+            distance(
+                player,
+                object
+            ) < 90
+        ) {
+
+            collectObject(
+                object
+            );
 
             return;
 
@@ -1160,235 +1442,115 @@ function interact() {
 
 }
 
-
-/* =====================================================
+/* =========================================================
    COLECCIONAR
-===================================================== */
+========================================================= */
 
 function collectObject(object) {
 
     object.collected = true;
 
-    inventory.push(object.name);
+    inventory.push({
+        name: object.name,
+        description: object.description
+    });
+
+    reputation += 2;
 
     updateInventory();
 
-
-    const photoCount =
-        inventory.filter(
-            item =>
-                item.includes("Fotografía")
-        ).length;
-
-
-    const documentCount =
-        inventory.filter(
-            item =>
-                item.includes("Documento")
-        ).length;
-
-
-    const photoElement =
-        document.getElementById(
-            "photo-count"
-        );
-
-
-    const documentElement =
-        document.getElementById(
-            "document-count"
-        );
-
-
-    if (photoElement) {
-
-        photoElement.textContent =
-            photoCount;
-
-    }
-
-
-    if (documentElement) {
-
-        documentElement.textContent =
-            documentCount;
-
-    }
-
-
-    /* Misión */
+    updateHUD();
 
     if (
         mission.active &&
         object.type === "photo"
     ) {
 
+        mission.active = false;
         mission.completed = true;
 
-        mission.active = false;
+        reputation += 5;
 
         setMissionHUD();
 
-
         setTimeout(
-            function() {
+            () => {
 
                 showDialogue(
                     "MISIÓN COMPLETADA",
 
-                    "Encontraste una fotografía " +
-                    "que puede ayudarnos a reconstruir " +
-                    "la memoria del pueblo."
+                    "Encontraste la fotografía. " +
+                    "Ahora comienza una investigación " +
+                    "mucho más grande sobre la memoria " +
+                    "del pueblo."
                 );
 
             },
-            300
+            350
         );
 
     }
 
 }
 
-
-/* =====================================================
+/* =========================================================
    DIÁLOGOS
-===================================================== */
+========================================================= */
 
-function showDialogue(name, text) {
+function showDialogue(
+    name,
+    text
+) {
 
-    const nameElement =
-        document.getElementById(
+    document
+        .getElementById(
             "dialogue-name"
-        );
+        )
+        .textContent = name;
 
-
-    const textElement =
-        document.getElementById(
+    document
+        .getElementById(
             "dialogue-text"
-        );
+        )
+        .textContent = text;
 
-
-    const dialogue =
-        document.getElementById(
+    document
+        .getElementById(
             "dialogue"
-        );
-
-
-    if (!nameElement ||
-        !textElement ||
-        !dialogue) {
-
-        return;
-
-    }
-
-
-    nameElement.textContent =
-        name;
-
-    textElement.textContent =
-        text;
-
-    dialogue.classList.remove(
-        "hidden"
-    );
+        )
+        .classList
+        .remove("hidden");
 
 }
 
-
-const dialogueClose =
-    document.getElementById(
-        "dialogue-close"
-    );
-
-
-if (dialogueClose) {
-
-    dialogueClose.addEventListener(
-        "click",
-        function() {
-
-            document
-                .getElementById("dialogue")
-                .classList
-                .add("hidden");
-
-        }
-    );
-
-}
-
-
-/* =====================================================
+/* =========================================================
    MISIONES
-===================================================== */
+========================================================= */
 
 function showMission() {
 
-    const title =
-        document.getElementById(
+    document
+        .getElementById(
             "mission-title"
-        );
-
-
-    const description =
-        document.getElementById(
-            "mission-description"
-        );
-
-
-    const panel =
-        document.getElementById(
-            "mission-panel"
-        );
-
-
-    if (!title ||
-        !description ||
-        !panel) {
-
-        return;
-
-    }
-
-
-    title.textContent =
+        )
+        .textContent =
         mission.title;
 
-    description.textContent =
+    document
+        .getElementById(
+            "mission-description"
+        )
+        .textContent =
         mission.description;
 
-    panel.classList.remove(
-        "hidden"
-    );
+    document
+        .getElementById(
+            "mission-panel"
+        )
+        .classList
+        .remove("hidden");
 
 }
-
-
-const missionClose =
-    document.getElementById(
-        "mission-close"
-    );
-
-
-if (missionClose) {
-
-    missionClose.addEventListener(
-        "click",
-        function() {
-
-            document
-                .getElementById(
-                    "mission-panel"
-                )
-                .classList
-                .add("hidden");
-
-        }
-    );
-
-}
-
 
 function setMissionHUD() {
 
@@ -1397,23 +1559,20 @@ function setMissionHUD() {
             "mission-hud"
         );
 
-
-    if (!hud) {
-        return;
-    }
-
-
-    if (mission.completed) {
+    if (
+        mission.completed
+    ) {
 
         hud.textContent =
-            "✓ Misión completada";
+            "✓ Investigación iniciada";
 
         return;
 
     }
 
-
-    if (mission.active) {
+    if (
+        mission.active
+    ) {
 
         hud.textContent =
             "Misión: encontrar la fotografía";
@@ -1422,61 +1581,25 @@ function setMissionHUD() {
 
     }
 
-
     hud.textContent =
         "Explorá el pueblo";
 
 }
 
-
-/* =====================================================
+/* =========================================================
    INVENTARIO
-===================================================== */
+========================================================= */
 
 function toggleInventory() {
 
-    const panel =
-        document.getElementById(
+    document
+        .getElementById(
             "inventory-panel"
-        );
-
-
-    if (!panel) {
-        return;
-    }
-
-
-    panel.classList.toggle(
-        "hidden"
-    );
+        )
+        .classList
+        .toggle("hidden");
 
 }
-
-
-const inventoryClose =
-    document.getElementById(
-        "inventory-close"
-    );
-
-
-if (inventoryClose) {
-
-    inventoryClose.addEventListener(
-        "click",
-        function() {
-
-            document
-                .getElementById(
-                    "inventory-panel"
-                )
-                .classList
-                .add("hidden");
-
-        }
-    );
-
-}
-
 
 function updateInventory() {
 
@@ -1485,43 +1608,297 @@ function updateInventory() {
             "inventory-items"
         );
 
-
-    if (!container) {
-        return;
-    }
-
-
-    if (inventory.length === 0) {
+    if (
+        inventory.length === 0
+    ) {
 
         container.innerHTML =
-            "Inventario vacío.";
+            "Todavía no encontraste objetos.";
 
         return;
 
     }
-
 
     container.innerHTML =
         inventory
             .map(
-                item =>
-                    "• " + item
+                item => `
+                    <div style="
+                        padding:12px 0;
+                        border-bottom:1px solid #493f34;
+                    ">
+                        <strong>${item.name}</strong>
+                        <br>
+                        <small>${item.description}</small>
+                    </div>
+                `
             )
-            .join("<br>");
+            .join("");
 
 }
 
+/* =========================================================
+   HUD
+========================================================= */
 
-/* =====================================================
+function updateHUD() {
+
+    document
+        .getElementById(
+            "reputation"
+        )
+        .textContent =
+        reputation;
+
+    document
+        .getElementById(
+            "photo-count"
+        )
+        .textContent =
+        inventory.filter(
+            item =>
+                item.name.includes(
+                    "Fotografía"
+                )
+        ).length;
+
+    document
+        .getElementById(
+            "document-count"
+        )
+        .textContent =
+        inventory.filter(
+            item =>
+                item.name.includes(
+                    "Documento"
+                )
+        ).length;
+
+}
+
+/* =========================================================
+   RELOJ
+========================================================= */
+
+function updateWorldTime() {
+
+    worldMinutes += .035;
+
+    if (
+        worldMinutes >= 1440
+    ) {
+
+        worldMinutes = 0;
+
+    }
+
+    const hours =
+        Math.floor(
+            worldMinutes / 60
+        );
+
+    const minutes =
+        Math.floor(
+            worldMinutes % 60
+        );
+
+    document
+        .getElementById(
+            "clock"
+        )
+        .textContent =
+        String(hours).padStart(2, "0") +
+        ":" +
+        String(minutes).padStart(2, "0");
+
+}
+
+/* =========================================================
+   DESCUBRIMIENTO
+========================================================= */
+
+function updateDiscovery() {
+
+    for (
+        const zone of zones
+    ) {
+
+        const inside =
+
+            player.x >
+            zone.x &&
+
+            player.x <
+            zone.x + zone.width &&
+
+            player.y >
+            zone.y &&
+
+            player.y <
+            zone.y + zone.height;
+
+        if (
+            inside &&
+            !discoveredZones.has(
+                zone.id
+            )
+        ) {
+
+            discoveredZones.add(
+                zone.id
+            );
+
+            showDiscovery(
+                zone.name
+            );
+
+        }
+
+    }
+
+}
+
+function showDiscovery(name) {
+
+    const element =
+        document.getElementById(
+            "discovery"
+        );
+
+    element.textContent =
+        "NUEVO LUGAR · " +
+        name.toUpperCase();
+
+    element.classList.add("show");
+
+    setTimeout(
+        () => {
+
+            element.classList.remove(
+                "show"
+            );
+
+        },
+        2500
+    );
+
+}
+
+/* =========================================================
+   AYUDA DE INTERACCIÓN
+========================================================= */
+
+function updateInteractionHint() {
+
+    let near = false;
+
+    for (
+        const npc of npcs
+    ) {
+
+        if (
+            distance(
+                player,
+                npc
+            ) < 100
+        ) {
+
+            near = true;
+
+        }
+
+    }
+
+    for (
+        const object of objects
+    ) {
+
+        if (
+            !object.collected &&
+            distance(
+                player,
+                object
+            ) < 90
+        ) {
+
+            near = true;
+
+        }
+
+    }
+
+    document
+        .getElementById(
+            "interaction-hint"
+        )
+        .classList
+        .toggle(
+            "hidden",
+            !near
+        );
+
+}
+
+/* =========================================================
+   ILUMINACIÓN
+========================================================= */
+
+function drawLighting() {
+
+    const phase =
+        Math.sin(
+            (
+                worldMinutes /
+                1440
+            ) *
+            Math.PI *
+            2
+            -
+            Math.PI / 2
+        );
+
+    const darkness =
+        Math.max(
+            0,
+            (
+                -phase +
+                .25
+            )
+            *
+            .20
+        );
+
+    if (
+        darkness > 0
+    ) {
+
+        ctx.fillStyle =
+            `rgba(15,25,55,${darkness})`;
+
+        ctx.fillRect(
+            0,
+            0,
+            WORLD_WIDTH,
+            WORLD_HEIGHT
+        );
+
+    }
+
+}
+
+/* =========================================================
    MINIMAPA
-===================================================== */
+========================================================= */
 
 function drawMinimap() {
 
-    if (!minimap || !miniCtx) {
-        return;
-    }
+    const scaleX =
+        minimap.width /
+        WORLD_WIDTH;
 
+    const scaleY =
+        minimap.height /
+        WORLD_HEIGHT;
 
     miniCtx.clearRect(
         0,
@@ -1530,21 +1907,8 @@ function drawMinimap() {
         minimap.height
     );
 
-
-    const scaleX =
-        minimap.width /
-        WORLD_WIDTH;
-
-
-    const scaleY =
-        minimap.height /
-        WORLD_HEIGHT;
-
-
-    /* Fondo */
-
     miniCtx.fillStyle =
-        "#c9ac77";
+        "#c7aa76";
 
     miniCtx.fillRect(
         0,
@@ -1553,31 +1917,37 @@ function drawMinimap() {
         minimap.height
     );
 
-
-    /* Edificios */
+    /* río */
 
     miniCtx.fillStyle =
-        "#76594a";
+        "#4c899d";
 
+    miniCtx.fillRect(
+        0,
+        3000 * scaleY,
+        minimap.width,
+        250 * scaleY
+    );
 
-    for (const building of buildings) {
+    /* edificios */
+
+    miniCtx.fillStyle =
+        "#674c40";
+
+    for (
+        const building of buildings
+    ) {
 
         miniCtx.fillRect(
-
             building.x * scaleX,
-
             building.y * scaleY,
-
             building.width * scaleX,
-
             building.height * scaleY
-
         );
 
     }
 
-
-    /* Jugador */
+    /* jugador */
 
     miniCtx.fillStyle =
         "#ff3333";
@@ -1585,69 +1955,28 @@ function drawMinimap() {
     miniCtx.beginPath();
 
     miniCtx.arc(
-
         player.x * scaleX,
-
         player.y * scaleY,
-
         4,
-
         0,
-
         Math.PI * 2
-
     );
 
     miniCtx.fill();
 
 }
 
+/* =========================================================
+   BOTONES
+========================================================= */
 
-/* =====================================================
-   DÍA / NOCHE
-===================================================== */
-
-function drawLighting() {
-
-    worldTime += 0.0003;
-
-
-    const darkness =
-        (
-            Math.sin(worldTime) +
-            1
-        ) / 2;
-
-
-    ctx.fillStyle =
-        `rgba(20,30,70,${darkness * 0.18})`;
-
-
-    ctx.fillRect(
-        0,
-        0,
-        WORLD_WIDTH,
-        WORLD_HEIGHT
-    );
-
-}
-
-
-/* =====================================================
-   INICIO
-===================================================== */
-
-const startButton =
-    document.getElementById(
+document
+    .getElementById(
         "start-button"
-    );
-
-
-if (startButton) {
-
-    startButton.addEventListener(
+    )
+    .addEventListener(
         "click",
-        function() {
+        () => {
 
             gameStarted = true;
 
@@ -1661,12 +1990,63 @@ if (startButton) {
         }
     );
 
-}
+document
+    .getElementById(
+        "dialogue-close"
+    )
+    .addEventListener(
+        "click",
+        () => {
 
+            document
+                .getElementById(
+                    "dialogue"
+                )
+                .classList
+                .add("hidden");
 
-/* =====================================================
-   DIBUJAR
-===================================================== */
+        }
+    );
+
+document
+    .getElementById(
+        "mission-close"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            document
+                .getElementById(
+                    "mission-panel"
+                )
+                .classList
+                .add("hidden");
+
+        }
+    );
+
+document
+    .getElementById(
+        "inventory-close"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            document
+                .getElementById(
+                    "inventory-panel"
+                )
+                .classList
+                .add("hidden");
+
+        }
+    );
+
+/* =========================================================
+   DIBUJO
+========================================================= */
 
 function draw() {
 
@@ -1677,15 +2057,12 @@ function draw() {
         canvas.height
     );
 
-
     ctx.save();
-
 
     ctx.translate(
         -camera.x,
         -camera.y
     );
-
 
     drawWorld();
 
@@ -1693,30 +2070,29 @@ function draw() {
 
     drawObjects();
 
+    for (
+        const npc of npcs
+    ) {
 
-    for (const npc of npcs) {
-
-        drawNPC(npc);
+        drawNPC(
+            npc
+        );
 
     }
-
 
     drawPlayer();
 
     drawLighting();
 
-
     ctx.restore();
-
 
     drawMinimap();
 
 }
 
-
-/* =====================================================
+/* =========================================================
    MOTOR
-===================================================== */
+========================================================= */
 
 function gameLoop() {
 
@@ -1726,11 +2102,15 @@ function gameLoop() {
 
         updateCamera();
 
+        updateWorldTime();
+
+        updateDiscovery();
+
+        updateInteractionHint();
+
     }
 
-
     draw();
-
 
     requestAnimationFrame(
         gameLoop
@@ -1738,12 +2118,13 @@ function gameLoop() {
 
 }
 
-
-/* =====================================================
-   ARRANQUE
-===================================================== */
+/* =========================================================
+   INICIALIZACIÓN
+========================================================= */
 
 updateInventory();
+
+updateHUD();
 
 setMissionHUD();
 
