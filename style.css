@@ -1,6 +1,7 @@
+```css
 /* =====================================================
    LOS SECRETOS DEL CHAÑAR
-   ESTILO VISUAL
+   SISTEMA VISUAL BASE
 ===================================================== */
 
 * {
@@ -12,27 +13,30 @@
 
 html,
 body {
-
     width: 100%;
     height: 100%;
-
     overflow: hidden;
-
-    background:
-        #191713;
-
-    font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-
-    color: white;
+    background: #111;
+    font-family: Arial, Helvetica, sans-serif;
+    touch-action: none;
 }
 
-body {
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
 
-    touch-action: none;
 
+/* =====================================================
+   CONTENEDOR
+===================================================== */
+
+#game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #c9ac77;
 }
 
 
@@ -41,9 +45,7 @@ body {
 ===================================================== */
 
 #game {
-
-    position: fixed;
-
+    position: absolute;
     inset: 0;
 
     width: 100%;
@@ -51,202 +53,9 @@ body {
 
     display: block;
 
-    image-rendering:
-        auto;
+    background: #c9ac77;
 
-}
-
-
-/* =====================================================
-   PANTALLA INICIAL
-===================================================== */
-
-.screen {
-
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 100;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    background:
-
-        linear-gradient(
-            rgba(25,20,15,0.55),
-            rgba(25,20,15,0.78)
-        );
-
-    backdrop-filter:
-        blur(2px);
-
-    transition:
-        opacity .6s ease,
-        visibility .6s ease;
-
-}
-
-
-.screen.hidden {
-
-    opacity: 0;
-
-    visibility:
-        hidden;
-
-    pointer-events:
-        none;
-
-}
-
-
-.title-card {
-
-    width:
-        min(720px, 90vw);
-
-    padding:
-        50px 35px;
-
-    text-align:
-        center;
-
-    background:
-        rgba(39,31,24,.92);
-
-    border:
-        1px solid
-        rgba(232,201,145,.45);
-
-    box-shadow:
-        0 25px 80px
-        rgba(0,0,0,.65);
-
-}
-
-
-.small-title {
-
-    font-size:
-        12px;
-
-    letter-spacing:
-        5px;
-
-    color:
-        #d5b875;
-
-    margin-bottom:
-        20px;
-
-}
-
-
-.title-card h1 {
-
-    font-size:
-        clamp(38px, 8vw, 78px);
-
-    line-height:
-        .9;
-
-    letter-spacing:
-        3px;
-
-    color:
-        #f0d39a;
-
-    text-shadow:
-        3px 4px 0 #3d2b20;
-
-}
-
-
-.subtitle {
-
-    max-width:
-        540px;
-
-    margin:
-        30px auto;
-
-    line-height:
-        1.7;
-
-    color:
-        #ddd1bd;
-
-    font-size:
-        17px;
-
-}
-
-
-#start-button {
-
-    border:
-        1px solid
-        #e0bf78;
-
-    background:
-        #73543b;
-
-    color:
-        #fff5df;
-
-    padding:
-        16px 45px;
-
-    font-family:
-        inherit;
-
-    font-size:
-        16px;
-
-    letter-spacing:
-        3px;
-
-    cursor:
-        pointer;
-
-    transition:
-        transform .2s,
-        background .2s;
-
-}
-
-
-#start-button:hover {
-
-    background:
-        #8c6747;
-
-    transform:
-        translateY(-2px);
-
-}
-
-
-.controls-info {
-
-    margin-top:
-        25px;
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size:
-        11px;
-
-    opacity:
-        .65;
-
+    image-rendering: auto;
 }
 
 
@@ -255,523 +64,408 @@ body {
 ===================================================== */
 
 #hud {
+    position: absolute;
 
-    position:
-        fixed;
+    top: 0;
+    left: 0;
 
-    inset:
-        0;
+    width: 100%;
 
-    pointer-events:
-        none;
+    padding: 12px;
 
-    z-index:
-        10;
+    pointer-events: none;
 
+    z-index: 20;
 }
 
-
-.hud-top {
-
-    display:
-        flex;
-
-    justify-content:
-        space-between;
-
-    align-items:
-        center;
-
-    padding:
-        15px 20px;
-
-    background:
-        linear-gradient(
-            rgba(15,13,10,.75),
-            transparent
-        );
-
+#hud-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
 }
 
+.hud-box {
+    background: rgba(15, 25, 20, 0.88);
+    color: white;
 
-.brand {
+    padding: 8px 12px;
 
-    font-size:
-        12px;
+    border-radius: 8px;
 
-    letter-spacing:
-        2px;
+    font-size: 12px;
 
-    color:
-        #f0d39a;
-
+    box-shadow:
+        0 4px 12px rgba(0,0,0,.25);
 }
 
-
-#location-name {
-
-    font-size:
-        11px;
-
-    letter-spacing:
-        2px;
-
-    color:
-        #ded3c0;
-
+.hud-box strong {
+    display: block;
 }
 
-
-#mission-hud {
-
-    position:
-        fixed;
-
-    top:
-        65px;
-
-    left:
-        20px;
-
-    padding:
-        8px 13px;
-
-    background:
-        rgba(28,23,18,.75);
-
-    border-left:
-        3px solid
-        #d5b875;
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size:
-        12px;
-
+#status-text {
+    opacity: .75;
+    margin-top: 3px;
 }
 
+.hud-button {
+    pointer-events: auto;
 
-.hud-bottom {
+    margin-left: auto;
 
-    position:
-        absolute;
+    width: 42px;
+    height: 42px;
 
-    left:
-        20px;
+    border: 0;
+    border-radius: 8px;
 
-    bottom:
-        20px;
+    background: rgba(15,25,20,.9);
+    color: white;
 
-}
-
-
-.stats {
-
-    display:
-        flex;
-
-    gap:
-        15px;
-
-    padding:
-        10px 15px;
-
-    background:
-        rgba(28,23,18,.78);
-
-    border:
-        1px solid
-        rgba(255,255,255,.12);
-
-    font-family:
-        Arial,
-        sans-serif;
-
+    font-size: 16px;
 }
 
 
 /* =====================================================
-   MAPA
+   MISIÓN HUD
 ===================================================== */
 
-#map-container {
+#mission-hud {
+    display: inline-block;
 
-    position:
-        fixed;
+    margin-top: 8px;
 
-    right:
-        18px;
+    background: rgba(20,30,25,.85);
+    color: #fff;
 
-    top:
-        70px;
+    padding: 7px 12px;
 
-    z-index:
-        15;
+    border-radius: 20px;
 
-    padding:
-        5px;
-
-    background:
-        rgba(20,17,14,.85);
-
-    border:
-        1px solid
-        rgba(255,255,255,.2);
-
-}
-
-
-#minimap {
-
-    width:
-        180px;
-
-    height:
-        120px;
-
-    display:
-        block;
-
-}
-
-
-.map-label {
-
-    position:
-        absolute;
-
-    top:
-        5px;
-
-    left:
-        8px;
-
-    font:
-        9px Arial;
-
-    letter-spacing:
-        2px;
-
-    text-shadow:
-        1px 1px 2px black;
-
+    font-size: 13px;
 }
 
 
 /* =====================================================
-   INTERACCIÓN
+   MINIMAPA
+===================================================== */
+
+#minimap-container {
+    position: absolute;
+
+    top: 15px;
+    right: 15px;
+
+    z-index: 15;
+
+    width: 190px;
+
+    padding: 5px;
+
+    background: rgba(10,15,12,.9);
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 5px 18px rgba(0,0,0,.35);
+}
+
+#minimap {
+    display: block;
+
+    width: 180px;
+    height: 120px;
+
+    border-radius: 6px;
+}
+
+#minimap-container span {
+    display: block;
+
+    color: white;
+
+    text-align: center;
+
+    font-size: 9px;
+
+    margin-top: 3px;
+}
+
+
+/* =====================================================
+   HINT
 ===================================================== */
 
 #interaction-hint {
+    position: absolute;
 
-    position:
-        fixed;
+    left: 50%;
+    bottom: 30px;
 
-    left:
-        50%;
+    transform: translateX(-50%);
 
-    bottom:
-        28px;
+    display: none;
 
-    transform:
-        translateX(-50%);
+    align-items: center;
 
-    z-index:
-        20;
+    gap: 8px;
 
-    display:
-        none;
+    padding: 9px 14px;
 
-    align-items:
-        center;
+    border-radius: 20px;
 
-    gap:
-        8px;
+    background: rgba(15,20,18,.9);
 
-    padding:
-        9px 15px;
+    color: white;
 
-    background:
-        rgba(25,20,16,.88);
+    z-index: 30;
 
-    border:
-        1px solid
-        rgba(255,255,255,.2);
+    font-size: 13px;
 
-    font:
-        12px Arial;
-
+    pointer-events: none;
 }
 
+#interaction-hint strong {
+    background: white;
+    color: #111;
 
-.key {
+    border-radius: 5px;
 
-    width:
-        26px;
-
-    height:
-        26px;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    background:
-        #c69c57;
-
-    color:
-        #241b13;
-
-    font-weight:
-        bold;
-
+    padding: 3px 7px;
 }
 
 
 /* =====================================================
-   PANELES
+   PANTALLAS
 ===================================================== */
 
-.panel {
+.screen {
+    position: absolute;
 
-    position:
-        fixed;
+    inset: 0;
 
-    inset:
-        0;
+    z-index: 100;
 
-    z-index:
-        80;
+    display: flex;
 
-    display:
-        flex;
-
-    align-items:
-        flex-end;
-
-    justify-content:
-        center;
-
-    padding:
-        30px;
+    align-items: center;
+    justify-content: center;
 
     background:
-        rgba(0,0,0,.25);
-
+        radial-gradient(
+            circle,
+            rgba(80,100,70,.25),
+            rgba(0,0,0,.78)
+        );
 }
 
+.screen-card {
+    width: min(90%, 440px);
 
-.panel.hidden {
+    padding: 35px 25px;
 
-    display:
-        none;
+    text-align: center;
 
-}
+    color: white;
 
-
-.panel-inner {
-
-    width:
-        min(760px, 94vw);
-
-    padding:
-        28px;
-
-    background:
-        rgba(35,29,23,.97);
+    background: rgba(20,28,23,.94);
 
     border:
-        1px solid
-        rgba(219,184,111,.5);
+        1px solid rgba(255,255,255,.12);
+
+    border-radius: 18px;
 
     box-shadow:
-        0 20px 70px
-        rgba(0,0,0,.7);
-
+        0 20px 60px rgba(0,0,0,.5);
 }
 
+.game-logo {
+    letter-spacing: 5px;
 
-.dialogue-name {
+    font-size: 12px;
 
-    color:
-        #e2c17d;
+    opacity: .65;
 
-    font-size:
-        20px;
-
-    margin-bottom:
-        14px;
-
+    margin-bottom: 18px;
 }
 
+.screen-card h1 {
+    font-size: clamp(28px, 7vw, 48px);
 
-.dialogue-text {
+    line-height: .95;
 
-    color:
-        #eee3d0;
+    letter-spacing: 2px;
 
-    line-height:
-        1.7;
-
-    font-size:
-        16px;
-
+    margin-bottom: 20px;
 }
 
+.screen-card h2 {
+    font-size: 30px;
 
-.panel button {
-
-    margin-top:
-        22px;
-
-    padding:
-        11px 22px;
-
-    background:
-        #73543b;
-
-    border:
-        1px solid
-        #cfa96a;
-
-    color:
-        white;
-
-    font-family:
-        inherit;
-
-    cursor:
-        pointer;
-
+    margin-bottom: 25px;
 }
 
+.screen-card p {
+    line-height: 1.5;
 
-.mission-tag {
+    opacity: .8;
 
-    color:
-        #d7b66f;
-
-    font:
-        10px Arial;
-
-    letter-spacing:
-        3px;
-
-    margin-bottom:
-        12px;
-
-}
-
-
-.panel h2 {
-
-    color:
-        #efd096;
-
-    margin-bottom:
-        15px;
-
-}
-
-
-.panel p {
-
-    color:
-        #ddd0bc;
-
-    line-height:
-        1.7;
-
-}
-
-
-.inventory-items {
-
-    min-height:
-        80px;
-
-    margin-top:
-        20px;
-
-    padding:
-        15px;
-
-    background:
-        rgba(0,0,0,.2);
-
-    line-height:
-        1.8;
-
-    color:
-        #ded1bd;
-
+    margin-bottom: 25px;
 }
 
 
 /* =====================================================
-   TOAST
+   BOTONES
 ===================================================== */
 
-#toast {
+#start-button,
+#resume-button,
+#restart-button,
+#dialogue-close,
+#mission-close,
+#inventory-close {
 
-    position:
-        fixed;
+    border: 0;
 
-    left:
-        50%;
+    padding: 13px 25px;
 
-    top:
-        18%;
+    border-radius: 8px;
 
-    transform:
-        translate(-50%, -20px);
+    background: #d6a84f;
 
-    z-index:
-        90;
+    color: #1a1a1a;
 
-    padding:
-        12px 22px;
-
-    background:
-        rgba(35,28,20,.95);
-
-    border:
-        1px solid
-        #d2ad68;
-
-    color:
-        #f1d49b;
-
-    font:
-        13px Arial;
-
-    opacity:
-        0;
-
-    pointer-events:
-        none;
+    font-weight: bold;
 
     transition:
-        .3s ease;
+        transform .15s,
+        filter .15s;
+}
 
+#start-button {
+    width: 100%;
+
+    font-size: 17px;
+
+    padding: 16px;
+}
+
+#resume-button,
+#restart-button {
+    width: 100%;
+
+    margin-top: 10px;
+}
+
+#start-button:hover,
+#resume-button:hover,
+#restart-button:hover,
+#dialogue-close:hover,
+#mission-close:hover,
+#inventory-close:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.controls-info {
+    font-size: 11px !important;
+
+    margin-top: 20px;
+
+    margin-bottom: 0 !important;
 }
 
 
-#toast.show {
+/* =====================================================
+   MODALES
+===================================================== */
 
-    opacity:
-        1;
+.modal {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 80;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0,0,0,.6);
+}
+
+.modal-card {
+    width: min(92%, 500px);
+
+    padding: 25px;
+
+    background: #f1e5cc;
+
+    color: #24231f;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 20px 50px rgba(0,0,0,.5);
+}
+
+.modal-card h2 {
+    margin-bottom: 15px;
+}
+
+.modal-card p {
+    line-height: 1.6;
+
+    margin-bottom: 20px;
+}
+
+.modal-card button {
+    float: right;
+}
+
+#inventory-items {
+    min-height: 100px;
+
+    line-height: 1.8;
+
+    margin-bottom: 20px;
+}
+
+
+/* =====================================================
+   MENSAJE
+===================================================== */
+
+#game-message {
+    position: absolute;
+
+    left: 50%;
+    top: 75%;
 
     transform:
-        translate(-50%, 0);
+        translate(-50%, -50%);
 
+    z-index: 70;
+
+    padding: 12px 20px;
+
+    border-radius: 20px;
+
+    background: rgba(0,0,0,.85);
+
+    color: white;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition: opacity .2s;
+}
+
+#game-message.show {
+    opacity: 1;
 }
 
 
@@ -780,153 +474,115 @@ body {
 ===================================================== */
 
 #mobile-controls {
+    position: absolute;
 
-    position:
-        fixed;
+    inset: auto 0 0 0;
 
-    inset:
-        0;
+    height: 210px;
 
-    z-index:
-        30;
+    z-index: 40;
 
-    pointer-events:
-        none;
+    display: none;
 
-    display:
-        none;
-
+    pointer-events: none;
 }
 
+#joystick-area {
+    position: absolute;
 
-#joystick {
+    left: 20px;
+    bottom: 25px;
 
-    position:
-        absolute;
+    width: 150px;
+    height: 150px;
 
-    left:
-        25px;
+    pointer-events: auto;
+}
 
-    bottom:
-        25px;
+#joystick-base {
+    position: absolute;
 
-    width:
-        130px;
+    left: 50%;
+    top: 50%;
 
-    height:
-        130px;
+    transform:
+        translate(-50%, -50%);
 
-    border-radius:
-        50%;
+    width: 115px;
+    height: 115px;
 
-    background:
-        rgba(30,25,20,.45);
+    border-radius: 50%;
+
+    background: rgba(20,25,22,.45);
 
     border:
-        2px solid
-        rgba(255,255,255,.18);
+        2px solid rgba(255,255,255,.25);
 
-    pointer-events:
-        auto;
-
+    backdrop-filter: blur(4px);
 }
 
+#joystick-stick {
+    position: absolute;
 
-#joystick-knob {
+    left: 50%;
+    top: 50%;
 
-    position:
-        absolute;
+    width: 55px;
+    height: 55px;
 
-    left:
-        50%;
+    transform:
+        translate(-50%, -50%);
 
-    top:
-        50%;
+    border-radius: 50%;
 
-    width:
-        55px;
+    background: rgba(255,255,255,.65);
 
-    height:
-        55px;
-
-    margin-left:
-        -27.5px;
-
-    margin-top:
-        -27.5px;
-
-    border-radius:
-        50%;
-
-    background:
-        rgba(222,188,119,.75);
-
-    border:
-        2px solid
-        rgba(255,255,255,.35);
-
+    box-shadow:
+        0 5px 15px rgba(0,0,0,.25);
 }
 
+#mobile-actions {
+    position: absolute;
+
+    right: 20px;
+    bottom: 35px;
+
+    display: flex;
+
+    gap: 12px;
+
+    pointer-events: auto;
+}
 
 .mobile-button {
+    width: 65px;
+    height: 65px;
 
-    position:
-        absolute;
-
-    right:
-        25px;
-
-    bottom:
-        35px;
-
-    width:
-        70px;
-
-    height:
-        70px;
-
-    border-radius:
-        50%;
+    border-radius: 50%;
 
     border:
-        2px solid
-        rgba(255,255,255,.3);
+        2px solid rgba(255,255,255,.35);
 
     background:
-        rgba(85,61,40,.82);
+        rgba(20,25,22,.65);
 
-    color:
-        white;
+    color: white;
 
-    font-weight:
-        bold;
+    font-weight: bold;
 
-    font-size:
-        22px;
+    font-size: 18px;
 
-    pointer-events:
-        auto;
-
+    box-shadow:
+        0 5px 15px rgba(0,0,0,.3);
 }
 
 
-.inventory-button {
+/* =====================================================
+   UTILIDAD
+===================================================== */
 
-    right:
-        110px;
-
-    bottom:
-        85px;
-
-    width:
-        50px;
-
-    height:
-        50px;
-
-    font-size:
-        15px;
-
+.hidden {
+    display: none !important;
 }
 
 
@@ -934,133 +590,80 @@ body {
    CELULAR
 ===================================================== */
 
-@media (max-width: 700px) {
+@media (max-width: 800px) {
 
     #mobile-controls {
-
-        display:
-            block;
-
+        display: block;
     }
 
+    #minimap-container {
+        width: 145px;
 
-    #map-container {
-
-        transform:
-            scale(.75);
-
-        transform-origin:
-            top right;
-
-        top:
-            65px;
-
-        right:
-            5px;
-
+        top: 10px;
+        right: 10px;
     }
 
-
-    #location-name {
-
-        display:
-            none;
-
+    #minimap {
+        width: 135px;
+        height: 90px;
     }
 
+    .hud-box {
+        padding: 6px 8px;
 
-    .brand {
-
-        font-size:
-            9px;
-
+        font-size: 10px;
     }
 
-
-    #mission-hud {
-
-        top:
-            48px;
-
-        left:
-            10px;
-
-        max-width:
-            210px;
-
-        font-size:
-            10px;
-
+    #hud {
+        padding: 8px;
     }
 
-
-    .hud-bottom {
-
-        bottom:
-            10px;
-
-        left:
-            10px;
-
+    #hud-top {
+        max-width: calc(100% - 150px);
+        flex-wrap: wrap;
     }
-
-
-    .stats {
-
-        font-size:
-            11px;
-
-    }
-
 
     #interaction-hint {
-
-        display:
-            none !important;
-
-    }
-
-
-    .panel {
-
-        padding:
-            10px;
-
-    }
-
-
-    .panel-inner {
-
-        padding:
-            20px;
-
-        margin-bottom:
-            10px;
-
-    }
-
-
-    .title-card {
-
-        padding:
-            35px 20px;
-
-    }
-
-
-    .subtitle {
-
-        font-size:
-            14px;
-
-    }
-
-
-    .controls-info {
-
-        display:
-            none;
-
+        bottom: 215px;
     }
 
 }
+
+
+/* =====================================================
+   CELULAR PEQUEÑO
+===================================================== */
+
+@media (max-width: 500px) {
+
+    #minimap-container {
+        display: none;
+    }
+
+    #hud-top {
+        max-width: 100%;
+    }
+
+    .hud-box:first-child {
+        width: 100%;
+    }
+
+    .screen-card {
+        padding: 28px 20px;
+    }
+
+}
+
+
+/* =====================================================
+   PANTALLA GRANDE
+===================================================== */
+
+@media (min-width: 801px) {
+
+    #mobile-controls {
+        display: none !important;
+    }
+
+}
+```
