@@ -1,622 +1,451 @@
-/* =========================================================
-   LOS SECRETOS DEL CHAÑAR
-   SISTEMA VISUAL BASE
-========================================================= */
-
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-
 html,
 body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #151515;
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-    color: white;
+    background: #111;
+    font-family: Arial, Helvetica, sans-serif;
+    touch-action: none;
 }
-
 
 body {
-    touch-action: none;
     user-select: none;
-    -webkit-user-select: none;
 }
-
-
-/* =========================================================
-   CONTENEDOR
-========================================================= */
 
 #game-container {
     position: relative;
-
-    width: 100vw;
-    height: 100vh;
-
+    width: 100%;
+    height: 100%;
     overflow: hidden;
-
-    background: #111;
 }
-
 
 #game {
     position: absolute;
-
-    left: 0;
-    top: 0;
-
+    inset: 0;
     width: 100%;
     height: 100%;
-
     display: block;
 }
 
 
-/* =========================================================
-   HUD
-========================================================= */
+/* =========================
+   PANTALLAS
+========================= */
 
-#hud {
-
+.screen {
     position: absolute;
-
-    left: 0;
-    top: 0;
-
-    width: 100%;
-
-    padding:
-        18px
-        22px;
+    inset: 0;
 
     display: flex;
+    justify-content: center;
+    align-items: center;
 
-    justify-content:
-        space-between;
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(130,100,65,.55),
+            rgba(15,20,25,.96)
+        );
 
-    align-items:
-        flex-start;
+    z-index: 100;
+}
+
+.start-card {
+    width: min(520px, 90%);
+    padding: 40px 30px;
+
+    text-align: center;
+
+    background: rgba(20,25,28,.94);
+
+    border: 1px solid rgba(255,255,255,.18);
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.6);
+
+    color: white;
+}
+
+.game-symbol {
+    font-size: 45px;
+    margin-bottom: 10px;
+}
+
+.start-card h1 {
+    font-size: clamp(30px, 6vw, 58px);
+    letter-spacing: 4px;
+    line-height: .95;
+    margin-bottom: 22px;
+}
+
+.start-card p {
+    color: #d8d0c3;
+    line-height: 1.6;
+    margin-bottom: 28px;
+}
+
+.start-card small {
+    display: block;
+    margin-top: 25px;
+    color: #999;
+    line-height: 1.6;
+}
+
+
+/* =========================
+   BOTONES
+========================= */
+
+button {
+    border: none;
+    cursor: pointer;
+
+    font-weight: bold;
+
+    color: white;
+
+    background: #765333;
+
+    border-radius: 10px;
+
+    padding: 13px 22px;
+
+    transition:
+        transform .15s,
+        filter .15s;
+}
+
+button:hover {
+    filter: brightness(1.2);
+}
+
+button:active {
+    transform: scale(.96);
+}
+
+#start-button {
+    width: 100%;
+    font-size: 18px;
+    padding: 17px;
+}
+
+.secondary-button {
+    margin-top: 10px;
+    width: 100%;
+    background: #3e4748;
+}
+
+
+/* =========================
+   HUD
+========================= */
+
+#hud {
+    position: absolute;
+    inset: 0;
 
     pointer-events: none;
 
     z-index: 20;
 }
 
-
-.hud-left {
+.hud-top {
     display: flex;
+    gap: 10px;
 
-    flex-direction:
-        column;
-
-    gap: 7px;
+    padding: 15px;
 }
 
-
-.game-title {
-
-    font-size: 15px;
-
-    font-weight: 800;
-
-    letter-spacing:
-        2px;
-
-    text-shadow:
-        0 2px 5px
-        rgba(0,0,0,.6);
-}
-
-
-#mission-hud {
-
-    display: inline-block;
-
-    padding:
-        7px 11px;
-
-    background:
-        rgba(20,20,20,.72);
-
-    border:
-        1px solid
-        rgba(255,255,255,.15);
-
-    border-radius: 7px;
-
-    font-size: 13px;
-
-    backdrop-filter:
-        blur(5px);
-}
-
-
-.hud-right {
-
-    display: flex;
-
-    gap: 8px;
-
-    pointer-events:
-        auto;
-}
-
-
-.hud-button {
-
-    width: 42px;
-    height: 42px;
-
-    border: none;
-
-    border-radius: 10px;
-
-    background:
-        rgba(20,20,20,.75);
+.hud-box {
+    background: rgba(15,20,22,.78);
 
     color: white;
 
-    font-size: 18px;
+    border: 1px solid rgba(255,255,255,.15);
 
-    cursor: pointer;
+    border-radius: 10px;
 
-    backdrop-filter:
-        blur(5px);
+    padding: 10px 13px;
 
-    box-shadow:
-        0 4px 15px
-        rgba(0,0,0,.25);
+    backdrop-filter: blur(6px);
+}
+
+.player-box {
+    width: 180px;
+}
+
+.mission-box {
+    min-width: 250px;
+}
+
+.resources {
+    display: flex;
+    gap: 15px;
+    margin-left: auto;
+}
+
+.level {
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 4px;
+}
+
+.xp-bar {
+    width: 100%;
+    height: 5px;
+
+    margin-top: 6px;
+
+    background: #333;
+
+    border-radius: 5px;
+
+    overflow: hidden;
+}
+
+#xp-fill {
+    width: 0%;
+    height: 100%;
+    background: #d5a84c;
 }
 
 
-.hud-button:active {
-    transform:
-        scale(.94);
-}
-
-
-/* =========================================================
+/* =========================
    MINIMAPA
-========================================================= */
+========================= */
 
 #minimap-container {
-
     position: absolute;
 
-    right: 20px;
-    top: 82px;
+    right: 15px;
+    top: 90px;
 
     width: 180px;
     height: 120px;
 
-    border:
-        2px solid
-        rgba(255,255,255,.45);
+    border: 2px solid rgba(255,255,255,.4);
 
-    border-radius: 8px;
+    background: rgba(0,0,0,.5);
 
-    overflow: hidden;
-
-    background: rgba(0,0,0,.4);
-
-    box-shadow:
-        0 5px 20px
-        rgba(0,0,0,.35);
-
-    z-index: 15;
+    pointer-events: none;
 }
-
 
 #minimap {
-
     width: 100%;
     height: 100%;
-
-    display: block;
 }
 
 
-/* =========================================================
-   INTERACCIÓN
-========================================================= */
+/* =========================
+   HUD BUTTONS
+========================= */
 
-#interaction-hint {
-
+#hud-buttons {
     position: absolute;
 
-    left: 50%;
+    right: 15px;
+    bottom: 20px;
 
-    bottom: 125px;
+    display: flex;
+    gap: 8px;
 
-    transform:
-        translateX(-50%);
+    pointer-events: auto;
+}
 
-    padding:
-        10px 18px;
+#hud-buttons button {
+    width: 48px;
+    height: 48px;
 
-    border-radius: 30px;
+    padding: 0;
 
-    background:
-        rgba(15,15,15,.82);
+    border-radius: 50%;
 
-    border:
-        1px solid
-        rgba(255,255,255,.2);
-
-    font-size: 14px;
-
-    z-index: 25;
-
-    backdrop-filter:
-        blur(8px);
+    background: rgba(20,25,25,.85);
 }
 
 
-.hidden {
-    display: none !important;
-}
-
-
-/* =========================================================
+/* =========================
    PANELES
-========================================================= */
+========================= */
 
 .panel {
-
     position: absolute;
 
     left: 50%;
-    top: 50%;
+    bottom: 30px;
 
-    transform:
-        translate(-50%,-50%);
+    transform: translateX(-50%);
 
-    width:
-        min(520px, 88vw);
+    width: min(650px, 92%);
 
-    padding: 6px;
-
-    border-radius: 18px;
-
-    background:
-        rgba(15,15,15,.78);
-
-    border:
-        1px solid
-        rgba(255,255,255,.16);
-
-    box-shadow:
-        0 25px 80px
-        rgba(0,0,0,.55);
-
-    backdrop-filter:
-        blur(15px);
-
-    z-index: 100;
-}
-
-
-.panel-inner {
-
-    padding: 28px;
-
-    border-radius: 13px;
-
-    background:
-        rgba(35,35,35,.9);
-}
-
-
-.panel-label {
-
-    margin-bottom: 8px;
-
-    font-size: 11px;
-
-    letter-spacing: 2px;
-
-    opacity: .65;
-}
-
-
-.panel h2 {
-
-    margin-bottom: 15px;
-
-    font-size: 27px;
-}
-
-
-.dialogue-name {
-
-    margin-bottom: 12px;
-
-    font-size: 19px;
-
-    font-weight: 800;
-}
-
-
-.dialogue-text {
-
-    line-height: 1.6;
-
-    font-size: 16px;
-
-    color:
-        rgba(255,255,255,.9);
-
-    margin-bottom: 22px;
-}
-
-
-.primary-button,
-.secondary-button {
-
-    width: 100%;
-
-    padding:
-        13px 18px;
-
-    margin-top: 9px;
-
-    border-radius: 10px;
-
-    cursor: pointer;
-
-    font-size: 15px;
-
-    font-weight: 700;
-
-    border: none;
-}
-
-
-.primary-button {
-
-    background: #e2b75e;
-
-    color: #20180e;
-}
-
-
-.secondary-button {
-
-    background:
-        rgba(255,255,255,.1);
+    padding: 25px;
 
     color: white;
 
+    background:
+        rgba(20,25,27,.96);
+
     border:
-        1px solid
-        rgba(255,255,255,.15);
+        1px solid rgba(255,255,255,.2);
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.55);
+
+    z-index: 50;
+}
+
+.panel-header {
+    color: #e0b65d;
+
+    font-weight: bold;
+
+    letter-spacing: 2px;
+
+    margin-bottom: 15px;
+}
+
+#dialogue-text,
+#mission-description {
+    line-height: 1.6;
+
+    color: #ddd;
+
+    margin-bottom: 20px;
+}
+
+#dialogue-close,
+#mission-close,
+#inventory-close,
+#resume-button,
+#save-button,
+#restart-button {
+    margin-right: 8px;
 }
 
 
-.primary-button:active,
-.secondary-button:active {
-
-    transform:
-        scale(.98);
-}
-
-
-/* =========================================================
+/* =========================
    INVENTARIO
-========================================================= */
+========================= */
 
-.inventory-items {
+#inventory-panel {
+    top: 50%;
+    bottom: auto;
 
-    min-height: 90px;
+    transform: translate(-50%, -50%);
+}
+
+#inventory-items {
+    min-height: 100px;
 
     padding: 15px;
 
-    margin:
-        15px 0;
+    margin-bottom: 20px;
 
-    border-radius: 10px;
+    background: rgba(255,255,255,.04);
 
-    background:
-        rgba(255,255,255,.06);
+    border-radius: 8px;
 
     line-height: 1.8;
 }
 
 
-.inventory-stats {
+/* =========================
+   PAUSA
+========================= */
 
-    display: flex;
+#pause-panel {
+    top: 50%;
+    bottom: auto;
 
-    flex-direction:
-        column;
-
-    gap: 7px;
-
-    margin-bottom: 10px;
-
-    opacity: .85;
-}
-
-
-/* =========================================================
-   PANTALLA DE INICIO
-========================================================= */
-
-#start-screen {
-
-    position: absolute;
-
-    inset: 0;
-
-    display: flex;
-
-    justify-content:
-        center;
-
-    align-items:
-        center;
+    transform: translate(-50%, -50%);
 
     text-align: center;
+}
 
-    z-index: 200;
-
-    background:
-        linear-gradient(
-            rgba(0,0,0,.48),
-            rgba(0,0,0,.72)
-        );
-
-    padding: 25px;
+#pause-panel button {
+    margin-top: 10px;
 }
 
 
-.start-content {
+/* =========================
+   INTERACCIÓN
+========================= */
 
-    width:
-        min(720px, 94vw);
+#interaction-hint {
+    position: absolute;
 
-    padding: 45px 30px;
+    left: 50%;
+    bottom: 115px;
+
+    transform: translateX(-50%);
+
+    padding: 10px 18px;
+
+    border-radius: 30px;
+
+    background: rgba(10,15,16,.85);
+
+    color: white;
+
+    font-size: 13px;
+
+    z-index: 25;
+}
+
+#interaction-hint span {
+    color: #e1b04c;
 }
 
 
-.start-kicker {
+/* =========================
+   NOTIFICACIONES
+========================= */
 
-    font-size: 12px;
+#notification {
+    position: absolute;
 
-    letter-spacing: 4px;
+    left: 50%;
+    top: 25%;
 
-    opacity: .75;
+    transform: translateX(-50%);
 
-    margin-bottom: 18px;
+    padding: 13px 22px;
+
+    border-radius: 30px;
+
+    background: rgba(20,25,25,.9);
+
+    color: white;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition: opacity .3s;
+
+    z-index: 80;
+}
+
+#notification.visible {
+    opacity: 1;
 }
 
 
-.start-content h1 {
-
-    font-size:
-        clamp(38px, 8vw, 82px);
-
-    line-height: .95;
-
-    letter-spacing:
-        -2px;
-
-    margin-bottom: 22px;
-
-    text-shadow:
-        0 8px 30px
-        rgba(0,0,0,.65);
-}
-
-
-.start-content h1 span {
-
-    display: block;
-
-    color: #e2b75e;
-}
-
-
-.start-content p {
-
-    max-width: 600px;
-
-    margin:
-        0 auto 30px;
-
-    line-height: 1.6;
-
-    font-size: 17px;
-
-    color:
-        rgba(255,255,255,.84);
-}
-
-
-.start-button {
-
-    border: none;
-
-    padding:
-        16px 42px;
-
-    border-radius: 50px;
-
-    background:
-        #e2b75e;
-
-    color:
-        #21180d;
-
-    font-size: 17px;
-
-    font-weight: 900;
-
-    letter-spacing: 1px;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 10px 30px
-        rgba(0,0,0,.35);
-
-    transition:
-        transform .15s,
-        box-shadow .15s;
-}
-
-
-.start-button:hover {
-
-    transform:
-        translateY(-2px);
-
-    box-shadow:
-        0 15px 40px
-        rgba(0,0,0,.45);
-}
-
-
-.start-button:active {
-
-    transform:
-        scale(.96);
-}
-
-
-.controls-info {
-
-    margin-top: 28px;
-
-    display: flex;
-
-    justify-content:
-        center;
-
-    flex-wrap: wrap;
-
-    gap: 9px;
-
-    font-size: 12px;
-
-    opacity: .55;
-}
-
-
-/* =========================================================
+/* =========================
    CONTROLES MOBILE
-========================================================= */
+========================= */
 
 #mobile-controls {
-
     position: absolute;
 
     inset: 0;
@@ -624,264 +453,166 @@ body {
     pointer-events: none;
 
     z-index: 40;
+
+    display: none;
 }
 
-
 #joystick {
-
     position: absolute;
 
     left: 25px;
+    bottom: 30px;
 
-    bottom: 25px;
-
-    width: 125px;
-    height: 125px;
+    width: 130px;
+    height: 130px;
 
     border-radius: 50%;
 
-    background:
-        rgba(255,255,255,.08);
+    background: rgba(20,25,25,.4);
 
     border:
-        2px solid
-        rgba(255,255,255,.18);
+        2px solid rgba(255,255,255,.2);
 
     pointer-events: auto;
 }
 
-
-#joystick-knob {
-
+#joystick-stick {
     position: absolute;
 
     left: 50%;
     top: 50%;
 
-    width: 52px;
-    height: 52px;
+    width: 55px;
+    height: 55px;
 
-    margin-left: -26px;
-    margin-top: -26px;
+    margin-left: -27.5px;
+    margin-top: -27.5px;
 
     border-radius: 50%;
 
-    background:
-        rgba(255,255,255,.25);
+    background: rgba(255,255,255,.35);
 
     border:
-        2px solid
-        rgba(255,255,255,.4);
-
-    box-shadow:
-        0 5px 20px
-        rgba(0,0,0,.25);
+        2px solid rgba(255,255,255,.3);
 }
 
-
-.action-button {
-
+#mobile-interact,
+#mobile-inventory {
     position: absolute;
-
-    width: 64px;
-    height: 64px;
-
-    border-radius: 50%;
-
-    border:
-        2px solid
-        rgba(255,255,255,.25);
-
-    background:
-        rgba(20,20,20,.7);
-
-    color: white;
-
-    font-weight: 900;
-
-    font-size: 20px;
 
     pointer-events: auto;
 
-    box-shadow:
-        0 5px 20px
-        rgba(0,0,0,.3);
-}
+    width: 65px;
+    height: 65px;
 
+    border-radius: 50%;
 
-#mobile-interact {
-
-    right: 35px;
-    bottom: 45px;
-
-    background:
-        rgba(226,183,94,.85);
-
-    color: #21180d;
-}
-
-
-#mobile-inventory {
-
-    right: 105px;
-    bottom: 115px;
+    padding: 0;
 
     font-size: 20px;
+
+    background: rgba(40,45,45,.8);
+}
+
+#mobile-interact {
+    right: 30px;
+    bottom: 45px;
+}
+
+#mobile-inventory {
+    right: 110px;
+    bottom: 85px;
 }
 
 
-/* =========================================================
-   NOTIFICACIONES
-========================================================= */
+/* =========================
+   OCULTAR
+========================= */
 
-#notification-container {
-
-    position: absolute;
-
-    left: 50%;
-    top: 75px;
-
-    transform:
-        translateX(-50%);
-
-    z-index: 150;
-
-    pointer-events: none;
+.hidden {
+    display: none !important;
 }
 
 
-.notification {
+/* =========================
+   CELULAR
+========================= */
 
-    padding:
-        10px 18px;
+@media (max-width: 700px) {
 
-    margin-bottom: 8px;
-
-    border-radius: 8px;
-
-    background:
-        rgba(20,20,20,.88);
-
-    border:
-        1px solid
-        rgba(255,255,255,.15);
-
-    box-shadow:
-        0 8px 30px
-        rgba(0,0,0,.35);
-
-    animation:
-        notificationIn .25s ease;
-}
-
-
-@keyframes notificationIn {
-
-    from {
-
-        opacity: 0;
-
-        transform:
-            translateY(-10px);
-
+    .hud-top {
+        padding: 8px;
     }
 
-    to {
-
-        opacity: 1;
-
-        transform:
-            translateY(0);
-
+    .player-box {
+        width: 130px;
     }
 
-}
+    .mission-box {
+        display: none;
+    }
 
+    .resources {
+        gap: 7px;
+        font-size: 13px;
+    }
 
-/* =========================================================
-   RESPONSIVE
-========================================================= */
+    #minimap-container {
+        top: 75px;
+        right: 8px;
 
-@media
-(pointer: coarse) {
+        width: 130px;
+        height: 85px;
+    }
+
+    #hud-buttons {
+        display: none;
+    }
 
     #mobile-controls {
         display: block;
     }
 
     #interaction-hint {
-        bottom: 205px;
+        bottom: 155px;
+
+        font-size: 10px;
     }
 
-    .controls-info {
-        display: none;
+    .panel {
+        bottom: 20px;
+
+        padding: 20px;
+    }
+
+    .panel button {
+        margin-top: 6px;
     }
 
 }
 
 
-@media
-(pointer: fine) {
+/* =========================
+   PANTALLAS MUY PEQUEÑAS
+========================= */
 
-    #mobile-controls {
+@media (max-width: 400px) {
+
+    .start-card {
+        padding: 25px 18px;
+    }
+
+    .start-card h1 {
+        font-size: 30px;
+    }
+
+    .resources {
         display: none;
     }
 
-}
-
-
-@media
-(max-width: 600px) {
-
-    #hud {
-
-        padding:
-            12px;
-
-    }
-
-    .game-title {
-
-        font-size: 11px;
-
-    }
-
-    #mission-hud {
-
-        font-size: 11px;
-
-        max-width:
-            210px;
-
-    }
-
-    #minimap-container {
-
-        top: 70px;
-
-        right: 10px;
-
-        width: 135px;
-        height: 90px;
-
-    }
-
-    .panel-inner {
-
-        padding: 22px;
-
-    }
-
-    .panel h2 {
-
-        font-size: 22px;
-
-    }
-
-    .dialogue-text {
-
-        font-size: 15px;
-
+    #joystick {
+        width: 110px;
+        height: 110px;
     }
 
 }
