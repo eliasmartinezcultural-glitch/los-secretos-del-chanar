@@ -1,312 +1,858 @@
+/* =====================================================
+   LOS SECRETOS DEL CHAÑAR
+   VERSIÓN 1.0
+===================================================== */
+
 * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
 }
 
 html,
 body {
+
+    margin: 0;
+    padding: 0;
+
     width: 100%;
     height: 100%;
+
     overflow: hidden;
-    background: #171512;
-    font-family: Arial, Helvetica, sans-serif;
+
+    background: #111;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
 }
 
-canvas {
-    display: block;
+body {
+
+    user-select: none;
+
 }
 
-.hidden {
-    display: none !important;
+
+/* =====================================================
+   CONTENEDOR
+===================================================== */
+
+#game-container {
+
+    position: relative;
+
+    width: 100vw;
+    height: 100vh;
+
+    overflow: hidden;
+
 }
 
-/* =========================
-   PANTALLA INICIAL
-========================= */
 
-.overlay {
-    position: fixed;
+#game {
+
+    position: absolute;
+
     inset: 0;
-    z-index: 100;
+
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+}
+
+
+/* =====================================================
+   HUD
+===================================================== */
+
+#hud {
+
+    position: absolute;
+
+    top: 18px;
+    left: 18px;
+    right: 18px;
+
     display: flex;
+
+    justify-content: space-between;
+
+    pointer-events: none;
+
+    z-index: 20;
+
+}
+
+
+#top-left,
+#top-right {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+}
+
+
+#top-right {
+
+    align-items: flex-end;
+
+}
+
+
+.hud-card {
+
+    padding: 10px 14px;
+
+    color: white;
+
+    background:
+        rgba(20, 25, 24, 0.78);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.16);
+
+    border-radius: 8px;
+
+    backdrop-filter: blur(5px);
+
+    box-shadow:
+        0 5px 20px
+        rgba(0,0,0,0.25);
+
+}
+
+
+.hud-title {
+
+    font-size: 12px;
+
+    letter-spacing: 2px;
+
+    opacity: .75;
+
+}
+
+
+#location-name {
+
+    margin-top: 3px;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+}
+
+
+.mission-hud {
+
+    min-width: 240px;
+
+    font-size: 13px;
+
+}
+
+
+#clock {
+
+    font-weight: bold;
+
+    font-size: 15px;
+
+}
+
+
+.hud-button {
+
+    pointer-events: auto;
+
+    border: 0;
+
+    padding: 10px 14px;
+
+    border-radius: 7px;
+
+    color: white;
+
+    background:
+        rgba(30, 35, 32, .85);
+
+    cursor: pointer;
+
+    font-weight: bold;
+
+}
+
+
+.hud-button:hover {
+
+    background:
+        rgba(55, 62, 55, .95);
+
+}
+
+
+/* =====================================================
+   MINIMAPA
+===================================================== */
+
+#minimap-container {
+
+    position: absolute;
+
+    right: 18px;
+    bottom: 18px;
+
+    width: 220px;
+    height: 175px;
+
+    padding: 8px;
+
+    background:
+        rgba(15,20,18,.88);
+
+    border:
+        1px solid
+        rgba(255,255,255,.2);
+
+    border-radius: 10px;
+
+    z-index: 20;
+
+    box-shadow:
+        0 5px 25px
+        rgba(0,0,0,.35);
+
+}
+
+
+#minimap {
+
+    width: 100%;
+    height: 150px;
+
+    display: block;
+
+}
+
+
+.map-label {
+
+    color: white;
+
+    font-size: 10px;
+
+    letter-spacing: 2px;
+
+    text-align: center;
+
+    opacity: .7;
+
+}
+
+
+/* =====================================================
+   INTERACCIÓN
+===================================================== */
+
+#interaction-hint {
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 32px;
+
+    transform:
+        translateX(-50%);
+
+    padding: 9px 15px;
+
+    background:
+        rgba(15,20,18,.78);
+
+    color: white;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+
+    opacity: .75;
+
+    z-index: 21;
+
+    pointer-events: none;
+
+}
+
+
+/* =====================================================
+   NOTIFICACIÓN
+===================================================== */
+
+#notification {
+
+    position: absolute;
+
+    top: 100px;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%)
+        translateY(-20px);
+
+    padding: 12px 22px;
+
+    background:
+        rgba(20,25,22,.94);
+
+    border:
+        1px solid
+        rgba(255,255,255,.2);
+
+    color: white;
+
+    border-radius: 8px;
+
+    opacity: 0;
+
+    transition:
+        opacity .25s,
+        transform .25s;
+
+    z-index: 50;
+
+    pointer-events: none;
+
+}
+
+
+#notification.show {
+
+    opacity: 1;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+
+}
+
+
+/* =====================================================
+   PANELES
+===================================================== */
+
+.panel {
+
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
     align-items: center;
+
+    justify-content: center;
+
+    z-index: 60;
+
+    background:
+        rgba(0,0,0,.55);
+
+    backdrop-filter:
+        blur(4px);
+
+}
+
+
+.panel-inner {
+
+    width: min(600px, 90vw);
+
+    padding: 30px;
+
+    background:
+        #242725;
+
+    border:
+        1px solid
+        rgba(255,255,255,.18);
+
+    border-radius: 14px;
+
+    color: white;
+
+    box-shadow:
+        0 20px 70px
+        rgba(0,0,0,.6);
+
+}
+
+
+.panel-title {
+
+    color: #d6ad62;
+
+    font-size: 13px;
+
+    letter-spacing: 3px;
+
+    font-weight: bold;
+
+}
+
+
+.panel-small-title {
+
+    color: #d6ad62;
+
+    font-size: 11px;
+
+    letter-spacing: 3px;
+
+}
+
+
+.panel-inner h2 {
+
+    margin:
+        10px 0 15px;
+
+    font-size: 30px;
+
+}
+
+
+.panel-text,
+.panel-inner p {
+
+    color: #ddd;
+
+    line-height: 1.65;
+
+    font-size: 16px;
+
+}
+
+
+.primary-button {
+
+    margin-top: 20px;
+
+    padding:
+        11px 20px;
+
+    border: 0;
+
+    border-radius: 7px;
+
+    background:
+        #b68a4a;
+
+    color: white;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+
+.primary-button:hover {
+
+    background:
+        #c99c5d;
+
+}
+
+
+/* =====================================================
+   INVENTARIO
+===================================================== */
+
+.inventory-stats {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 10px;
+
+    margin:
+        20px 0;
+
+}
+
+
+.inventory-stats div {
+
+    padding: 14px;
+
+    background:
+        rgba(255,255,255,.06);
+
+    border-radius: 8px;
+
+    text-align: center;
+
+    font-size: 10px;
+
+    letter-spacing: 1px;
+
+}
+
+
+.inventory-stats strong {
+
+    display: block;
+
+    margin-top: 5px;
+
+    font-size: 22px;
+
+    color: #d6ad62;
+
+}
+
+
+#inventory-items {
+
+    max-height: 280px;
+
+    overflow-y: auto;
+
+    padding: 15px;
+
+    background:
+        rgba(0,0,0,.18);
+
+    border-radius: 8px;
+
+    line-height: 1.8;
+
+    color: #ddd;
+
+}
+
+
+/* =====================================================
+   START SCREEN
+===================================================== */
+
+#start-screen {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 100;
+
+    display: flex;
+
+    align-items: center;
+
     justify-content: center;
 
     background:
+
         radial-gradient(
             circle at center,
-            rgba(90,70,40,.15),
-            rgba(10,9,7,.94)
+            rgba(120,105,70,.18),
+            rgba(0,0,0,.92)
         );
+
 }
 
-.start-card {
-    width: min(620px, 90vw);
-    padding: 55px 45px;
+
+.start-overlay {
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+
+        linear-gradient(
+            rgba(0,0,0,.2),
+            rgba(0,0,0,.75)
+        );
+
+}
+
+
+.start-content {
+
+    position: relative;
+
+    width: min(780px, 90vw);
+
     text-align: center;
 
-    background: rgba(25,22,18,.94);
-    border: 1px solid rgba(221,190,128,.35);
-    box-shadow: 0 25px 80px rgba(0,0,0,.6);
+    color: white;
+
+    z-index: 2;
+
 }
 
-.eyebrow {
-    color: #c8a66a;
-    font-size: 11px;
+
+.start-kicker {
+
+    font-size: 12px;
+
     letter-spacing: 4px;
-    margin-bottom: 22px;
+
+    color: #d6ad62;
+
+    margin-bottom: 18px;
+
 }
 
-.start-card h1 {
-    color: #f0dfb5;
-    font-family: Georgia, serif;
-    font-size: clamp(42px, 8vw, 76px);
-    line-height: .92;
-    letter-spacing: 2px;
+
+.start-content h1 {
+
+    margin: 0;
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size:
+        clamp(45px, 8vw, 100px);
+
+    line-height: .9;
+
+    letter-spacing: -4px;
+
+    text-shadow:
+        0 8px 30px
+        rgba(0,0,0,.7);
+
 }
 
-.start-card p {
-    max-width: 440px;
-    margin: 28px auto;
-    color: #c9c1b3;
-    font-size: 17px;
-    line-height: 1.6;
+
+.start-content h1 span {
+
+    color: #d6ad62;
+
 }
 
-button {
-    cursor: pointer;
-    border: 0;
-    padding: 14px 28px;
-    background: #b58b4e;
-    color: #17130e;
+
+.start-content p {
+
+    max-width: 620px;
+
+    margin:
+        28px auto;
+
+    line-height: 1.7;
+
+    color: #ddd;
+
+    font-size: 16px;
+
+}
+
+
+.start-button {
+
+    padding:
+        16px 42px;
+
+    border: 1px solid
+        rgba(255,255,255,.3);
+
+    border-radius: 5px;
+
+    color: white;
+
+    background:
+        #9a713a;
+
+    font-size: 16px;
+
     font-weight: bold;
+
     letter-spacing: 2px;
-    transition: .2s;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 10px 35px
+        rgba(0,0,0,.35);
+
 }
 
-button:hover {
-    transform: translateY(-2px);
-    background: #d2aa68;
+
+.start-button:hover {
+
+    background:
+        #bd9252;
+
+    transform:
+        translateY(-2px);
+
 }
+
 
 .controls {
+
     display: flex;
-    justify-content: center;
-    gap: 15px;
+
     flex-wrap: wrap;
-    margin-top: 28px;
-    color: #83796a;
-    font-size: 10px;
-    letter-spacing: 1px;
-}
 
-/* =========================
-   HUD
-========================= */
-
-#hud {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 20;
-}
-
-.hud-top {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    right: 20px;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-}
-
-.brand {
-    color: white;
-    font-size: 13px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    text-shadow: 0 2px 4px #000;
-}
-
-#mission-hud {
-    padding: 10px 15px;
-    background: rgba(15,14,12,.75);
-    color: #e9d29e;
-    border-left: 3px solid #c29b59;
-    font-size: 12px;
-}
-
-#stats {
-    position: absolute;
-    top: 75px;
-    right: 20px;
-
-    display: flex;
-    gap: 8px;
-}
-
-#stats div {
-    padding: 8px 11px;
-    background: rgba(15,14,12,.78);
-    color: #eee;
-    font-size: 13px;
-}
-
-#minimap {
-    position: absolute;
-    right: 20px;
-    bottom: 20px;
-
-    width: 220px;
-    height: 150px;
-
-    border: 2px solid rgba(255,255,255,.4);
-    box-shadow: 0 5px 25px rgba(0,0,0,.5);
-}
-
-#clock {
-    position: absolute;
-    left: 20px;
-    bottom: 20px;
-
-    padding: 10px 15px;
-
-    color: white;
-    background: rgba(15,14,12,.75);
-    font-family: monospace;
-    font-size: 17px;
-}
-
-#interaction-hint {
-    position: absolute;
-    bottom: 25px;
-    left: 50%;
-    transform: translateX(-50%);
-
-    padding: 12px 18px;
-    background: rgba(15,14,12,.9);
-    color: white;
-}
-
-#interaction-hint strong {
-    display: inline-block;
-    margin-right: 8px;
-    padding: 3px 7px;
-    background: #d2aa68;
-    color: #17130e;
-}
-
-/* =========================
-   DESCUBRIMIENTO
-========================= */
-
-#discovery {
-    position: absolute;
-    top: 110px;
-    left: 50%;
-    transform: translateX(-50%);
-
-    padding: 14px 25px;
-
-    background: rgba(25,22,18,.94);
-    color: #e6c47d;
-
-    font-family: Georgia, serif;
-    letter-spacing: 3px;
-    font-size: 13px;
-
-    opacity: 0;
-    transition: opacity .4s;
-}
-
-#discovery.show {
-    opacity: 1;
-}
-
-/* =========================
-   PANELES
-========================= */
-
-.panel {
-    position: fixed;
-    inset: 0;
-    z-index: 80;
-
-    display: flex;
-    align-items: flex-end;
     justify-content: center;
 
-    padding-bottom: 40px;
+    gap: 8px;
 
-    background: rgba(0,0,0,.35);
+    margin-top: 35px;
+
+    opacity: .65;
+
 }
 
-.panel-inner {
-    width: min(700px, 90vw);
-    padding: 30px;
 
-    background: rgba(27,24,20,.97);
-    border: 1px solid rgba(211,175,105,.4);
-    box-shadow: 0 20px 70px rgba(0,0,0,.6);
+.controls span {
+
+    padding: 5px 8px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.2);
+
+    border-radius: 4px;
+
+    font-size: 9px;
+
+}
+
+
+.version {
+
+    margin-top: 35px;
+
+    font-size: 9px;
+
+    letter-spacing: 2px;
+
+    opacity: .4;
+
+}
+
+
+/* =====================================================
+   OCULTAR
+===================================================== */
+
+.hidden {
+
+    display: none !important;
+
+}
+
+
+/* =====================================================
+   CONTROLES MÓVILES
+===================================================== */
+
+#mobile-controls {
+
+    display: none;
+
+    position: absolute;
+
+    bottom: 20px;
+
+    left: 20px;
+
+    z-index: 40;
+
+}
+
+
+#mobile-controls button {
+
+    width: 48px;
+
+    height: 48px;
+
+    margin: 3px;
+
+    border: 0;
+
+    border-radius: 50%;
+
+    background:
+        rgba(25,30,27,.72);
 
     color: white;
+
+    font-weight: bold;
+
 }
 
-.panel-inner h2 {
-    margin: 8px 0 15px;
-    color: #e7cb91;
-    font-family: Georgia, serif;
+
+#mobile-interact {
+
+    position: absolute;
+
+    left: 145px;
+
+    bottom: 45px;
+
 }
 
-.label {
-    color: #c59b5c;
-    font-size: 10px;
-    letter-spacing: 3px;
-}
 
-#dialogue-name {
-    margin-bottom: 15px;
-    color: #d5ae69;
-    font-size: 13px;
-    letter-spacing: 2px;
-}
-
-#dialogue-text,
-#mission-description {
-    color: #ddd4c6;
-    line-height: 1.7;
-    font-size: 16px;
-}
-
-.panel button {
-    margin-top: 25px;
-}
-
-/* =========================
+/* =====================================================
    RESPONSIVE
-========================= */
+===================================================== */
 
 @media (max-width: 700px) {
 
-    .start-card {
-        padding: 35px 22px;
-    }
+    #minimap-container {
 
-    .hud-top {
-        flex-direction: column;
-        gap: 10px;
-    }
+        width: 150px;
+        height: 112px;
 
-    #mission-hud {
-        max-width: 75vw;
     }
 
     #minimap {
-        width: 150px;
-        height: 105px;
+
+        width: 100%;
+        height: 92px;
+
+    }
+
+    .mission-hud {
+
+        min-width: 180px;
+
+    }
+
+    #mobile-controls {
+
+        display: block;
+
+    }
+
+    #interaction-hint {
+
+        bottom: 20px;
+
+    }
+
+    .start-content h1 {
+
+        letter-spacing: -2px;
+
     }
 
 }
