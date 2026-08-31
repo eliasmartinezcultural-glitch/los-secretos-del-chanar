@@ -1,0 +1,78 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #111;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+#game-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    image-rendering: pixelated;
+}
+
+#hud {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+
+    display: flex;
+    justify-content: space-between;
+
+    color: white;
+    font-weight: bold;
+
+    pointer-events: none;
+}
+
+#player-name,
+#inventory {
+    background: rgba(0,0,0,0.65);
+    padding: 10px 14px;
+    border-radius: 8px;
+}
+
+#dialogue {
+    position: absolute;
+
+    left: 50%;
+    bottom: 30px;
+
+    transform: translateX(-50%);
+
+    width: min(700px, 90%);
+
+    background: rgba(0,0,0,0.9);
+    color: white;
+
+    padding: 20px;
+
+    border: 2px solid white;
+    border-radius: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+#dialogue-text {
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+button {
+    padding: 8px 15px;
+    cursor: pointer;
+}
