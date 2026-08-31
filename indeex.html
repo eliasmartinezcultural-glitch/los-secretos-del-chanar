@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 
@@ -21,22 +22,71 @@
 
 </head>
 
+
 <body>
 
-<div id="game-container">
+
+    <!-- =====================================================
+         JUEGO
+    ====================================================== -->
 
     <canvas id="game"></canvas>
 
 
-    <!-- PANTALLA DE INICIO -->
+    <!-- =====================================================
+         HUD
+    ====================================================== -->
 
-    <div id="start-screen">
+    <div id="hud">
 
-        <div class="title">
+        <div class="hud-title">
+            LOS SECRETOS DEL CHAÑAR
+        </div>
 
-            <div class="small-title">
-                OCARINA PRESENTA
-            </div>
+        <div id="mission-hud">
+            Explorá el pueblo
+        </div>
+
+        <div class="controls">
+            WASD / FLECHAS — Moverse
+            <br>
+            E — Interactuar
+            <br>
+            M — Inventario
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MINIMAPA
+    ====================================================== -->
+
+    <div id="minimap-container">
+
+        <div class="minimap-title">
+            MAPA
+        </div>
+
+        <canvas
+            id="minimap"
+            width="220"
+            height="150"
+        ></canvas>
+
+    </div>
+
+
+    <!-- =====================================================
+         PANTALLA DE INICIO
+    ====================================================== -->
+
+    <div
+        id="start-screen"
+        class="overlay"
+    >
+
+        <div class="start-box">
 
             <h1>
                 LOS SECRETOS<br>
@@ -44,8 +94,9 @@
             </h1>
 
             <p>
-                Una aventura por la memoria
-                de un pueblo.
+                Una aventura por la memoria,
+                las historias y los secretos
+                de San Patricio del Chañar.
             </p>
 
             <button id="start-button">
@@ -57,158 +108,116 @@
     </div>
 
 
-    <!-- HUD -->
-
-    <div id="hud">
-
-        <div class="hud-left">
-
-            <div class="hud-title">
-                LOS SECRETOS DEL CHAÑAR
-            </div>
-
-            <div id="mission-hud">
-                Misión: explorar el pueblo
-            </div>
-
-        </div>
-
-
-        <div class="hud-right">
-
-            <div class="hud-item">
-                📷
-                <span id="photo-count">
-                    0
-                </span>
-            </div>
-
-            <div class="hud-item">
-                📜
-                <span id="document-count">
-                    0
-                </span>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- MINIMAPA -->
-
-    <canvas
-        id="minimap"
-    ></canvas>
-
-
-    <!-- CONTROLES -->
-
-    <div id="controls">
-
-        <strong>CONTROLES</strong>
-
-        <br>
-
-        WASD / Flechas:
-        mover
-
-        <br>
-
-        E:
-        interactuar
-
-        <br>
-
-        M:
-        mapa
-
-    </div>
-
-
-    <!-- MISIÓN -->
-
-    <div
-        id="mission-panel"
-        class="hidden"
-    >
-
-        <div class="mission-header">
-
-            NUEVA MISIÓN
-
-        </div>
-
-        <h2 id="mission-title">
-            La fotografía perdida
-        </h2>
-
-        <p id="mission-description">
-            Encontrá la fotografía
-            que perdió Don Pedro.
-        </p>
-
-        <button
-            id="mission-close"
-        >
-            ACEPTAR
-        </button>
-
-    </div>
-
-
-    <!-- DIÁLOGO -->
+    <!-- =====================================================
+         DIÁLOGOS
+    ====================================================== -->
 
     <div
         id="dialogue"
-        class="hidden"
+        class="panel hidden"
     >
 
-        <div
-            id="dialogue-name"
-        ></div>
+        <div class="panel-box">
 
-        <div
-            id="dialogue-text"
-        ></div>
+            <h2 id="dialogue-name">
+                Personaje
+            </h2>
 
-        <button
-            id="dialogue-close"
-        >
-            CONTINUAR
-        </button>
+            <p id="dialogue-text">
+                ...
+            </p>
+
+            <button id="dialogue-close">
+                CERRAR
+            </button>
+
+        </div>
 
     </div>
 
 
-    <!-- INVENTARIO -->
+    <!-- =====================================================
+         MISIÓN
+    ====================================================== -->
+
+    <div
+        id="mission-panel"
+        class="panel hidden"
+    >
+
+        <div class="panel-box">
+
+            <h2 id="mission-title">
+                Misión
+            </h2>
+
+            <p id="mission-description">
+                ...
+            </p>
+
+            <button id="mission-close">
+                ENTENDIDO
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         INVENTARIO
+    ====================================================== -->
 
     <div
         id="inventory-panel"
-        class="hidden"
+        class="panel hidden"
     >
 
-        <h2>
-            INVENTARIO
-        </h2>
+        <div class="panel-box">
 
-        <div
-            id="inventory-items"
-        ></div>
+            <h2>
+                INVENTARIO
+            </h2>
 
-        <button
-            id="inventory-close"
-        >
-            CERRAR
-        </button>
+            <div id="inventory-items">
+                Inventario vacío.
+            </div>
+
+            <hr>
+
+            <p>
+                📷 Fotografías:
+                <strong id="photo-count">
+                    0
+                </strong>
+            </p>
+
+            <p>
+                📜 Documentos:
+                <strong id="document-count">
+                    0
+                </strong>
+            </p>
+
+            <button id="inventory-close">
+                CERRAR
+            </button>
+
+        </div>
 
     </div>
 
-</div>
 
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
 
-<script src="game.js"></script>
+    <script
+        src="script.js"
+    ></script>
+
 
 </body>
 
 </html>
+```
