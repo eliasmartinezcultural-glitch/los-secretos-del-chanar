@@ -1,669 +1,887 @@
-```css
-/* =====================================================
+/* =========================================================
    LOS SECRETOS DEL CHAÑAR
    SISTEMA VISUAL BASE
-===================================================== */
+========================================================= */
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    -webkit-tap-highlight-color: transparent;
 }
+
 
 html,
 body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #111;
-    font-family: Arial, Helvetica, sans-serif;
+    background: #151515;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+    color: white;
+}
+
+
+body {
     touch-action: none;
-}
-
-button {
-    font-family: inherit;
-    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 
-/* =====================================================
+/* =========================================================
    CONTENEDOR
-===================================================== */
+========================================================= */
 
 #game-container {
     position: relative;
+
     width: 100vw;
     height: 100vh;
+
     overflow: hidden;
-    background: #c9ac77;
+
+    background: #111;
 }
 
 
-/* =====================================================
-   CANVAS
-===================================================== */
-
 #game {
     position: absolute;
-    inset: 0;
+
+    left: 0;
+    top: 0;
 
     width: 100%;
     height: 100%;
 
     display: block;
-
-    background: #c9ac77;
-
-    image-rendering: auto;
 }
 
 
-/* =====================================================
+/* =========================================================
    HUD
-===================================================== */
+========================================================= */
 
 #hud {
+
     position: absolute;
 
-    top: 0;
     left: 0;
+    top: 0;
 
     width: 100%;
 
-    padding: 12px;
+    padding:
+        18px
+        22px;
+
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        flex-start;
 
     pointer-events: none;
 
     z-index: 20;
 }
 
-#hud-top {
+
+.hud-left {
     display: flex;
-    align-items: flex-start;
+
+    flex-direction:
+        column;
+
+    gap: 7px;
+}
+
+
+.game-title {
+
+    font-size: 15px;
+
+    font-weight: 800;
+
+    letter-spacing:
+        2px;
+
+    text-shadow:
+        0 2px 5px
+        rgba(0,0,0,.6);
+}
+
+
+#mission-hud {
+
+    display: inline-block;
+
+    padding:
+        7px 11px;
+
+    background:
+        rgba(20,20,20,.72);
+
+    border:
+        1px solid
+        rgba(255,255,255,.15);
+
+    border-radius: 7px;
+
+    font-size: 13px;
+
+    backdrop-filter:
+        blur(5px);
+}
+
+
+.hud-right {
+
+    display: flex;
+
     gap: 8px;
+
+    pointer-events:
+        auto;
 }
 
-.hud-box {
-    background: rgba(15, 25, 20, 0.88);
-    color: white;
-
-    padding: 8px 12px;
-
-    border-radius: 8px;
-
-    font-size: 12px;
-
-    box-shadow:
-        0 4px 12px rgba(0,0,0,.25);
-}
-
-.hud-box strong {
-    display: block;
-}
-
-#status-text {
-    opacity: .75;
-    margin-top: 3px;
-}
 
 .hud-button {
-    pointer-events: auto;
-
-    margin-left: auto;
 
     width: 42px;
     height: 42px;
 
-    border: 0;
-    border-radius: 8px;
-
-    background: rgba(15,25,20,.9);
-    color: white;
-
-    font-size: 16px;
-}
-
-
-/* =====================================================
-   MISIÓN HUD
-===================================================== */
-
-#mission-hud {
-    display: inline-block;
-
-    margin-top: 8px;
-
-    background: rgba(20,30,25,.85);
-    color: #fff;
-
-    padding: 7px 12px;
-
-    border-radius: 20px;
-
-    font-size: 13px;
-}
-
-
-/* =====================================================
-   MINIMAPA
-===================================================== */
-
-#minimap-container {
-    position: absolute;
-
-    top: 15px;
-    right: 15px;
-
-    z-index: 15;
-
-    width: 190px;
-
-    padding: 5px;
-
-    background: rgba(10,15,12,.9);
+    border: none;
 
     border-radius: 10px;
 
+    background:
+        rgba(20,20,20,.75);
+
+    color: white;
+
+    font-size: 18px;
+
+    cursor: pointer;
+
+    backdrop-filter:
+        blur(5px);
+
     box-shadow:
-        0 5px 18px rgba(0,0,0,.35);
+        0 4px 15px
+        rgba(0,0,0,.25);
 }
 
-#minimap {
-    display: block;
+
+.hud-button:active {
+    transform:
+        scale(.94);
+}
+
+
+/* =========================================================
+   MINIMAPA
+========================================================= */
+
+#minimap-container {
+
+    position: absolute;
+
+    right: 20px;
+    top: 82px;
 
     width: 180px;
     height: 120px;
 
-    border-radius: 6px;
-}
-
-#minimap-container span {
-    display: block;
-
-    color: white;
-
-    text-align: center;
-
-    font-size: 9px;
-
-    margin-top: 3px;
-}
-
-
-/* =====================================================
-   HINT
-===================================================== */
-
-#interaction-hint {
-    position: absolute;
-
-    left: 50%;
-    bottom: 30px;
-
-    transform: translateX(-50%);
-
-    display: none;
-
-    align-items: center;
-
-    gap: 8px;
-
-    padding: 9px 14px;
-
-    border-radius: 20px;
-
-    background: rgba(15,20,18,.9);
-
-    color: white;
-
-    z-index: 30;
-
-    font-size: 13px;
-
-    pointer-events: none;
-}
-
-#interaction-hint strong {
-    background: white;
-    color: #111;
-
-    border-radius: 5px;
-
-    padding: 3px 7px;
-}
-
-
-/* =====================================================
-   PANTALLAS
-===================================================== */
-
-.screen {
-    position: absolute;
-
-    inset: 0;
-
-    z-index: 100;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(80,100,70,.25),
-            rgba(0,0,0,.78)
-        );
-}
-
-.screen-card {
-    width: min(90%, 440px);
-
-    padding: 35px 25px;
-
-    text-align: center;
-
-    color: white;
-
-    background: rgba(20,28,23,.94);
-
     border:
-        1px solid rgba(255,255,255,.12);
-
-    border-radius: 18px;
-
-    box-shadow:
-        0 20px 60px rgba(0,0,0,.5);
-}
-
-.game-logo {
-    letter-spacing: 5px;
-
-    font-size: 12px;
-
-    opacity: .65;
-
-    margin-bottom: 18px;
-}
-
-.screen-card h1 {
-    font-size: clamp(28px, 7vw, 48px);
-
-    line-height: .95;
-
-    letter-spacing: 2px;
-
-    margin-bottom: 20px;
-}
-
-.screen-card h2 {
-    font-size: 30px;
-
-    margin-bottom: 25px;
-}
-
-.screen-card p {
-    line-height: 1.5;
-
-    opacity: .8;
-
-    margin-bottom: 25px;
-}
-
-
-/* =====================================================
-   BOTONES
-===================================================== */
-
-#start-button,
-#resume-button,
-#restart-button,
-#dialogue-close,
-#mission-close,
-#inventory-close {
-
-    border: 0;
-
-    padding: 13px 25px;
+        2px solid
+        rgba(255,255,255,.45);
 
     border-radius: 8px;
 
-    background: #d6a84f;
+    overflow: hidden;
 
-    color: #1a1a1a;
-
-    font-weight: bold;
-
-    transition:
-        transform .15s,
-        filter .15s;
-}
-
-#start-button {
-    width: 100%;
-
-    font-size: 17px;
-
-    padding: 16px;
-}
-
-#resume-button,
-#restart-button {
-    width: 100%;
-
-    margin-top: 10px;
-}
-
-#start-button:hover,
-#resume-button:hover,
-#restart-button:hover,
-#dialogue-close:hover,
-#mission-close:hover,
-#inventory-close:hover {
-    filter: brightness(1.1);
-    transform: translateY(-1px);
-}
-
-.controls-info {
-    font-size: 11px !important;
-
-    margin-top: 20px;
-
-    margin-bottom: 0 !important;
-}
-
-
-/* =====================================================
-   MODALES
-===================================================== */
-
-.modal {
-    position: absolute;
-
-    inset: 0;
-
-    z-index: 80;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    padding: 20px;
-
-    background: rgba(0,0,0,.6);
-}
-
-.modal-card {
-    width: min(92%, 500px);
-
-    padding: 25px;
-
-    background: #f1e5cc;
-
-    color: #24231f;
-
-    border-radius: 14px;
+    background: rgba(0,0,0,.4);
 
     box-shadow:
-        0 20px 50px rgba(0,0,0,.5);
-}
+        0 5px 20px
+        rgba(0,0,0,.35);
 
-.modal-card h2 {
-    margin-bottom: 15px;
-}
-
-.modal-card p {
-    line-height: 1.6;
-
-    margin-bottom: 20px;
-}
-
-.modal-card button {
-    float: right;
-}
-
-#inventory-items {
-    min-height: 100px;
-
-    line-height: 1.8;
-
-    margin-bottom: 20px;
+    z-index: 15;
 }
 
 
-/* =====================================================
-   MENSAJE
-===================================================== */
+#minimap {
 
-#game-message {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+}
+
+
+/* =========================================================
+   INTERACCIÓN
+========================================================= */
+
+#interaction-hint {
+
     position: absolute;
 
     left: 50%;
-    top: 75%;
+
+    bottom: 125px;
 
     transform:
-        translate(-50%, -50%);
+        translateX(-50%);
 
-    z-index: 70;
+    padding:
+        10px 18px;
 
-    padding: 12px 20px;
-
-    border-radius: 20px;
-
-    background: rgba(0,0,0,.85);
-
-    color: white;
-
-    opacity: 0;
-
-    pointer-events: none;
-
-    transition: opacity .2s;
-}
-
-#game-message.show {
-    opacity: 1;
-}
-
-
-/* =====================================================
-   CONTROLES MÓVILES
-===================================================== */
-
-#mobile-controls {
-    position: absolute;
-
-    inset: auto 0 0 0;
-
-    height: 210px;
-
-    z-index: 40;
-
-    display: none;
-
-    pointer-events: none;
-}
-
-#joystick-area {
-    position: absolute;
-
-    left: 20px;
-    bottom: 25px;
-
-    width: 150px;
-    height: 150px;
-
-    pointer-events: auto;
-}
-
-#joystick-base {
-    position: absolute;
-
-    left: 50%;
-    top: 50%;
-
-    transform:
-        translate(-50%, -50%);
-
-    width: 115px;
-    height: 115px;
-
-    border-radius: 50%;
-
-    background: rgba(20,25,22,.45);
-
-    border:
-        2px solid rgba(255,255,255,.25);
-
-    backdrop-filter: blur(4px);
-}
-
-#joystick-stick {
-    position: absolute;
-
-    left: 50%;
-    top: 50%;
-
-    width: 55px;
-    height: 55px;
-
-    transform:
-        translate(-50%, -50%);
-
-    border-radius: 50%;
-
-    background: rgba(255,255,255,.65);
-
-    box-shadow:
-        0 5px 15px rgba(0,0,0,.25);
-}
-
-#mobile-actions {
-    position: absolute;
-
-    right: 20px;
-    bottom: 35px;
-
-    display: flex;
-
-    gap: 12px;
-
-    pointer-events: auto;
-}
-
-.mobile-button {
-    width: 65px;
-    height: 65px;
-
-    border-radius: 50%;
-
-    border:
-        2px solid rgba(255,255,255,.35);
+    border-radius: 30px;
 
     background:
-        rgba(20,25,22,.65);
+        rgba(15,15,15,.82);
 
-    color: white;
+    border:
+        1px solid
+        rgba(255,255,255,.2);
 
-    font-weight: bold;
+    font-size: 14px;
 
-    font-size: 18px;
+    z-index: 25;
 
-    box-shadow:
-        0 5px 15px rgba(0,0,0,.3);
+    backdrop-filter:
+        blur(8px);
 }
 
-
-/* =====================================================
-   UTILIDAD
-===================================================== */
 
 .hidden {
     display: none !important;
 }
 
 
-/* =====================================================
-   CELULAR
-===================================================== */
+/* =========================================================
+   PANELES
+========================================================= */
 
-@media (max-width: 800px) {
+.panel {
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%,-50%);
+
+    width:
+        min(520px, 88vw);
+
+    padding: 6px;
+
+    border-radius: 18px;
+
+    background:
+        rgba(15,15,15,.78);
+
+    border:
+        1px solid
+        rgba(255,255,255,.16);
+
+    box-shadow:
+        0 25px 80px
+        rgba(0,0,0,.55);
+
+    backdrop-filter:
+        blur(15px);
+
+    z-index: 100;
+}
+
+
+.panel-inner {
+
+    padding: 28px;
+
+    border-radius: 13px;
+
+    background:
+        rgba(35,35,35,.9);
+}
+
+
+.panel-label {
+
+    margin-bottom: 8px;
+
+    font-size: 11px;
+
+    letter-spacing: 2px;
+
+    opacity: .65;
+}
+
+
+.panel h2 {
+
+    margin-bottom: 15px;
+
+    font-size: 27px;
+}
+
+
+.dialogue-name {
+
+    margin-bottom: 12px;
+
+    font-size: 19px;
+
+    font-weight: 800;
+}
+
+
+.dialogue-text {
+
+    line-height: 1.6;
+
+    font-size: 16px;
+
+    color:
+        rgba(255,255,255,.9);
+
+    margin-bottom: 22px;
+}
+
+
+.primary-button,
+.secondary-button {
+
+    width: 100%;
+
+    padding:
+        13px 18px;
+
+    margin-top: 9px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    border: none;
+}
+
+
+.primary-button {
+
+    background: #e2b75e;
+
+    color: #20180e;
+}
+
+
+.secondary-button {
+
+    background:
+        rgba(255,255,255,.1);
+
+    color: white;
+
+    border:
+        1px solid
+        rgba(255,255,255,.15);
+}
+
+
+.primary-button:active,
+.secondary-button:active {
+
+    transform:
+        scale(.98);
+}
+
+
+/* =========================================================
+   INVENTARIO
+========================================================= */
+
+.inventory-items {
+
+    min-height: 90px;
+
+    padding: 15px;
+
+    margin:
+        15px 0;
+
+    border-radius: 10px;
+
+    background:
+        rgba(255,255,255,.06);
+
+    line-height: 1.8;
+}
+
+
+.inventory-stats {
+
+    display: flex;
+
+    flex-direction:
+        column;
+
+    gap: 7px;
+
+    margin-bottom: 10px;
+
+    opacity: .85;
+}
+
+
+/* =========================================================
+   PANTALLA DE INICIO
+========================================================= */
+
+#start-screen {
+
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    justify-content:
+        center;
+
+    align-items:
+        center;
+
+    text-align: center;
+
+    z-index: 200;
+
+    background:
+        linear-gradient(
+            rgba(0,0,0,.48),
+            rgba(0,0,0,.72)
+        );
+
+    padding: 25px;
+}
+
+
+.start-content {
+
+    width:
+        min(720px, 94vw);
+
+    padding: 45px 30px;
+}
+
+
+.start-kicker {
+
+    font-size: 12px;
+
+    letter-spacing: 4px;
+
+    opacity: .75;
+
+    margin-bottom: 18px;
+}
+
+
+.start-content h1 {
+
+    font-size:
+        clamp(38px, 8vw, 82px);
+
+    line-height: .95;
+
+    letter-spacing:
+        -2px;
+
+    margin-bottom: 22px;
+
+    text-shadow:
+        0 8px 30px
+        rgba(0,0,0,.65);
+}
+
+
+.start-content h1 span {
+
+    display: block;
+
+    color: #e2b75e;
+}
+
+
+.start-content p {
+
+    max-width: 600px;
+
+    margin:
+        0 auto 30px;
+
+    line-height: 1.6;
+
+    font-size: 17px;
+
+    color:
+        rgba(255,255,255,.84);
+}
+
+
+.start-button {
+
+    border: none;
+
+    padding:
+        16px 42px;
+
+    border-radius: 50px;
+
+    background:
+        #e2b75e;
+
+    color:
+        #21180d;
+
+    font-size: 17px;
+
+    font-weight: 900;
+
+    letter-spacing: 1px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.35);
+
+    transition:
+        transform .15s,
+        box-shadow .15s;
+}
+
+
+.start-button:hover {
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 15px 40px
+        rgba(0,0,0,.45);
+}
+
+
+.start-button:active {
+
+    transform:
+        scale(.96);
+}
+
+
+.controls-info {
+
+    margin-top: 28px;
+
+    display: flex;
+
+    justify-content:
+        center;
+
+    flex-wrap: wrap;
+
+    gap: 9px;
+
+    font-size: 12px;
+
+    opacity: .55;
+}
+
+
+/* =========================================================
+   CONTROLES MOBILE
+========================================================= */
+
+#mobile-controls {
+
+    position: absolute;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    z-index: 40;
+}
+
+
+#joystick {
+
+    position: absolute;
+
+    left: 25px;
+
+    bottom: 25px;
+
+    width: 125px;
+    height: 125px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,255,255,.08);
+
+    border:
+        2px solid
+        rgba(255,255,255,.18);
+
+    pointer-events: auto;
+}
+
+
+#joystick-knob {
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 52px;
+    height: 52px;
+
+    margin-left: -26px;
+    margin-top: -26px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,255,255,.25);
+
+    border:
+        2px solid
+        rgba(255,255,255,.4);
+
+    box-shadow:
+        0 5px 20px
+        rgba(0,0,0,.25);
+}
+
+
+.action-button {
+
+    position: absolute;
+
+    width: 64px;
+    height: 64px;
+
+    border-radius: 50%;
+
+    border:
+        2px solid
+        rgba(255,255,255,.25);
+
+    background:
+        rgba(20,20,20,.7);
+
+    color: white;
+
+    font-weight: 900;
+
+    font-size: 20px;
+
+    pointer-events: auto;
+
+    box-shadow:
+        0 5px 20px
+        rgba(0,0,0,.3);
+}
+
+
+#mobile-interact {
+
+    right: 35px;
+    bottom: 45px;
+
+    background:
+        rgba(226,183,94,.85);
+
+    color: #21180d;
+}
+
+
+#mobile-inventory {
+
+    right: 105px;
+    bottom: 115px;
+
+    font-size: 20px;
+}
+
+
+/* =========================================================
+   NOTIFICACIONES
+========================================================= */
+
+#notification-container {
+
+    position: absolute;
+
+    left: 50%;
+    top: 75px;
+
+    transform:
+        translateX(-50%);
+
+    z-index: 150;
+
+    pointer-events: none;
+}
+
+
+.notification {
+
+    padding:
+        10px 18px;
+
+    margin-bottom: 8px;
+
+    border-radius: 8px;
+
+    background:
+        rgba(20,20,20,.88);
+
+    border:
+        1px solid
+        rgba(255,255,255,.15);
+
+    box-shadow:
+        0 8px 30px
+        rgba(0,0,0,.35);
+
+    animation:
+        notificationIn .25s ease;
+}
+
+
+@keyframes notificationIn {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(-10px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0);
+
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media
+(pointer: coarse) {
 
     #mobile-controls {
         display: block;
     }
 
-    #minimap-container {
-        width: 145px;
-
-        top: 10px;
-        right: 10px;
-    }
-
-    #minimap {
-        width: 135px;
-        height: 90px;
-    }
-
-    .hud-box {
-        padding: 6px 8px;
-
-        font-size: 10px;
-    }
-
-    #hud {
-        padding: 8px;
-    }
-
-    #hud-top {
-        max-width: calc(100% - 150px);
-        flex-wrap: wrap;
-    }
-
     #interaction-hint {
-        bottom: 215px;
+        bottom: 205px;
     }
 
-}
-
-
-/* =====================================================
-   CELULAR PEQUEÑO
-===================================================== */
-
-@media (max-width: 500px) {
-
-    #minimap-container {
+    .controls-info {
         display: none;
     }
 
-    #hud-top {
-        max-width: 100%;
-    }
-
-    .hud-box:first-child {
-        width: 100%;
-    }
-
-    .screen-card {
-        padding: 28px 20px;
-    }
-
 }
 
 
-/* =====================================================
-   PANTALLA GRANDE
-===================================================== */
-
-@media (min-width: 801px) {
+@media
+(pointer: fine) {
 
     #mobile-controls {
-        display: none !important;
+        display: none;
     }
 
 }
-```
+
+
+@media
+(max-width: 600px) {
+
+    #hud {
+
+        padding:
+            12px;
+
+    }
+
+    .game-title {
+
+        font-size: 11px;
+
+    }
+
+    #mission-hud {
+
+        font-size: 11px;
+
+        max-width:
+            210px;
+
+    }
+
+    #minimap-container {
+
+        top: 70px;
+
+        right: 10px;
+
+        width: 135px;
+        height: 90px;
+
+    }
+
+    .panel-inner {
+
+        padding: 22px;
+
+    }
+
+    .panel h2 {
+
+        font-size: 22px;
+
+    }
+
+    .dialogue-text {
+
+        font-size: 15px;
+
+    }
+
+}
