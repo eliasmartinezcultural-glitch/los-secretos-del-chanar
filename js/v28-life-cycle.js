@@ -1,0 +1,7 @@
+/* V28.9 — autonomous actor life-cycle bridge */
+(function(){'use strict';const C=window.ChanarV28Life={version:'28.9',actors:new Map()};
+C.register=function(actor,id){const key=id||actor.id||('actor-'+C.actors.size);if(!C.actors.has(key))C.actors.set(key,{actor:actor,state:'idle',destination:null,route:[],action:null,lastTick:-1});return C.actors.get(key)};
+C.tick=function(actor,ctx){const id=actor.id||actor.name||('actor-'+C.actors.size),entry=C.register(actor,id);const B=window.ChanarV28Behavior,N=window.ChanarV28Navigation;if(!B||!N)return entry;const hour=Number(ctx&&ctx.hour||8),zone=ctx&&ctx.zone||'street';if(entry.lastTick===hour)return entry;entry.lastTick=hour;const decision=B.next(actor,{hour:hour,zone:zone});if(decision.to!==entry.state){entry.state=decision.to;entry.action=null;const places=B.destination(entry.state,zone);entry.destination=places[0]||zone;entry.route=[]}if(ctx&&ctx.destinations&&entry.destination){const target=ctx.destinations[entry.destination];if(target){entry.route=N.route(actor,[target]);if(N.arrived(actor,target,24)){entry.action=entry.state;entry.route=[]}}}return entry};
+C.snapshot=function(){return Array.from(C.actors.entries()).map(function(x){return{id:x[0],state:x[1].state,destination:x[1].destination,action:x[1].action}})};
+C.rule='Cada actor conserva estado, destino, ruta y acción; el ciclo se actualiza por tiempo y contexto sin borrar su identidad.';
+})();
