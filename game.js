@@ -1,23 +1,32 @@
-/* =========================================================
+/* =====================================================
    LOS SECRETOS DEL CHAÑAR
-   VERSIÓN 19.0
-   PUEBLO VIVO
+   V19.0
+   MOTOR PRINCIPAL
+
    PC + CELULAR
-========================================================= */
+   MUNDO ABIERTO
+   DIA / NOCHE
+   CLIMA
+   TRAFICO
+   NPC
+   ANIMALES
+   CASAS
+   NEGOCIOS
+   INTERIORES
+   MISIONES
+   INVENTARIO
+===================================================== */
 
-"use strict";
 
-
-/* =========================================================
+/* =====================================================
    CANVAS
-========================================================= */
+===================================================== */
 
 const canvas =
     document.getElementById("game");
 
 const ctx =
     canvas.getContext("2d");
-
 
 const minimap =
     document.getElementById("minimap");
@@ -26,132 +35,25 @@ const miniCtx =
     minimap.getContext("2d");
 
 
-/* =========================================================
-   MUNDO
-========================================================= */
+/* =====================================================
+   CONFIGURACION
+===================================================== */
 
 const WORLD_WIDTH = 5200;
 const WORLD_HEIGHT = 3600;
 
-
-/* =========================================================
-   CONFIGURACIÓN
-========================================================= */
-
-let gameStarted = false;
-
-let currentBuilding = null;
-
-let worldMinutes = 8 * 60;
-
-let lastTime = 0;
-
-let toastTimer = 0;
-
-let speechTimer = 0;
-
-
-/* =========================================================
-   PLAYER
-========================================================= */
-
-const player = {
-
-    x: 2550,
-
-    y: 1650,
-
-    width: 28,
-
-    height: 42,
-
-    speed: 210,
-
-    moving: false,
-
-    direction: "down",
-
-    animation: 0,
-
-    mate: false,
-
-    money: 150,
-
-    bread: 0
-
-};
-
-
-/* =========================================================
-   CAMERA
-========================================================= */
-
-const camera = {
-
-    x: 0,
-
-    y: 0,
-
-    smooth: 0.12
-
-};
-
-
-/* =========================================================
-   TECLADO
-========================================================= */
+const TILE = 40;
 
 const keys = {};
 
+let gameStarted = false;
 
-document.addEventListener(
-    "keydown",
-    event => {
-
-        const key =
-            event.key.toLowerCase();
-
-        keys[key] = true;
+let paused = false;
 
 
-        if (
-            key === "e" &&
-            !event.repeat
-        ) {
-
-            interact();
-
-        }
-
-
-        if (
-            key === "m" &&
-            !event.repeat
-        ) {
-
-            toggleInventory();
-
-        }
-
-    }
-);
-
-
-document.addEventListener(
-    "keyup",
-    event => {
-
-        keys[
-            event.key.toLowerCase()
-        ] = false;
-
-    }
-);
-
-
-/* =========================================================
+/* =====================================================
    RESIZE
-========================================================= */
+===================================================== */
 
 function resizeCanvas() {
 
@@ -184,7 +86,6 @@ function resizeCanvas() {
 
 }
 
-
 window.addEventListener(
     "resize",
     resizeCanvas
@@ -193,422 +94,386 @@ window.addEventListener(
 resizeCanvas();
 
 
-/* =========================================================
-   CALLES
-   LOS VEHÍCULOS SOLO PUEDEN CIRCULAR AQUÍ
-========================================================= */
+/* =====================================================
+   CAMARA
+===================================================== */
+
+const camera = {
+
+    x: 0,
+    y: 0,
+
+    smooth: .13
+
+};
+
+
+/* =====================================================
+   JUGADOR
+===================================================== */
+
+const player = {
+
+    x: 2500,
+    y: 1800,
+
+    width: 28,
+    height: 34,
+
+    speed: 3.7,
+
+    moving: false,
+
+    direction: "down",
+
+    frame: 0,
+
+    inside: false,
+
+    currentBuilding: null,
+
+    bread: 0,
+
+    mate: 0
+
+};
+
+
+/* =====================================================
+   TIEMPO
+===================================================== */
+
+const world = {
+
+    day: 1,
+
+    hour: 8,
+
+    minute: 0,
+
+    timeSpeed: .025,
+
+    weather: "clear",
+
+    weatherTimer: 0,
+
+    rain: false
+
+};
+
+
+/* =====================================================
+   CLIMA
+===================================================== */
+
+const weatherTypes = [
+
+    {
+        id: "clear",
+        name: "Despejado",
+        icon: "☀",
+        darkness: 0
+    },
+
+    {
+        id: "cloudy",
+        name: "Nublado",
+        icon: "☁",
+        darkness: .08
+    },
+
+    {
+        id: "rain",
+        name: "Lluvia",
+        icon: "🌧",
+        darkness: .20
+    }
+
+];
+
+
+/* =====================================================
+   CARRETERAS
+===================================================== */
 
 const roads = [
 
     {
         x: 0,
-        y: 1480,
+        y: 1670,
         width: WORLD_WIDTH,
-        height: 130,
+        height: 150,
         type: "avenue"
     },
 
     {
-        x: 0,
-        y: 2050,
-        width: WORLD_WIDTH,
-        height: 110,
-        type: "street"
-    },
-
-    {
-        x: 1050,
+        x: 2420,
         y: 0,
-        width: 120,
+        width: 160,
         height: WORLD_HEIGHT,
         type: "street"
     },
 
     {
-        x: 2450,
-        y: 0,
-        width: 130,
-        height: WORLD_HEIGHT,
-        type: "avenue"
-    },
-
-    {
-        x: 3650,
-        y: 0,
-        width: 120,
-        height: WORLD_HEIGHT,
-        type: "street"
-    },
-
-    {
-        x: 4300,
-        y: 800,
-        width: 900,
-        height: 95,
-        type: "rural"
-    },
-
-    {
-        x: 800,
-        y: 2750,
-        width: 3500,
-        height: 100,
-        type: "rural"
-    }
-
-];
-
-
-/* =========================================================
-   EDIFICIOS
-========================================================= */
-
-const buildings = [
-
-    {
-        id: "panaderia",
-
-        x: 1750,
-        y: 1280,
-
-        width: 300,
-        height: 230,
-
-        type: "bakery",
-
-        name: "PANADERÍA EL CHAÑAR",
-
-        color: "#c98c5d",
-
-        interior: true,
-
-        locked: false
-    },
-
-
-    {
-        id: "radio",
-
-        x: 2750,
-        y: 1250,
-
-        width: 350,
-        height: 250,
-
-        type: "radio",
-
-        name: "RADIO OCARINA",
-
-        color: "#6c7567",
-
-        interior: true,
-
-        locked: false
-    },
-
-
-    {
-        id: "municipalidad",
-
-        x: 3150,
-        y: 1220,
-
-        width: 360,
-        height: 260,
-
-        type: "government",
-
-        name: "MUNICIPALIDAD",
-
-        color: "#a99b80",
-
-        interior: true,
-
-        locked: true
-    },
-
-
-    {
-        id: "casa1",
-
-        x: 1350,
-        y: 1000,
-
-        width: 230,
-        height: 170,
-
-        type: "house",
-
-        name: "Casa de Rosa",
-
-        color: "#a86f52",
-
-        interior: true,
-
-        locked: false
-    },
-
-
-    {
-        id: "casa2",
-
-        x: 3550,
-        y: 1080,
-
-        width: 250,
-        height: 180,
-
-        type: "house",
-
-        name: "Casa de Don Pedro",
-
-        color: "#88715e",
-
-        interior: true,
-
-        locked: false
-    },
-
-
-    {
-        id: "club",
-
-        x: 3150,
-        y: 2350,
-
-        width: 600,
-
-        height: 430,
-
-        type: "stadium",
-
-        name: "CLUB SOCIAL Y DEPORTIVO",
-
-        color: "#7d654f",
-
-        interior: true,
-
-        locked: false
-    },
-
-
-    {
-        id: "almacen",
-
-        x: 750,
-        y: 1900,
-
-        width: 260,
-
-        height: 190,
-
-        type: "store",
-
-        name: "ALMACÉN DE LA ESQUINA",
-
-        color: "#92704f",
-
-        interior: true,
-
-        locked: false
-    },
-
-
-    {
-        id: "escuela",
-
-        x: 700,
-        y: 1150,
-
-        width: 390,
-
-        height: 250,
-
-        type: "school",
-
-        name: "ESCUELA",
-
-        color: "#b27d59",
-
-        interior: true,
-
-        locked: true
-    }
-
-];
-
-
-/* =========================================================
-   CHACRAS
-========================================================= */
-
-const chacras = [
-
-    {
-        x: 100,
-        y: 500,
-        width: 850,
-        height: 550
-    },
-
-    {
-        x: 3800,
-        y: 350,
-        width: 1150,
-        height: 500
-    },
-
-    {
-        x: 100,
-        y: 3000,
-        width: 900,
-        height: 450
+        x: 500,
+        y: 2450,
+        width: 4200,
+        height: 120,
+        type: "route"
     },
 
     {
         x: 4000,
-        y: 2850,
-        width: 1000,
-        height: 500
+        y: 700,
+        width: 130,
+        height: 1850,
+        type: "route"
     }
 
 ];
 
 
-/* =========================================================
-   VIÑEDOS
-========================================================= */
+/* =====================================================
+   ZONAS
+===================================================== */
 
-const vineyards = [
+const zones = [
 
     {
+        name: "CENTRO DEL CHAÑAR",
+        x: 1450,
+        y: 1000,
+        width: 1800,
+        height: 1250
+    },
+
+    {
+        name: "CHACRAS",
+        x: 100,
+        y: 400,
+        width: 1250,
+        height: 1900
+    },
+
+    {
+        name: "SECTOR RURAL",
         x: 200,
-        y: 600,
-        rows: 11,
-        cols: 18
+        y: 2550,
+        width: 3700,
+        height: 850
     },
 
     {
-        x: 3900,
-        y: 420,
-        rows: 10,
-        cols: 17
-    },
-
-    {
+        name: "RIBERA",
         x: 4200,
-        y: 2900,
-        rows: 10,
-        cols: 16
+        y: 2550,
+        width: 1000,
+        height: 1050
     }
 
 ];
 
 
-/* =========================================================
-   RÍO
-   ALEJADO DEL CASCO URBANO
-========================================================= */
+/* =====================================================
+   EDIFICIOS
+===================================================== */
 
-const river = {
-
-    x: 0,
-
-    y: 3350,
-
-    width: WORLD_WIDTH,
-
-    height: 250
-
-};
-
-
-/* =========================================================
-   CANALES
-========================================================= */
-
-const canals = [
+const buildings = [
 
     {
-        x: 0,
-        y: 920,
-        width: 5200,
-        height: 35
+        id: "bakery",
+        x: 1650,
+        y: 1320,
+        width: 260,
+        height: 180,
+        type: "business",
+        name: "PANADERÍA EL CHAÑAR",
+        color: "#c9895f",
+        roof: "#704634",
+        interior: true
     },
 
     {
-        x: 1250,
-        y: 0,
-        width: 30,
-        height: 3600
+        id: "radio",
+        x: 2870,
+        y: 1190,
+        width: 340,
+        height: 210,
+        type: "radio",
+        name: "RADIO OCARINA",
+        color: "#6f665b",
+        roof: "#423c37",
+        interior: true
     },
 
     {
-        x: 4050,
+        id: "school",
+        x: 1660,
+        y: 1950,
+        width: 400,
+        height: 230,
+        type: "school",
+        name: "ESCUELA",
+        color: "#b87355",
+        roof: "#583b31",
+        interior: true
+    },
+
+    {
+        id: "stadium",
+        x: 3250,
+        y: 1750,
+        width: 700,
+        height: 450,
+        type: "stadium",
+        name: "ESTADIO",
+        color: "#8a806b",
+        roof: "#635c50",
+        interior: true
+    },
+
+    {
+        id: "museum",
+        x: 2220,
+        y: 1050,
+        width: 300,
+        height: 200,
+        type: "museum",
+        name: "MUSEO LOCAL",
+        color: "#927a62",
+        roof: "#4d4035",
+        interior: true
+    },
+
+    {
+        id: "market",
+        x: 1970,
+        y: 1350,
+        width: 260,
+        height: 180,
+        type: "business",
+        name: "ALMACÉN DEL BARRIO",
+        color: "#a98b65",
+        roof: "#5b4636",
+        interior: true
+    },
+
+    {
+        id: "house1",
+        x: 1480,
+        y: 1480,
+        width: 250,
+        height: 160,
+        type: "house",
+        name: "CASA DE ROSA",
+        color: "#d19a70",
+        roof: "#774a39",
+        interior: true
+    },
+
+    {
+        id: "house2",
+        x: 2300,
+        y: 1500,
+        width: 260,
+        height: 170,
+        type: "house",
+        name: "CASA DE DON PEDRO",
+        color: "#c7a174",
+        roof: "#594437",
+        interior: true
+    },
+
+    {
+        id: "house3",
+        x: 2700,
+        y: 1740,
+        width: 270,
+        height: 170,
+        type: "house",
+        name: "CASA DE MARÍA",
+        color: "#d4a879",
+        roof: "#624639",
+        interior: true
+    },
+
+    {
+        id: "farmhouse",
+        x: 650,
         y: 850,
-        width: 30,
-        height: 2600
+        width: 330,
+        height: 200,
+        type: "farm",
+        name: "CHACRA",
+        color: "#b78860",
+        roof: "#594336",
+        interior: true
     }
 
 ];
 
 
-/* =========================================================
-   ÁRBOLES
-========================================================= */
+/* =====================================================
+   ARBOLES
+===================================================== */
 
 const trees = [];
 
 function generateTrees() {
 
-    for (
-        let i = 0;
-        i < 220;
-        i++
-    ) {
+    const positions = [
 
-        const x =
-            100 +
-            Math.random() *
-            (WORLD_WIDTH - 200);
+        [300,300],
+        [600,250],
+        [1000,330],
+        [1250,650],
 
-        const y =
-            100 +
-            Math.random() *
-            (WORLD_HEIGHT - 400);
+        [400,1300],
+        [800,1450],
+        [1100,1650],
 
-        if (
-            insideAnyBuilding(x, y)
-        ) {
+        [350,2100],
+        [850,2200],
 
-            continue;
+        [1450,700],
+        [3200,800],
+        [3500,950],
+
+        [4300,700],
+        [4800,900],
+
+        [500,2900],
+        [1200,3000],
+        [1900,2850],
+        [2700,3100],
+        [3400,2900],
+
+        [4500,2900],
+        [4900,3200]
+    ];
+
+    positions.forEach(
+        p => {
+
+            trees.push({
+                x: p[0],
+                y: p[1],
+                size:
+                    26 +
+                    Math.random() * 14
+            });
 
         }
-
-        if (
-            insideRoad(x, y)
-        ) {
-
-            continue;
-
-        }
-
-        trees.push({
-            x,
-            y,
-            size:
-                0.7 +
-                Math.random() * 0.7
-        });
-
-    }
+    );
 
 }
 
+generateTrees();
 
-/* =========================================================
+
+/* =====================================================
    FLORES
-========================================================= */
+===================================================== */
 
 const flowers = [];
 
@@ -616,394 +481,471 @@ function generateFlowers() {
 
     for (
         let i = 0;
-        i < 320;
+        i < 180;
         i++
     ) {
 
-        const x =
-            Math.random() *
-            WORLD_WIDTH;
-
-        const y =
-            Math.random() *
-            3300;
-
-        if (
-            insideRoad(x, y) ||
-            insideAnyBuilding(x, y)
-        ) {
-
-            continue;
-
-        }
-
         flowers.push({
-            x,
-            y,
+
+            x:
+                100 +
+                Math.random() *
+                (WORLD_WIDTH - 200),
+
+            y:
+                200 +
+                Math.random() *
+                (WORLD_HEIGHT - 400),
+
             type:
                 Math.floor(
-                    Math.random() * 4
+                    Math.random() * 3
                 )
+
         });
 
     }
 
 }
 
+generateFlowers();
 
-/* =========================================================
-   NPC
-========================================================= */
 
-const npcs = [
+/* =====================================================
+   VIÑEDOS
+===================================================== */
+
+const vineyards = [
 
     {
-        name: "Don Pedro",
-
-        x: 3460,
-        y: 1350,
-
-        role: "Vecino",
-
-        color: "#52605a",
-
-        activity: "mate",
-
-        dialogue: [
-
-            "Buen día, vecino.",
-
-            "Acá nos conocemos casi todos.",
-
-            "Si querés conocer Chañar, caminá. No te quedes mirando solamente.",
-
-            "Hay historias que no aparecen en ningún cartel."
-        ],
-
-        mission: true
-
+        x: 180,
+        y: 650,
+        rows: 13,
+        cols: 20
     },
 
-
     {
-        name: "Rosa",
-
-        x: 1450,
-        y: 1250,
-
-        role: "Panadera",
-
-        color: "#9b6547",
-
-        activity: "work",
-
-        dialogue: [
-
-            "Buen día. ¿Pan calentito?",
-
-            "Recién salieron las tortas fritas.",
-
-            "A la mañana el pueblo empieza por acá.",
-
-            "Llevate algo para el mate."
-        ]
-
+        x: 150,
+        y: 1750,
+        rows: 9,
+        cols: 22
     },
 
-
     {
-        name: "Miguel",
-
-        x: 2200,
-        y: 1500,
-
-        role: "Trabajador rural",
-
-        color: "#596d45",
-
-        activity: "work",
-
-        dialogue: [
-
-            "¿Venís de la chacra?",
-
-            "Por acá el agua vale oro.",
-
-            "Entre canales, chacras y viñedos se armó buena parte de la historia productiva.",
-
-            "No todo lo que parece desierto está seco."
-        ]
-
-    },
-
-
-    {
-        name: "María",
-
-        x: 2550,
-        y: 1700,
-
-        role: "Vecina",
-
-        color: "#754d58",
-
-        activity: "walk",
-
-        dialogue: [
-
-            "Hola.",
-
-            "Qué lindo día para caminar.",
-
-            "¿Ya conociste la plaza?",
-
-            "Después pasá por la radio."
-        ]
-
-    },
-
-
-    {
-        name: "Julián",
-
-        x: 2950,
-        y: 1450,
-
-        role: "Comunicador",
-
-        color: "#3e5362",
-
-        activity: "radio",
-
-        dialogue: [
-
-            "La radio tiene una historia larga en los pueblos.",
-
-            "Acá la gente llama, pregunta, saluda y cuenta cosas.",
-
-            "Un pueblo también se construye con las historias que cuenta."
-        ]
-
-    },
-
-
-    {
-        name: "Ana",
-
-        x: 900,
-        y: 1550,
-
-        role: "Docente",
-
-        color: "#8a694c",
-
-        activity: "walk",
-
-        dialogue: [
-
-            "Buen día.",
-
-            "Los chicos conocen el pueblo de una manera distinta.",
-
-            "Preguntales por sus lugares favoritos."
-        ]
-
+        x: 650,
+        y: 2600,
+        rows: 9,
+        cols: 25
     }
 
 ];
 
 
-/* =========================================================
-   ANIMALES
-========================================================= */
+/* =====================================================
+   RIO
+   IMPORTANTE:
+   SECTOR ALEJADO DEL CENTRO URBANO
+===================================================== */
 
-const animals = [
+const river = {
 
-    {
-        type: "dog",
-        x: 1250,
-        y: 1900,
-        vx: 20,
-        vy: 0
-    },
+    x: 4250,
 
-    {
-        type: "dog",
-        x: 3300,
-        y: 1600,
-        vx: -15,
-        vy: 0
-    },
+    y: 2550,
 
-    {
-        type: "cat",
-        x: 1550,
-        y: 1100,
-        vx: 8,
-        vy: 4
-    },
+    width: 950,
 
-    {
-        type: "horse",
-        x: 4700,
-        y: 3000,
-        vx: 0,
-        vy: 0
-    }
-
-];
-
-
-/* =========================================================
-   VEHÍCULOS
-========================================================= */
-
-const vehicles = [
-
-    {
-        type: "car",
-        x: 400,
-        y: 1545,
-        speed: 110,
-        direction: 1
-    },
-
-    {
-        type: "car",
-        x: 2200,
-        y: 2105,
-        speed: 85,
-        direction: -1
-    },
-
-    {
-        type: "tractor",
-        x: 700,
-        y: 2800,
-        speed: 45,
-        direction: 1
-    },
-
-    {
-        type: "tractor",
-        x: 4100,
-        y: 845,
-        speed: 42,
-        direction: -1
-    }
-
-];
-
-
-/* =========================================================
-   OBJETOS
-========================================================= */
-
-const objects = [
-
-    {
-        type: "photo",
-        name: "Fotografía antigua",
-        x: 820,
-        y: 1300,
-        collected: false
-    },
-
-    {
-        type: "document",
-        name: "Documento de la comunidad",
-        x: 3050,
-        y: 1350,
-        collected: false
-    },
-
-    {
-        type: "history",
-        name: "Historia del Chañar",
-        x: 2800,
-        y: 1350,
-        collected: false
-    },
-
-    {
-        type: "mate",
-        name: "Mate",
-        x: 1500,
-        y: 1400,
-        collected: false
-    }
-
-];
-
-
-/* =========================================================
-   INVENTARIO
-========================================================= */
-
-const inventory = [];
-
-
-/* =========================================================
-   MISIÓN
-========================================================= */
-
-const mission = {
-
-    stage: 0,
-
-    title:
-        "Los primeros secretos",
-
-    description:
-        "Hablá con Don Pedro y descubrí qué historia guarda el pueblo.",
-
-    completed:
-        false
+    height: 1050
 
 };
 
 
-/* =========================================================
-   UTILIDADES
-========================================================= */
+/* =====================================================
+   NPC
+===================================================== */
+
+const npcs = [
+
+    {
+        id: "pedro",
+
+        x: 2260,
+        y: 1680,
+
+        name: "Don Pedro",
+
+        role: "Vecino histórico",
+
+        personality: "mayor",
+
+        speed: 1,
+
+        destination: null,
+
+        text: [
+
+            "Buen día, chango. ¿Cómo andás?",
+
+            "Este pueblo parece tranquilo, pero tiene muchísima historia.",
+
+            "Si querés conocer Chañar, caminá. Mirá las calles, hablá con la gente.",
+
+            "Las historias más interesantes muchas veces aparecen en una charla cualquiera."
+
+        ],
+
+        mission: true
+    },
+
+    {
+        id: "maria",
+
+        x: 2810,
+        y: 1580,
+
+        name: "María",
+
+        role: "Vecina",
+
+        personality: "woman",
+
+        speed: 1.2,
+
+        destination: "bakery",
+
+        text: [
+
+            "Hola, ¿vas para el centro?",
+
+            "Yo tengo que pasar por la panadería.",
+
+            "Acá uno siempre termina conociendo a alguien en la calle.",
+
+            "Después de comprar el pan me voy para casa."
+        ]
+    },
+
+    {
+        id: "juan",
+
+        x: 1900,
+        y: 1700,
+
+        name: "Juan",
+
+        role: "Trabajador rural",
+
+        personality: "worker",
+
+        speed: 1.4,
+
+        destination: "farm",
+
+        text: [
+
+            "Buen día.",
+
+            "Hoy toca trabajar en la chacra.",
+
+            "Cuando llega la temporada, acá hay movimiento por todos lados.",
+
+            "El campo y el pueblo están mucho más conectados de lo que parece."
+        ]
+    },
+
+    {
+        id: "ana",
+
+        x: 3060,
+        y: 1510,
+
+        name: "Ana",
+
+        role: "Comunicadora",
+
+        personality: "woman",
+
+        speed: 1,
+
+        destination: "radio",
+
+        text: [
+
+            "¿Escuchaste la radio hoy?",
+
+            "La radio sirve para enterarse de todo lo que pasa.",
+
+            "En un pueblo, la comunicación tiene otra dimensión.",
+
+            "Siempre aparece alguna historia para contar."
+        ]
+    },
+
+    {
+        id: "luis",
+
+        x: 1780,
+        y: 1840,
+
+        name: "Luis",
+
+        role: "Vecino",
+
+        personality: "man",
+
+        speed: .8,
+
+        destination: "market",
+
+        text: [
+
+            "Hola.",
+
+            "¿Todo tranquilo?",
+
+            "Yo voy al almacén y vuelvo.",
+
+            "Nos vemos después."
+        ]
+    }
+
+];
+
+
+/* =====================================================
+   ANIMALES
+===================================================== */
+
+const animals = [
+
+    {
+        x: 800,
+        y: 1150,
+        type: "horse",
+        dx: .2,
+        dy: 0
+    },
+
+    {
+        x: 1000,
+        y: 1200,
+        type: "cow",
+        dx: -.1,
+        dy: 0
+    },
+
+    {
+        x: 1250,
+        y: 2800,
+        type: "horse",
+        dx: .15,
+        dy: .1
+    },
+
+    {
+        x: 4550,
+        y: 3000,
+        type: "dog",
+        dx: .3,
+        dy: .1
+    },
+
+    {
+        x: 2900,
+        y: 2300,
+        type: "dog",
+        dx: -.2,
+        dy: .15
+    }
+
+];
+
+
+/* =====================================================
+   VEHICULOS
+===================================================== */
+
+const vehicles = [
+
+    {
+        x: 100,
+        y: 1730,
+        width: 70,
+        height: 35,
+        speed: 2.2,
+        direction: 1,
+        type: "car",
+        color: "#b74d3d"
+    },
+
+    {
+        x: 1100,
+        y: 1780,
+        width: 70,
+        height: 35,
+        speed: 1.7,
+        direction: -1,
+        type: "car",
+        color: "#4b6879"
+    },
+
+    {
+        x: 600,
+        y: 2510,
+        width: 80,
+        height: 38,
+        speed: 1.5,
+        direction: 1,
+        type: "tractor",
+        color: "#c69a2c"
+    },
+
+    {
+        x: 2700,
+        y: 2510,
+        width: 75,
+        height: 38,
+        speed: 1.9,
+        direction: -1,
+        type: "truck",
+        color: "#64725c"
+    },
+
+    {
+        x: 4200,
+        y: 1200,
+        width: 75,
+        height: 36,
+        speed: 1.8,
+        direction: 1,
+        type: "car",
+        color: "#80515a"
+    }
+
+];
+
+
+/* =====================================================
+   SEMAFOROS
+===================================================== */
+
+const trafficLights = [
+
+    {
+        x: 2400,
+        y: 1600,
+        state: 0,
+        timer: 0
+    },
+
+    {
+        x: 2550,
+        y: 1670,
+        state: 2,
+        timer: 0
+    }
+
+];
+
+
+/* =====================================================
+   OBJETOS HISTORICOS
+===================================================== */
+
+const objects = [
+
+    {
+        x: 2130,
+        y: 1080,
+        type: "photo",
+        name: "Fotografía antigua del Chañar",
+        collected: false
+    },
+
+    {
+        x: 2320,
+        y: 1130,
+        type: "document",
+        name: "Documento histórico",
+        collected: false
+    },
+
+    {
+        x: 1250,
+        y: 900,
+        type: "photo",
+        name: "Fotografía de las chacras",
+        collected: false
+    },
+
+    {
+        x: 4460,
+        y: 2880,
+        type: "document",
+        name: "Documento encontrado junto al río",
+        collected: false
+    }
+
+];
+
+
+/* =====================================================
+   INVENTARIO
+===================================================== */
+
+const inventory = [];
+
+
+/* =====================================================
+   MISION
+===================================================== */
+
+const mission = {
+
+    active: false,
+
+    completed: false,
+
+    title:
+        "La memoria del pueblo",
+
+    description:
+        "Don Pedro quiere recuperar " +
+        "una fotografía antigua. " +
+        "Recorré el pueblo y encontrala."
+
+};
+
+
+/* =====================================================
+   DISTANCIA
+===================================================== */
 
 function distance(a, b) {
 
+    const ax =
+        a.x + (a.width || 0) / 2;
+
+    const ay =
+        a.y + (a.height || 0) / 2;
+
+    const bx =
+        b.x + (b.width || 0) / 2;
+
+    const by =
+        b.y + (b.height || 0) / 2;
+
     return Math.hypot(
-        a.x - b.x,
-        a.y - b.y
+        ax - bx,
+        ay - by
     );
 
 }
 
 
-function insideRoad(x, y) {
-
-    return roads.some(
-        road =>
-
-            x >= road.x &&
-            x <= road.x + road.width &&
-            y >= road.y &&
-            y <= road.y + road.height
-    );
-
-}
-
-
-function insideAnyBuilding(x, y) {
-
-    return buildings.some(
-        building =>
-
-            x >= building.x &&
-            x <= building.x + building.width &&
-            y >= building.y &&
-            y <= building.y + building.height
-    );
-
-}
-
+/* =====================================================
+   COLISION
+===================================================== */
 
 function collision(a, b) {
 
@@ -1026,178 +968,28 @@ function collision(a, b) {
 }
 
 
-/* =========================================================
-   MOVIMIENTO PLAYER
-========================================================= */
+/* =====================================================
+   EDIFICIOS SOLIDOS
+===================================================== */
 
-function updatePlayer(dt) {
+function buildingCollision(x, y) {
 
-    let dx = 0;
-    let dy = 0;
-
-
-    if (
-        keys["w"] ||
-        keys["arrowup"]
-    ) {
-
-        dy -= 1;
-
-        player.direction =
-            "up";
-
+    if (player.inside) {
+        return false;
     }
 
+    const test = {
 
-    if (
-        keys["s"] ||
-        keys["arrowdown"]
-    ) {
+        x: x,
+        y: y,
 
-        dy += 1;
+        width:
+            player.width,
 
-        player.direction =
-            "down";
-
-    }
-
-
-    if (
-        keys["a"] ||
-        keys["arrowleft"]
-    ) {
-
-        dx -= 1;
-
-        player.direction =
-            "left";
-
-    }
-
-
-    if (
-        keys["d"] ||
-        keys["arrowright"]
-    ) {
-
-        dx += 1;
-
-        player.direction =
-            "right";
-
-    }
-
-
-    if (
-        joystick.dx ||
-        joystick.dy
-    ) {
-
-        dx += joystick.dx;
-        dy += joystick.dy;
-
-    }
-
-
-    const magnitude =
-        Math.hypot(dx, dy);
-
-
-    if (
-        magnitude > 0
-    ) {
-
-        dx /= magnitude;
-        dy /= magnitude;
-
-        player.moving =
-            true;
-
-        player.animation +=
-            dt * 8;
-
-    } else {
-
-        player.moving =
-            false;
-
-    }
-
-
-    const nextX =
-        player.x +
-        dx *
-        player.speed *
-        dt;
-
-
-    const nextY =
-        player.y +
-        dy *
-        player.speed *
-        dt;
-
-
-    if (
-        canPlayerMove(
-            nextX,
-            player.y
-        )
-    ) {
-
-        player.x =
-            nextX;
-
-    }
-
-
-    if (
-        canPlayerMove(
-            player.x,
-            nextY
-        )
-    ) {
-
-        player.y =
-            nextY;
-
-    }
-
-
-    player.x =
-        Math.max(
-            20,
-            Math.min(
-                WORLD_WIDTH - 20,
-                player.x
-            )
-        );
-
-
-    player.y =
-        Math.max(
-            20,
-            Math.min(
-                WORLD_HEIGHT - 280,
-                player.y
-            )
-        );
-
-}
-
-
-function canPlayerMove(x, y) {
-
-    const body = {
-
-        x: x - 12,
-        y: y - 18,
-
-        width: 24,
-        height: 36
+        height:
+            player.height
 
     };
-
 
     for (
         const building
@@ -1206,49 +998,189 @@ function canPlayerMove(x, y) {
 
         if (
             collision(
-                body,
+                test,
                 building
             )
         ) {
 
-            return false;
+            return true;
 
         }
 
     }
 
-
-    /* RÍO */
-
-    if (
-        y >
-        river.y - 10
-    ) {
-
-        return false;
-
-    }
-
-
-    return true;
+    return false;
 
 }
 
 
-/* =========================================================
-   CÁMARA
-========================================================= */
+/* =====================================================
+   RIO
+===================================================== */
+
+function riverCollision(x, y) {
+
+    if (player.inside) {
+        return false;
+    }
+
+    const riverRect = {
+
+        x: river.x,
+        y: river.y,
+
+        width:
+            river.width,
+
+        height:
+            river.height
+
+    };
+
+    return collision(
+        {
+            x,
+            y,
+            width: player.width,
+            height: player.height
+        },
+        riverRect
+    );
+
+}
+
+
+/* =====================================================
+   MOVIMIENTO
+===================================================== */
+
+function updatePlayer() {
+
+    if (
+        !gameStarted ||
+        paused ||
+        player.inside
+    ) {
+        return;
+    }
+
+    let dx = 0;
+    let dy = 0;
+
+    if (
+        keys["w"] ||
+        keys["arrowup"]
+    ) {
+        dy -= player.speed;
+        player.direction = "up";
+    }
+
+    if (
+        keys["s"] ||
+        keys["arrowdown"]
+    ) {
+        dy += player.speed;
+        player.direction = "down";
+    }
+
+    if (
+        keys["a"] ||
+        keys["arrowleft"]
+    ) {
+        dx -= player.speed;
+        player.direction = "left";
+    }
+
+    if (
+        keys["d"] ||
+        keys["arrowright"]
+    ) {
+        dx += player.speed;
+        player.direction = "right";
+    }
+
+    if (
+        dx !== 0 &&
+        dy !== 0
+    ) {
+
+        dx *= .707;
+        dy *= .707;
+
+    }
+
+    player.moving =
+        dx !== 0 ||
+        dy !== 0;
+
+    if (player.moving) {
+
+        player.frame += .15;
+
+    }
+
+    const newX =
+        player.x + dx;
+
+    const newY =
+        player.y + dy;
+
+    if (
+        newX >= 0 &&
+        newX <
+        WORLD_WIDTH -
+        player.width &&
+        !buildingCollision(
+            newX,
+            player.y
+        ) &&
+        !riverCollision(
+            newX,
+            player.y
+        )
+    ) {
+
+        player.x = newX;
+
+    }
+
+    if (
+        newY >= 0 &&
+        newY <
+        WORLD_HEIGHT -
+        player.height &&
+        !buildingCollision(
+            player.x,
+            newY
+        ) &&
+        !riverCollision(
+            player.x,
+            newY
+        )
+    ) {
+
+        player.y = newY;
+
+    }
+
+}
+
+
+/* =====================================================
+   CAMARA
+===================================================== */
 
 function updateCamera() {
 
     const targetX =
-        player.x -
+        player.x +
+        player.width / 2 -
         window.innerWidth / 2;
 
     const targetY =
-        player.y -
+        player.y +
+        player.height / 2 -
         window.innerHeight / 2;
-
 
     camera.x +=
         (
@@ -1257,14 +1189,12 @@ function updateCamera() {
         ) *
         camera.smooth;
 
-
     camera.y +=
         (
             targetY -
             camera.y
         ) *
         camera.smooth;
-
 
     camera.x =
         Math.max(
@@ -1275,7 +1205,6 @@ function updateCamera() {
                 camera.x
             )
         );
-
 
     camera.y =
         Math.max(
@@ -1290,326 +1219,215 @@ function updateCamera() {
 }
 
 
-/* =========================================================
-   MUNDO
-========================================================= */
+/* =====================================================
+   RELOJ
+===================================================== */
 
-function drawWorld() {
+function updateTime() {
 
-    const w =
-        window.innerWidth;
+    if (!gameStarted) {
+        return;
+    }
+
+    world.minute +=
+        world.timeSpeed;
+
+    if (
+        world.minute >= 60
+    ) {
+
+        world.minute = 0;
+
+        world.hour++;
+
+    }
+
+    if (
+        world.hour >= 24
+    ) {
+
+        world.hour = 0;
+
+        world.day++;
+
+        chooseWeather();
+
+        notify(
+            "Comenzó un nuevo día."
+        );
+
+    }
+
+    updateClockHUD();
+
+}
+
+
+/* =====================================================
+   CLIMA
+===================================================== */
+
+function chooseWeather() {
+
+    const r =
+        Math.random();
+
+    if (r < .62) {
+
+        world.weather =
+            "clear";
+
+    } else if (r < .84) {
+
+        world.weather =
+            "cloudy";
+
+    } else {
+
+        world.weather =
+            "rain";
+
+    }
+
+    world.weatherTimer =
+        1000 +
+        Math.random() * 2000;
+
+}
+
+
+/* =====================================================
+   HUD RELOJ
+===================================================== */
+
+function updateClockHUD() {
 
     const h =
-        window.innerHeight;
+        String(
+            Math.floor(
+                world.hour
+            )
+        ).padStart(
+            2,
+            "0"
+        );
 
+    const m =
+        String(
+            Math.floor(
+                world.minute
+            )
+        ).padStart(
+            2,
+            "0"
+        );
+
+    document
+        .getElementById(
+            "clock"
+        )
+        .textContent =
+        `${h}:${m}`;
+
+    document
+        .getElementById(
+            "day-label"
+        )
+        .textContent =
+        `Día ${world.day}`;
+
+    const weather =
+        weatherTypes.find(
+            w =>
+                w.id ===
+                world.weather
+        );
+
+    document
+        .getElementById(
+            "weather-label"
+        )
+        .textContent =
+        `${weather.icon} ${weather.name}`;
+
+}
+
+
+/* =====================================================
+   FONDO
+===================================================== */
+
+function drawGround() {
 
     ctx.fillStyle =
-        "#b9a070";
+        "#b9a06f";
 
     ctx.fillRect(
-        camera.x,
-        camera.y,
-        w,
-        h
+        0,
+        0,
+        WORLD_WIDTH,
+        WORLD_HEIGHT
     );
 
-
-    drawRelief();
-
-    drawChacras();
-
-    drawCanals();
-
-    drawRiver();
+    drawZones();
 
     drawRoads();
 
-    drawVineyards();
+    drawRiver();
+
+    drawFields();
 
     drawFlowers();
 
     drawTrees();
 
-    drawBuildings();
-
-    drawAnimals();
-
-    drawVehicles();
-
-    drawNPCs();
-
-    drawObjects();
-
-    drawPlayer();
+    drawVineyards();
 
 }
 
 
-/* =========================================================
-   RELIEVE
-========================================================= */
+/* =====================================================
+   ZONAS
+===================================================== */
 
-function drawRelief() {
+function drawZones() {
 
     ctx.fillStyle =
-        "#927d63";
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        0,
-        650
-    );
-
-    ctx.lineTo(
-        600,
-        390
-    );
-
-    ctx.lineTo(
-        1200,
-        620
-    );
-
-    ctx.lineTo(
-        1900,
-        370
-    );
-
-    ctx.lineTo(
-        2600,
-        650
-    );
-
-    ctx.lineTo(
-        3400,
-        420
-    );
-
-    ctx.lineTo(
-        4200,
-        650
-    );
-
-    ctx.lineTo(
-        5200,
-        390
-    );
-
-    ctx.lineTo(
-        5200,
-        0
-    );
-
-    ctx.lineTo(
-        0,
-        0
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-
-
-    ctx.fillStyle =
-        "rgba(70,58,45,.15)";
-
-    for (
-        let i = 0;
-        i < 18;
-        i++
-    ) {
-
-        ctx.beginPath();
-
-        ctx.ellipse(
-            i * 320,
-            720 + Math.sin(i) * 40,
-            250,
-            90,
-            0,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-    }
-
-}
-
-
-/* =========================================================
-   CHACRAS
-========================================================= */
-
-function drawChacras() {
-
-    for (
-        const c
-        of chacras
-    ) {
-
-        ctx.fillStyle =
-            "#9c875e";
-
-        ctx.fillRect(
-            c.x,
-            c.y,
-            c.width,
-            c.height
-        );
-
-
-        ctx.strokeStyle =
-            "rgba(70,80,45,.35)";
-
-        ctx.lineWidth =
-            2;
-
-
-        for (
-            let y = c.y + 20;
-            y < c.y + c.height;
-            y += 30
-        ) {
-
-            ctx.beginPath();
-
-            ctx.moveTo(
-                c.x,
-                y
-            );
-
-            ctx.lineTo(
-                c.x + c.width,
-                y
-            );
-
-            ctx.stroke();
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   CANALES
-========================================================= */
-
-function drawCanals() {
-
-    for (
-        const canal
-        of canals
-    ) {
-
-        ctx.fillStyle =
-            "#527f87";
-
-        ctx.fillRect(
-            canal.x,
-            canal.y,
-            canal.width,
-            canal.height
-        );
-
-
-        ctx.fillStyle =
-            "rgba(255,255,255,.18)";
-
-
-        if (
-            canal.width >
-            canal.height
-        ) {
-
-            for (
-                let x = canal.x;
-                x < canal.x + canal.width;
-                x += 90
-            ) {
-
-                ctx.fillRect(
-                    x,
-                    canal.y + 8,
-                    45,
-                    3
-                );
-
-            }
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   RÍO
-========================================================= */
-
-function drawRiver() {
-
-    ctx.fillStyle =
-        "#426f7e";
+        "#aeb276";
 
     ctx.fillRect(
-        river.x,
-        river.y,
-        river.width,
-        river.height
+        1450,
+        1000,
+        1800,
+        1250
     );
 
+    ctx.fillStyle =
+        "#9ba86b";
+
+    ctx.fillRect(
+        100,
+        400,
+        1250,
+        1900
+    );
 
     ctx.fillStyle =
-        "rgba(255,255,255,.14)";
+        "#b09a68";
 
-
-    for (
-        let x = 0;
-        x < WORLD_WIDTH;
-        x += 150
-    ) {
-
-        ctx.fillRect(
-            x,
-            river.y + 35,
-            75,
-            3
-        );
-
-        ctx.fillRect(
-            x + 60,
-            river.y + 120,
-            90,
-            3
-        );
-
-    }
-
-
-    ctx.fillStyle =
-        "#d7c79e";
-
-    ctx.font =
-        "24px Georgia";
-
-    ctx.fillText(
-        "RÍO NEUQUÉN",
-        2200,
-        river.y + 140
+    ctx.fillRect(
+        200,
+        2550,
+        3700,
+        850
     );
 
 }
 
 
-/* =========================================================
-   CALLES
-========================================================= */
+/* =====================================================
+   CAMINOS
+===================================================== */
 
 function drawRoads() {
 
@@ -1619,10 +1437,9 @@ function drawRoads() {
     ) {
 
         ctx.fillStyle =
-            road.type === "rural"
-                ? "#917653"
-                : "#625b50";
-
+            road.type === "route"
+                ? "#575753"
+                : "#8a7860";
 
         ctx.fillRect(
             road.x,
@@ -1631,22 +1448,19 @@ function drawRoads() {
             road.height
         );
 
-
         if (
-            road.type !==
-            "rural"
+            road.type ===
+            "route"
         ) {
 
             ctx.strokeStyle =
-                "#d8c58b";
+                "#d7c98c";
 
-            ctx.lineWidth =
-                3;
+            ctx.lineWidth = 5;
 
             ctx.setLineDash(
-                [25, 20]
+                [35, 25]
             );
-
 
             if (
                 road.width >
@@ -1700,44 +1514,248 @@ function drawRoads() {
 }
 
 
-/* =========================================================
+/* =====================================================
+   CAMPOS
+===================================================== */
+
+function drawFields() {
+
+    const fields = [
+
+        [80,420,450,500],
+        [600,400,650,350],
+        [100,1450,500,300],
+        [650,1250,600,500],
+        [200,2700,600,500],
+        [1100,2700,700,450],
+        [2000,2750,600,400]
+    ];
+
+    for (
+        const f
+        of fields
+    ) {
+
+        ctx.fillStyle =
+            "#9aa15e";
+
+        ctx.fillRect(
+            f[0],
+            f[1],
+            f[2],
+            f[3]
+        );
+
+        ctx.strokeStyle =
+            "rgba(80,80,40,.3)";
+
+        ctx.lineWidth = 2;
+
+        for (
+            let x =
+                f[0] + 20;
+            x <
+                f[0] + f[2];
+            x += 25
+        ) {
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                x,
+                f[1]
+            );
+
+            ctx.lineTo(
+                x,
+                f[1] + f[3]
+            );
+
+            ctx.stroke();
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   RIO
+===================================================== */
+
+function drawRiver() {
+
+    ctx.fillStyle =
+        "#4f8193";
+
+    ctx.fillRect(
+        river.x,
+        river.y,
+        river.width,
+        river.height
+    );
+
+    ctx.fillStyle =
+        "rgba(255,255,255,.15)";
+
+    for (
+        let y =
+            river.y + 40;
+        y <
+            river.y +
+            river.height;
+        y += 70
+    ) {
+
+        ctx.fillRect(
+            river.x + 20,
+            y,
+            river.width - 40,
+            3
+        );
+
+    }
+
+    ctx.fillStyle =
+        "#6e8450";
+
+    ctx.fillRect(
+        river.x - 35,
+        river.y,
+        35,
+        river.height
+    );
+
+}
+
+
+/* =====================================================
+   FLORES
+===================================================== */
+
+function drawFlowers() {
+
+    for (
+        const flower
+        of flowers
+    ) {
+
+        ctx.fillStyle =
+            flower.type === 0
+                ? "#d7c46d"
+                : flower.type === 1
+                    ? "#b98aa1"
+                    : "#e2d6a4";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            flower.x,
+            flower.y,
+            3,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+}
+
+
+/* =====================================================
+   ARBOLES
+===================================================== */
+
+function drawTrees() {
+
+    for (
+        const tree
+        of trees
+    ) {
+
+        ctx.fillStyle =
+            "#664733";
+
+        ctx.fillRect(
+            tree.x - 6,
+            tree.y,
+            12,
+            34
+        );
+
+        ctx.fillStyle =
+            "#496d3e";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            tree.x,
+            tree.y - 8,
+            tree.size,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        ctx.fillStyle =
+            "#5b7c46";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            tree.x - 15,
+            tree.y - 15,
+            tree.size * .65,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+}
+
+
+/* =====================================================
    VIÑEDOS
-========================================================= */
+===================================================== */
 
 function drawVineyards() {
 
     for (
-        const vineyard
+        const v
         of vineyards
     ) {
 
         for (
-            let row = 0;
-            row < vineyard.rows;
-            row++
+            let r = 0;
+            r < v.rows;
+            r++
         ) {
 
             for (
-                let col = 0;
-                col < vineyard.cols;
-                col++
+                let c = 0;
+                c < v.cols;
+                c++
             ) {
 
                 const x =
-                    vineyard.x +
-                    col * 34;
+                    v.x +
+                    c * 30;
 
                 const y =
-                    vineyard.y +
-                    row * 34;
-
+                    v.y +
+                    r * 42;
 
                 ctx.strokeStyle =
-                    "#53643b";
+                    "#526b3e";
 
-                ctx.lineWidth =
-                    3;
-
+                ctx.lineWidth = 2;
 
                 ctx.beginPath();
 
@@ -1748,14 +1766,13 @@ function drawVineyards() {
 
                 ctx.lineTo(
                     x,
-                    y + 22
+                    y + 25
                 );
 
                 ctx.stroke();
 
-
                 ctx.fillStyle =
-                    "#46683d";
+                    "#527844";
 
                 ctx.beginPath();
 
@@ -1778,121 +1795,9 @@ function drawVineyards() {
 }
 
 
-/* =========================================================
-   FLORES
-========================================================= */
-
-function drawFlowers() {
-
-    for (
-        const flower
-        of flowers
-    ) {
-
-        let petal =
-            "#d6b5a1";
-
-        if (
-            flower.type === 1
-        )
-            petal =
-                "#e1c36d";
-
-        if (
-            flower.type === 2
-        )
-            petal =
-                "#c79ab8";
-
-        if (
-            flower.type === 3
-        )
-            petal =
-                "#f0e6ca";
-
-
-        ctx.fillStyle =
-            petal;
-
-
-        ctx.beginPath();
-
-        ctx.arc(
-            flower.x,
-            flower.y,
-            3,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-    }
-
-}
-
-
-/* =========================================================
-   ÁRBOLES
-========================================================= */
-
-function drawTrees() {
-
-    for (
-        const tree
-        of trees
-    ) {
-
-        ctx.fillStyle =
-            "#63452f";
-
-        ctx.fillRect(
-            tree.x - 6,
-            tree.y,
-            12,
-            34
-        );
-
-
-        ctx.fillStyle =
-            "#49673c";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            tree.x,
-            tree.y - 5,
-            27 * tree.size,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-
-        ctx.fillStyle =
-            "#5b7546";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            tree.x + 18,
-            tree.y + 5,
-            18 * tree.size,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-    }
-
-}
-
-
-/* =========================================================
+/* =====================================================
    EDIFICIOS
-========================================================= */
+===================================================== */
 
 function drawBuildings() {
 
@@ -1901,400 +1806,464 @@ function drawBuildings() {
         of buildings
     ) {
 
-        /* sombra */
-
-        ctx.fillStyle =
-            "rgba(0,0,0,.22)";
-
-        ctx.fillRect(
-            b.x + 12,
-            b.y + 15,
-            b.width,
-            b.height
+        drawBuilding(
+            b
         );
-
-
-        /* edificio */
-
-        ctx.fillStyle =
-            b.color;
-
-        ctx.fillRect(
-            b.x,
-            b.y,
-            b.width,
-            b.height
-        );
-
-
-        /* techo */
-
-        ctx.fillStyle =
-            "#4b3b32";
-
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            b.x - 15,
-            b.y
-        );
-
-        ctx.lineTo(
-            b.x +
-            b.width / 2,
-            b.y - 65
-        );
-
-        ctx.lineTo(
-            b.x +
-            b.width + 15,
-            b.y
-        );
-
-        ctx.closePath();
-
-        ctx.fill();
-
-
-        /* ventanas */
-
-        ctx.fillStyle =
-            "#b9d1cc";
-
-
-        const windowCount =
-            Math.max(
-                2,
-                Math.floor(
-                    b.width / 120
-                )
-            );
-
-
-        for (
-            let i = 0;
-            i < windowCount;
-            i++
-        ) {
-
-            const wx =
-                b.x +
-                30 +
-                i * 100;
-
-
-            ctx.fillRect(
-                wx,
-                b.y + 45,
-                42,
-                48
-            );
-
-        }
-
-
-        /* puerta */
-
-        ctx.fillStyle =
-            "#49372d";
-
-        ctx.fillRect(
-            b.x +
-            b.width / 2 -
-            22,
-            b.y +
-            b.height -
-            72,
-            44,
-            72
-        );
-
-
-        /* CARTEL */
-
-        ctx.fillStyle =
-            "#f3dfb6";
-
-        ctx.font =
-            "bold 15px Georgia";
-
-        ctx.fillText(
-            b.name,
-            b.x,
-            b.y +
-            b.height +
-            25
-        );
-
-
-        /* detalles */
-
-        if (
-            b.type ===
-            "bakery"
-        ) {
-
-            drawBakeryDetails(b);
-
-        }
-
-
-        if (
-            b.type ===
-            "radio"
-        ) {
-
-            drawRadioDetails(b);
-
-        }
-
-
-        if (
-            b.type ===
-            "stadium"
-        ) {
-
-            drawStadium(b);
-
-        }
 
     }
 
 }
 
 
-/* =========================================================
-   PANADERÍA
-========================================================= */
+/* =====================================================
+   EDIFICIO INDIVIDUAL
+===================================================== */
 
-function drawBakeryDetails(b) {
+function drawBuilding(b) {
+
+    /* sombra */
 
     ctx.fillStyle =
-        "#f0d5a4";
+        "rgba(0,0,0,.22)";
 
     ctx.fillRect(
-        b.x + 90,
-        b.y - 45,
-        120,
-        28
+        b.x + 10,
+        b.y + 12,
+        b.width,
+        b.height
     );
 
+
+    /* cuerpo */
 
     ctx.fillStyle =
-        "#7b4d31";
+        b.color;
 
-    ctx.font =
-        "bold 14px Georgia";
-
-    ctx.fillText(
-        "PAN",
-        b.x + 135,
-        b.y - 25
+    ctx.fillRect(
+        b.x,
+        b.y,
+        b.width,
+        b.height
     );
 
-}
 
+    /* techo */
 
-/* =========================================================
-   RADIO
-========================================================= */
-
-function drawRadioDetails(b) {
-
-    ctx.strokeStyle =
-        "#4c4035";
-
-    ctx.lineWidth =
-        5;
-
+    ctx.fillStyle =
+        b.roof;
 
     ctx.beginPath();
 
     ctx.moveTo(
-        b.x +
-        b.width - 50,
+        b.x - 20,
         b.y
     );
 
     ctx.lineTo(
         b.x +
-        b.width - 20,
-        b.y - 170
+        b.width / 2,
+        b.y - 65
     );
 
-    ctx.stroke();
+    ctx.lineTo(
+        b.x +
+        b.width +
+        20,
+        b.y
+    );
 
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    /* ventanas */
+
+    drawWindows(
+        b
+    );
+
+
+    /* puerta */
 
     ctx.fillStyle =
-        "#403d35";
+        "#49362d";
 
     ctx.fillRect(
         b.x +
-        b.width - 30,
-        b.y - 175,
-        20,
-        10
+        b.width / 2 -
+        18,
+
+        b.y +
+        b.height -
+        65,
+
+        36,
+        65
+    );
+
+
+    /* manija */
+
+    ctx.fillStyle =
+        "#d3b766";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        b.x +
+        b.width / 2 +
+        8,
+
+        b.y +
+        b.height -
+        32,
+
+        3,
+
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    /* cartel */
+
+    ctx.fillStyle =
+        "rgba(30,25,20,.82)";
+
+    ctx.fillRect(
+        b.x +
+        15,
+
+        b.y +
+        12,
+
+        Math.min(
+            b.width - 30,
+            190
+        ),
+
+        28
+    );
+
+    ctx.fillStyle =
+        "#f2dfb2";
+
+    ctx.font =
+        "bold 12px Arial";
+
+    ctx.fillText(
+        b.name,
+        b.x + 22,
+        b.y + 31
+    );
+
+
+    /* detalles especiales */
+
+    if (
+        b.type ===
+        "bakery"
+    ) {
+
+        drawBakeryDetails(
+            b
+        );
+
+    }
+
+    if (
+        b.type ===
+        "radio"
+    ) {
+
+        drawRadioDetails(
+            b
+        );
+
+    }
+
+    if (
+        b.type ===
+        "stadium"
+    ) {
+
+        drawStadium(
+            b
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   VENTANAS
+===================================================== */
+
+function drawWindows(b) {
+
+    const positions = [
+
+        [30,45],
+        [b.width - 75,45]
+    ];
+
+    for (
+        const p
+        of positions
+    ) {
+
+        ctx.fillStyle =
+            "#8fb0ae";
+
+        ctx.fillRect(
+            b.x + p[0],
+            b.y + p[1],
+            45,
+            42
+        );
+
+        ctx.strokeStyle =
+            "#493b34";
+
+        ctx.lineWidth = 4;
+
+        ctx.strokeRect(
+            b.x + p[0],
+            b.y + p[1],
+            45,
+            42
+        );
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            b.x + p[0] + 22,
+            b.y + p[1]
+        );
+
+        ctx.lineTo(
+            b.x + p[0] + 22,
+            b.y + p[1] + 42
+        );
+
+        ctx.stroke();
+
+    }
+
+}
+
+
+/* =====================================================
+   PANADERIA
+===================================================== */
+
+function drawBakeryDetails(b) {
+
+    ctx.fillStyle =
+        "#e9d7b0";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        b.x + b.width - 35,
+        b.y + 105,
+        23,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+    ctx.fillStyle =
+        "#9b5d38";
+
+    ctx.font =
+        "20px Arial";
+
+    ctx.fillText(
+        "PAN",
+        b.x + b.width - 53,
+        b.y + 112
     );
 
 }
 
 
-/* =========================================================
-   ESTADIO
-========================================================= */
+/* =====================================================
+   RADIO
+===================================================== */
 
-function drawStadium(b) {
-
-    const fieldX =
-        b.x + 65;
-
-    const fieldY =
-        b.y + 80;
-
-    const fieldW =
-        b.width - 130;
-
-    const fieldH =
-        b.height - 130;
-
+function drawRadioDetails(b) {
 
     ctx.fillStyle =
-        "#477347";
+        "#332d2a";
 
     ctx.fillRect(
-        fieldX,
-        fieldY,
-        fieldW,
-        fieldH
+        b.x + 130,
+        b.y + 85,
+        80,
+        70
     );
-
 
     ctx.strokeStyle =
-        "#e4e5ce";
+        "#c2a764";
 
-    ctx.lineWidth =
-        3;
-
-    ctx.strokeRect(
-        fieldX,
-        fieldY,
-        fieldW,
-        fieldH
-    );
-
+    ctx.lineWidth = 3;
 
     ctx.beginPath();
 
     ctx.moveTo(
-        fieldX +
-        fieldW / 2,
-        fieldY
+        b.x + 170,
+        b.y + 85
     );
 
     ctx.lineTo(
-        fieldX +
-        fieldW / 2,
-        fieldY +
-        fieldH
+        b.x + 170,
+        b.y + 35
     );
 
     ctx.stroke();
 
+}
+
+
+/* =====================================================
+   ESTADIO
+===================================================== */
+
+function drawStadium(b) {
+
+    ctx.fillStyle =
+        "#628153";
+
+    ctx.fillRect(
+        b.x + 70,
+        b.y + 95,
+        b.width - 140,
+        b.height - 150
+    );
+
+    ctx.strokeStyle =
+        "white";
+
+    ctx.lineWidth = 3;
+
+    ctx.strokeRect(
+        b.x + 100,
+        b.y + 120,
+        b.width - 200,
+        b.height - 200
+    );
 
     ctx.beginPath();
 
     ctx.arc(
-        fieldX +
-        fieldW / 2,
-        fieldY +
-        fieldH / 2,
-        45,
+        b.x +
+        b.width / 2,
+
+        b.y +
+        b.height / 2,
+
+        40,
+
         0,
         Math.PI * 2
     );
 
     ctx.stroke();
 
-
-    /* tribunas */
-
-    ctx.fillStyle =
-        "#54483e";
-
-    ctx.fillRect(
-        b.x + 15,
-        b.y + 45,
-        35,
-        b.height - 70
-    );
-
-    ctx.fillRect(
-        b.x + b.width - 50,
-        b.y + 45,
-        35,
-        b.height - 70
-    );
-
 }
 
 
-/* =========================================================
-   PERSONAS
-========================================================= */
+/* =====================================================
+   VEHICULOS
+===================================================== */
 
-function drawNPCs() {
+function updateVehicles() {
 
     for (
-        const npc
-        of npcs
+        const v
+        of vehicles
     ) {
 
-        const bob =
-            npc.activity === "walk"
-                ? Math.sin(
-                    performance.now() / 180
-                ) * 2
-                : 0;
-
-
-        drawPerson(
-            npc.x,
-            npc.y + bob,
-            npc.color,
-            npc.activity
-        );
-
-
-        ctx.fillStyle =
-            "#fff";
-
-        ctx.font =
-            "12px Georgia";
-
-        ctx.fillText(
-            npc.name,
-            npc.x - 30,
-            npc.y + 38
-        );
-
-
         if (
-            npc.mission &&
-            !mission.completed
+            v.type ===
+            "car" ||
+            v.type ===
+            "truck" ||
+            v.type ===
+            "tractor"
         ) {
 
-            ctx.fillStyle =
-                "#f0c84b";
+            if (
+                v.y >
+                1600 &&
+                v.y <
+                1850
+            ) {
 
-            ctx.font =
-                "bold 24px Arial";
+                v.x +=
+                    v.speed *
+                    v.direction;
 
-            ctx.fillText(
-                "!",
-                npc.x - 5,
-                npc.y - 55
-            );
+            }
+
+            if (
+                v.y >
+                2450 &&
+                v.y <
+                2600
+            ) {
+
+                v.x +=
+                    v.speed *
+                    v.direction;
+
+            }
+
+            if (
+                v.x >
+                3900 &&
+                v.y >
+                600
+            ) {
+
+                v.y +=
+                    v.speed;
+
+            }
+
+        }
+
+        if (
+            v.x >
+            WORLD_WIDTH + 100
+        ) {
+
+            v.x = -100;
+
+        }
+
+        if (
+            v.x <
+            -100
+        ) {
+
+            v.x =
+                WORLD_WIDTH + 100;
+
+        }
+
+        if (
+            v.y >
+            WORLD_HEIGHT + 100
+        ) {
+
+            v.y = -100;
 
         }
 
@@ -2303,16 +2272,278 @@ function drawNPCs() {
 }
 
 
-/* =========================================================
-   FIGURA HUMANA
-========================================================= */
+/* =====================================================
+   DIBUJAR VEHICULOS
+===================================================== */
 
-function drawPerson(
-    x,
-    y,
-    clothes,
-    activity
-) {
+function drawVehicles() {
+
+    for (
+        const v
+        of vehicles
+    ) {
+
+        if (
+            v.type ===
+            "tractor"
+        ) {
+
+            drawTractor(v);
+
+        } else {
+
+            drawCar(v);
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   AUTO
+===================================================== */
+
+function drawCar(v) {
+
+    ctx.fillStyle =
+        "rgba(0,0,0,.2)";
+
+    ctx.fillRect(
+        v.x + 4,
+        v.y + 7,
+        v.width,
+        v.height
+    );
+
+    ctx.fillStyle =
+        v.color;
+
+    ctx.fillRect(
+        v.x,
+        v.y,
+        v.width,
+        v.height
+    );
+
+    ctx.fillStyle =
+        "#6f9094";
+
+    ctx.fillRect(
+        v.x + 15,
+        v.y + 5,
+        30,
+        14
+    );
+
+    ctx.fillStyle =
+        "#202020";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        v.x + 16,
+        v.y + v.height,
+        7,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.arc(
+        v.x + v.width - 16,
+        v.y + v.height,
+        7,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+}
+
+
+/* =====================================================
+   TRACTOR
+===================================================== */
+
+function drawTractor(v) {
+
+    /* ruedas grandes */
+
+    ctx.fillStyle =
+        "#252525";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        v.x + 18,
+        v.y + 30,
+        14,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+    ctx.beginPath();
+
+    ctx.arc(
+        v.x + 65,
+        v.y + 30,
+        9,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    /* cuerpo */
+
+    ctx.fillStyle =
+        v.color;
+
+    ctx.fillRect(
+        v.x + 10,
+        v.y + 8,
+        55,
+        22
+    );
+
+
+    /* cabina */
+
+    ctx.fillStyle =
+        "#334943";
+
+    ctx.fillRect(
+        v.x + 28,
+        v.y - 10,
+        28,
+        25
+    );
+
+
+    /* vidrio */
+
+    ctx.fillStyle =
+        "#9eb5ae";
+
+    ctx.fillRect(
+        v.x + 32,
+        v.y - 6,
+        20,
+        13
+    );
+
+
+    /* escape */
+
+    ctx.fillStyle =
+        "#333";
+
+    ctx.fillRect(
+        v.x + 56,
+        v.y - 20,
+        5,
+        25
+    );
+
+}
+
+
+/* =====================================================
+   NPC
+===================================================== */
+
+function updateNPCs() {
+
+    for (
+        const npc
+        of npcs
+    ) {
+
+        if (
+            !npc.destination
+        ) {
+
+            continue;
+
+        }
+
+        const destination =
+            buildings.find(
+                b =>
+                    b.id ===
+                    npc.destination
+            );
+
+        if (!destination) {
+            continue;
+        }
+
+        const target = {
+
+            x:
+                destination.x +
+                destination.width / 2,
+
+            y:
+                destination.y +
+                destination.height / 2
+        };
+
+        const dx =
+            target.x -
+            npc.x;
+
+        const dy =
+            target.y -
+            npc.y;
+
+        const d =
+            Math.hypot(
+                dx,
+                dy
+            );
+
+        if (
+            d > 50
+        ) {
+
+            npc.x +=
+                dx / d *
+                npc.speed;
+
+            npc.y +=
+                dy / d *
+                npc.speed;
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   NPC HUMANOIDE
+===================================================== */
+
+function drawNPC(npc) {
+
+    const bob =
+        Math.sin(
+            performance.now() / 180 +
+            npc.x
+        ) *
+        (
+            npc.speed > 1
+                ? 2
+                : .5
+        );
+
 
     /* sombra */
 
@@ -2322,8 +2553,574 @@ function drawPerson(
     ctx.beginPath();
 
     ctx.ellipse(
+        npc.x,
+        npc.y + 25,
+        17,
+        6,
+        0,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    /* piernas */
+
+    ctx.strokeStyle =
+        "#29333a";
+
+    ctx.lineWidth = 6;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        npc.x - 5,
+        npc.y + 12
+    );
+
+    ctx.lineTo(
+        npc.x - 7 +
+        bob,
+        npc.y + 27
+    );
+
+    ctx.moveTo(
+        npc.x + 5,
+        npc.y + 12
+    );
+
+    ctx.lineTo(
+        npc.x + 7 -
+        bob,
+        npc.y + 27
+    );
+
+    ctx.stroke();
+
+
+    /* cuerpo */
+
+    ctx.fillStyle =
+        npc.personality ===
+        "worker"
+            ? "#6b7654"
+            : npc.personality ===
+              "woman"
+                ? "#80576b"
+                : "#536b76";
+
+    ctx.fillRect(
+        npc.x - 11,
+        npc.y - 2,
+        22,
+        20
+    );
+
+
+    /* brazos */
+
+    ctx.strokeStyle =
+        "#c58e70";
+
+    ctx.lineWidth = 5;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        npc.x - 10,
+        npc.y + 2
+    );
+
+    ctx.lineTo(
+        npc.x - 17,
+        npc.y + 15
+    );
+
+    ctx.moveTo(
+        npc.x + 10,
+        npc.y + 2
+    );
+
+    ctx.lineTo(
+        npc.x + 17,
+        npc.y + 15
+    );
+
+    ctx.stroke();
+
+
+    /* cabeza */
+
+    ctx.fillStyle =
+        "#c58e70";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        npc.x,
+        npc.y - 14,
+        11,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    /* pelo */
+
+    ctx.fillStyle =
+        npc.personality ===
+        "mayor"
+            ? "#aaa39a"
+            : "#3b2923";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        npc.x,
+        npc.y - 20,
+        10,
+        Math.PI,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    /* ojos */
+
+    ctx.fillStyle =
+        "#211b18";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        npc.x - 4,
+        npc.y - 15,
+        1.5,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.arc(
+        npc.x + 4,
+        npc.y - 15,
+        1.5,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    /* nombre */
+
+    ctx.font =
+        "11px Arial";
+
+    ctx.textAlign =
+        "center";
+
+    ctx.fillStyle =
+        "rgba(255,255,255,.9)";
+
+    ctx.fillText(
+        npc.name,
+        npc.x,
+        npc.y + 47
+    );
+
+    ctx.textAlign =
+        "left";
+
+
+    /* globo */
+
+    if (
+        distance(
+            player,
+            npc
+        ) < 95
+    ) {
+
+        drawSpeechBubble(
+            npc.x,
+            npc.y - 65,
+            "Hola"
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   GLOBO DE DIALOGO
+===================================================== */
+
+function drawSpeechBubble(
+    x,
+    y,
+    text
+) {
+
+    ctx.font =
+        "bold 11px Arial";
+
+    const width =
+        ctx.measureText(
+            text
+        ).width +
+        20;
+
+    ctx.fillStyle =
+        "rgba(255,255,255,.94)";
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+        x - width / 2,
+        y - 17,
+        width,
+        25,
+        8
+    );
+
+    ctx.fill();
+
+    ctx.fillStyle =
+        "#2b302c";
+
+    ctx.textAlign =
+        "center";
+
+    ctx.fillText(
+        text,
         x,
-        y + 28,
+        y
+    );
+
+    ctx.textAlign =
+        "left";
+
+}
+
+
+/* =====================================================
+   ANIMALES
+===================================================== */
+
+function updateAnimals() {
+
+    for (
+        const animal
+        of animals
+    ) {
+
+        animal.x +=
+            animal.dx;
+
+        animal.y +=
+            animal.dy;
+
+        if (
+            Math.random() <
+            .005
+        ) {
+
+            animal.dx =
+                (
+                    Math.random() -
+                    .5
+                ) * .5;
+
+            animal.dy =
+                (
+                    Math.random() -
+                    .5
+                ) * .5;
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   DIBUJAR ANIMALES
+===================================================== */
+
+function drawAnimals() {
+
+    for (
+        const a
+        of animals
+    ) {
+
+        if (
+            a.type ===
+            "horse"
+        ) {
+
+            drawHorse(a);
+
+        }
+
+        if (
+            a.type ===
+            "cow"
+        ) {
+
+            drawCow(a);
+
+        }
+
+        if (
+            a.type ===
+            "dog"
+        ) {
+
+            drawDog(a);
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   CABALLO
+===================================================== */
+
+function drawHorse(a) {
+
+    ctx.fillStyle =
+        "#654534";
+
+    ctx.fillRect(
+        a.x - 25,
+        a.y - 13,
+        48,
+        25
+    );
+
+    ctx.beginPath();
+
+    ctx.arc(
+        a.x + 28,
+        a.y - 18,
+        11,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+    ctx.strokeStyle =
+        "#463328";
+
+    ctx.lineWidth = 5;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        a.x - 15,
+        a.y + 10
+    );
+
+    ctx.lineTo(
+        a.x - 15,
+        a.y + 30
+    );
+
+    ctx.moveTo(
+        a.x + 10,
+        a.y + 10
+    );
+
+    ctx.lineTo(
+        a.x + 10,
+        a.y + 30
+    );
+
+    ctx.stroke();
+
+}
+
+
+/* =====================================================
+   VACA
+===================================================== */
+
+function drawCow(a) {
+
+    ctx.fillStyle =
+        "#eee7d9";
+
+    ctx.fillRect(
+        a.x - 25,
+        a.y - 14,
+        50,
+        28
+    );
+
+    ctx.fillStyle =
+        "#50473e";
+
+    ctx.fillRect(
+        a.x - 10,
+        a.y - 10,
+        13,
+        12
+    );
+
+    ctx.beginPath();
+
+    ctx.arc(
+        a.x + 29,
+        a.y - 10,
+        11,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+}
+
+
+/* =====================================================
+   PERRO
+===================================================== */
+
+function drawDog(a) {
+
+    ctx.fillStyle =
+        "#8c684c";
+
+    ctx.fillRect(
+        a.x - 18,
+        a.y - 10,
+        35,
+        18
+    );
+
+    ctx.beginPath();
+
+    ctx.arc(
+        a.x + 20,
+        a.y - 8,
+        8,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+}
+
+
+/* =====================================================
+   OBJETOS
+===================================================== */
+
+function drawObjects() {
+
+    for (
+        const o
+        of objects
+    ) {
+
+        if (
+            o.collected
+        ) {
+
+            continue;
+
+        }
+
+        const pulse =
+            Math.sin(
+                performance.now() / 250
+            ) * 3;
+
+        ctx.fillStyle =
+            "#e6c36e";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            o.x,
+            o.y - 10,
+            13 + pulse,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        ctx.fillStyle =
+            "#40382d";
+
+        ctx.font =
+            "18px Arial";
+
+        ctx.textAlign =
+            "center";
+
+        ctx.fillText(
+            o.type === "photo"
+                ? "F"
+                : "D",
+            o.x,
+            o.y - 4
+        );
+
+        ctx.textAlign =
+            "left";
+
+    }
+
+}
+
+
+/* =====================================================
+   JUGADOR
+===================================================== */
+
+function drawPlayer() {
+
+    const bob =
+        player.moving
+            ? Math.sin(
+                player.frame * 8
+            ) * 2
+            : 0;
+
+    const x =
+        player.x +
+        player.width / 2;
+
+    const y =
+        player.y +
+        player.height / 2 +
+        bob;
+
+
+    /* sombra */
+
+    ctx.fillStyle =
+        "rgba(0,0,0,.25)";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        x,
+        y + 18,
         18,
         6,
         0,
@@ -2337,11 +3134,16 @@ function drawPerson(
     /* piernas */
 
     ctx.strokeStyle =
-        "#3d3b37";
+        "#29343c";
 
-    ctx.lineWidth =
-        6;
+    ctx.lineWidth = 6;
 
+    const step =
+        player.moving
+            ? Math.sin(
+                player.frame * 8
+            ) * 5
+            : 0;
 
     ctx.beginPath();
 
@@ -2351,14 +3153,9 @@ function drawPerson(
     );
 
     ctx.lineTo(
-        x - 8,
-        y + 29
+        x - 6 + step,
+        y + 28
     );
-
-    ctx.stroke();
-
-
-    ctx.beginPath();
 
     ctx.moveTo(
         x + 5,
@@ -2366,8 +3163,8 @@ function drawPerson(
     );
 
     ctx.lineTo(
-        x + 8,
-        y + 29
+        x + 6 - step,
+        y + 28
     );
 
     ctx.stroke();
@@ -2376,66 +3173,69 @@ function drawPerson(
     /* cuerpo */
 
     ctx.fillStyle =
-        clothes;
+        "#31516a";
 
     ctx.fillRect(
-        x - 10,
-        y - 3,
-        20,
-        20
+        x - 12,
+        y - 8,
+        24,
+        24
     );
 
 
     /* brazos */
 
     ctx.strokeStyle =
-        clothes;
+        "#c58f72";
 
-    ctx.lineWidth =
-        5;
-
+    ctx.lineWidth = 6;
 
     ctx.beginPath();
 
     ctx.moveTo(
-        x - 8,
-        y
+        x - 10,
+        y - 3
     );
 
     ctx.lineTo(
         x - 18,
-        y + 13
+        y + 10
     );
 
-    ctx.stroke();
-
-
-    ctx.beginPath();
-
     ctx.moveTo(
-        x + 8,
-        y
+        x + 10,
+        y - 3
     );
 
     ctx.lineTo(
         x + 18,
-        y + 13
+        y + 10
     );
 
     ctx.stroke();
 
 
-    /* cabeza */
+    /* cuello */
 
     ctx.fillStyle =
-        "#d39d79";
+        "#c58f72";
+
+    ctx.fillRect(
+        x - 5,
+        y - 16,
+        10,
+        8
+    );
+
+
+    /* cabeza */
 
     ctx.beginPath();
 
     ctx.arc(
         x,
-        y - 15,
-        10,
+        y - 25,
+        12,
         0,
         Math.PI * 2
     );
@@ -2446,14 +3246,14 @@ function drawPerson(
     /* pelo */
 
     ctx.fillStyle =
-        "#352820";
+        "#30231e";
 
     ctx.beginPath();
 
     ctx.arc(
         x,
-        y - 20,
-        10,
+        y - 32,
+        12,
         Math.PI,
         Math.PI * 2
     );
@@ -2461,49 +3261,100 @@ function drawPerson(
     ctx.fill();
 
 
-    /* herramienta */
+    /* ojos */
 
-    if (
-        activity === "work"
+    ctx.fillStyle =
+        "#1b1714";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x - 4,
+        y - 26,
+        1.5,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.arc(
+        x + 4,
+        y - 26,
+        1.5,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+}
+
+
+/* =====================================================
+   SEMAFOROS
+===================================================== */
+
+function updateTrafficLights() {
+
+    for (
+        const light
+        of trafficLights
     ) {
 
-        ctx.strokeStyle =
-            "#624a36";
+        light.timer++;
 
-        ctx.lineWidth =
-            3;
+        if (
+            light.timer >
+            180
+        ) {
 
-        ctx.beginPath();
+            light.timer = 0;
 
-        ctx.moveTo(
-            x + 17,
-            y + 10
-        );
+            light.state =
+                (
+                    light.state + 1
+                ) % 3;
 
-        ctx.lineTo(
-            x + 26,
-            y - 8
-        );
-
-        ctx.stroke();
+        }
 
     }
 
+}
 
-    /* mate */
 
-    if (
-        activity === "mate"
+function drawTrafficLights() {
+
+    for (
+        const light
+        of trafficLights
     ) {
 
         ctx.fillStyle =
-            "#704f38";
+            "#292929";
+
+        ctx.fillRect(
+            light.x,
+            light.y,
+            12,
+            55
+        );
+
+        const colors = [
+            "#d84b42",
+            "#e0bd52",
+            "#55a65b"
+        ];
+
+        ctx.fillStyle =
+            colors[
+                light.state
+            ];
 
         ctx.beginPath();
 
         ctx.arc(
-            x + 20,
-            y + 8,
+            light.x + 6,
+            light.y + 10 +
+            light.state * 16,
             5,
             0,
             Math.PI * 2
@@ -2516,167 +3367,132 @@ function drawPerson(
 }
 
 
-/* =========================================================
-   ANIMALES
-========================================================= */
+/* =====================================================
+   DIA / NOCHE
+===================================================== */
 
-function drawAnimals() {
+function drawLighting() {
 
-    for (
-        const animal
-        of animals
+    let alpha = 0;
+
+    const hour =
+        world.hour +
+        world.minute / 60;
+
+    if (
+        hour < 6
     ) {
 
-        animal.x +=
-            animal.vx *
-            0.016;
+        alpha = .43;
 
-        animal.y +=
-            animal.vy *
-            0.016;
+    } else if (
+        hour < 8
+    ) {
 
+        alpha =
+            .43 -
+            (
+                hour - 6
+            ) *
+            .215;
 
-        if (
-            animal.type ===
-            "horse"
-        ) {
+    } else if (
+        hour < 18
+    ) {
 
-            drawHorse(
-                animal.x,
-                animal.y
-            );
+        alpha = 0;
 
-        } else {
+    } else if (
+        hour < 21
+    ) {
 
-            drawSmallAnimal(
-                animal.x,
-                animal.y,
-                animal.type
-            );
+        alpha =
+            (
+                hour - 18
+            ) *
+            .13;
 
-        }
+    } else {
+
+        alpha = .39;
+
+    }
+
+    const weather =
+        weatherTypes.find(
+            w =>
+                w.id ===
+                world.weather
+        );
+
+    alpha +=
+        weather.darkness;
+
+    if (
+        alpha > 0
+    ) {
+
+        ctx.fillStyle =
+            `rgba(20,30,60,${alpha})`;
+
+        ctx.fillRect(
+            0,
+            0,
+            WORLD_WIDTH,
+            WORLD_HEIGHT
+        );
 
     }
 
 }
 
 
-function drawSmallAnimal(
-    x,
-    y,
-    type
-) {
+/* =====================================================
+   LLUVIA
+===================================================== */
 
-    ctx.fillStyle =
-        type === "cat"
-            ? "#66574c"
-            : "#704f3b";
+function drawRain() {
 
+    if (
+        world.weather !==
+        "rain"
+    ) {
 
-    ctx.beginPath();
+        return;
 
-    ctx.ellipse(
-        x,
-        y,
-        20,
-        11,
-        0,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x + 17,
-        y - 4,
-        8,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
+    }
 
     ctx.strokeStyle =
-        "#48362b";
+        "rgba(210,230,240,.42)";
 
-    ctx.lineWidth =
-        3;
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        x - 17,
-        y
-    );
-
-    ctx.lineTo(
-        x - 28,
-        y - 8
-    );
-
-    ctx.stroke();
-
-}
-
-
-function drawHorse(
-    x,
-    y
-) {
-
-    ctx.fillStyle =
-        "#6b4b36";
-
-    ctx.fillRect(
-        x - 25,
-        y - 20,
-        55,
-        35
-    );
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x + 35,
-        y - 23,
-        17,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.strokeStyle =
-        "#493428";
-
-    ctx.lineWidth =
-        5;
-
+    ctx.lineWidth = 1;
 
     for (
         let i = 0;
-        i < 4;
+        i < 150;
         i++
     ) {
+
+        const x =
+            camera.x +
+            Math.random() *
+            window.innerWidth;
+
+        const y =
+            camera.y +
+            Math.random() *
+            window.innerHeight;
 
         ctx.beginPath();
 
         ctx.moveTo(
-            x - 18 + i * 15,
-            y + 10
+            x,
+            y
         );
 
         ctx.lineTo(
-            x - 18 + i * 15,
-            y + 35
+            x - 4,
+            y + 15
         );
 
         ctx.stroke();
@@ -2686,466 +3502,33 @@ function drawHorse(
 }
 
 
-/* =========================================================
-   VEHÍCULOS
-========================================================= */
-
-function drawVehicles() {
-
-    for (
-        const v
-        of vehicles
-    ) {
-
-        v.x +=
-            v.speed *
-            v.direction *
-            0.016;
-
-
-        if (
-            v.x >
-            WORLD_WIDTH + 100
-        ) {
-
-            v.x = -100;
-
-        }
-
-
-        if (
-            v.x <
-            -100
-        ) {
-
-            v.x =
-                WORLD_WIDTH + 100;
-
-        }
-
-
-        if (
-            v.type ===
-            "tractor"
-        ) {
-
-            drawTractor(
-                v.x,
-                v.y,
-                v.direction
-            );
-
-        } else {
-
-            drawCar(
-                v.x,
-                v.y,
-                v.direction
-            );
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   AUTO
-========================================================= */
-
-function drawCar(
-    x,
-    y,
-    direction
-) {
-
-    ctx.save();
-
-    ctx.translate(
-        x,
-        y
-    );
-
-    if (
-        direction < 0
-    ) {
-
-        ctx.scale(
-            -1,
-            1
-        );
-
-    }
-
-
-    ctx.fillStyle =
-        "#303b45";
-
-    ctx.fillRect(
-        -38,
-        -20,
-        76,
-        38
-    );
-
-
-    ctx.fillStyle =
-        "#a7c0c3";
-
-    ctx.fillRect(
-        -18,
-        -17,
-        30,
-        17
-    );
-
-
-    ctx.fillStyle =
-        "#191919";
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        -24,
-        20,
-        8,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        25,
-        20,
-        8,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.restore();
-
-}
-
-
-/* =========================================================
-   TRACTOR
-========================================================= */
-
-function drawTractor(
-    x,
-    y,
-    direction
-) {
-
-    ctx.save();
-
-    ctx.translate(
-        x,
-        y
-    );
-
-
-    if (
-        direction < 0
-    ) {
-
-        ctx.scale(
-            -1,
-            1
-        );
-
-    }
-
-
-    /* ruedas */
-
-    ctx.fillStyle =
-        "#242323";
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        -25,
-        15,
-        20,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        30,
-        19,
-        12,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    /* carrocería */
-
-    ctx.fillStyle =
-        "#b45c31";
-
-    ctx.fillRect(
-        -25,
-        -5,
-        58,
-        30
-    );
-
-
-    /* cabina */
-
-    ctx.fillStyle =
-        "#7d432d";
-
-    ctx.fillRect(
-        -2,
-        -35,
-        30,
-        30
-    );
-
-
-    /* vidrio */
-
-    ctx.fillStyle =
-        "#9ab7b8";
-
-    ctx.fillRect(
-        3,
-        -31,
-        23,
-        18
-    );
-
-
-    /* capó */
-
-    ctx.fillStyle =
-        "#c16b35";
-
-    ctx.fillRect(
-        -48,
-        -2,
-        27,
-        18
-    );
-
-
-    /* escape */
-
-    ctx.strokeStyle =
-        "#333";
-
-    ctx.lineWidth =
-        4;
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        -38,
-        -2
-    );
-
-    ctx.lineTo(
-        -38,
-        -30
-    );
-
-    ctx.stroke();
-
-
-    ctx.restore();
-
-}
-
-
-/* =========================================================
-   OBJETOS
-========================================================= */
-
-function drawObjects() {
-
-    for (
-        const object
-        of objects
-    ) {
-
-        if (
-            object.collected
-        )
-            continue;
-
-
-        let symbol =
-            "◆";
-
-
-        if (
-            object.type ===
-            "photo"
-        )
-            symbol = "▣";
-
-
-        if (
-            object.type ===
-            "document"
-        )
-            symbol = "▤";
-
-
-        if (
-            object.type ===
-            "mate"
-        )
-            symbol = "●";
-
-
-        ctx.fillStyle =
-            "#f2d18a";
-
-        ctx.font =
-            "22px Arial";
-
-        ctx.fillText(
-            symbol,
-            object.x,
-            object.y
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   PLAYER
-========================================================= */
-
-function drawPlayer() {
-
-    drawPerson(
-        player.x,
-        player.y,
-        "#304d62",
-        player.moving
-            ? "walk"
-            : "idle"
-    );
-
-}
-
-
-/* =========================================================
-   INTERACCIÓN
-========================================================= */
+/* =====================================================
+   INTERACCION
+===================================================== */
 
 function interact() {
 
-    if (
-        !gameStarted
-    )
+    if (!gameStarted) {
         return;
+    }
 
 
     /* NPC */
-
-    let closestNPC =
-        null;
-
-    let npcDistance =
-        Infinity;
-
 
     for (
         const npc
         of npcs
     ) {
 
-        const d =
+        if (
             distance(
                 player,
                 npc
-            );
-
-
-        if (
-            d < npcDistance
+            ) < 90
         ) {
 
-            closestNPC =
-                npc;
-
-            npcDistance =
-                d;
-
-        }
-
-    }
-
-
-    if (
-        closestNPC &&
-        npcDistance < 90
-    ) {
-
-        talkToNPC(
-            closestNPC
-        );
-
-        return;
-
-    }
-
-
-    /* EDIFICIO */
-
-    for (
-        const building
-        of buildings
-    ) {
-
-        const center = {
-
-            x:
-                building.x +
-                building.width / 2,
-
-            y:
-                building.y +
-                building.height / 2
-
-        };
-
-
-        if (
-            distance(
-                player,
-                center
-            ) < 170
-        ) {
-
-            enterBuilding(
-                building
+            talkToNPC(
+                npc
             );
 
             return;
@@ -3164,15 +3547,17 @@ function interact() {
 
         if (
             object.collected
-        )
+        ) {
+
             continue;
 
+        }
 
         if (
             distance(
                 player,
                 object
-            ) < 70
+            ) < 80
         ) {
 
             collectObject(
@@ -3186,56 +3571,372 @@ function interact() {
     }
 
 
-    showToast(
-        "No hay nada para interactuar acá."
+    /* EDIFICIOS */
+
+    for (
+        const building
+        of buildings
+    ) {
+
+        if (
+            nearDoor(
+                building
+            )
+        ) {
+
+            enterBuilding(
+                building
+            );
+
+            return;
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   PUERTA
+===================================================== */
+
+function nearDoor(
+    building
+) {
+
+    const door = {
+
+        x:
+            building.x +
+            building.width / 2,
+
+        y:
+            building.y +
+            building.height -
+            25
+
+    };
+
+    return Math.hypot(
+        player.x +
+            player.width / 2 -
+            door.x,
+
+        player.y +
+            player.height / 2 -
+            door.y
+    ) < 75;
+
+}
+
+
+/* =====================================================
+   ENTRAR
+===================================================== */
+
+function enterBuilding(
+    building
+) {
+
+    player.inside =
+        true;
+
+    player.currentBuilding =
+        building;
+
+    paused = true;
+
+    showInterior(
+        building
     );
 
 }
 
 
-/* =========================================================
-   NPC
-========================================================= */
+/* =====================================================
+   INTERIOR
+===================================================== */
 
-function talkToNPC(npc) {
+function showInterior(
+    building
+) {
 
-    const text =
-        npc.dialogue[
-            Math.floor(
-                Math.random() *
-                npc.dialogue.length
-            )
-        ];
+    const panel =
+        document.getElementById(
+            "interaction-panel"
+        );
 
+    const title =
+        document.getElementById(
+            "interaction-title"
+        );
+
+    const description =
+        document.getElementById(
+            "interaction-description"
+        );
+
+    const actions =
+        document.getElementById(
+            "interaction-actions"
+        );
+
+    title.textContent =
+        building.name;
+
+    actions.innerHTML = "";
+
+    if (
+        building.id ===
+        "bakery"
+    ) {
+
+        description.textContent =
+            "El olor a pan recién horneado llena el local.";
+
+        addAction(
+            actions,
+            "Comprar pan",
+            buyBread
+        );
+
+    } else if (
+        building.id ===
+        "radio"
+    ) {
+
+        description.textContent =
+            "Un pequeño estudio de radio. Micrófonos, consola y vecinos entrando y saliendo.";
+
+        addAction(
+            actions,
+            "Escuchar la radio",
+            listenRadio
+        );
+
+    } else if (
+        building.id ===
+        "market"
+    ) {
+
+        description.textContent =
+            "Un almacén de barrio donde siempre hay alguien conversando.";
+
+        addAction(
+            actions,
+            "Comprar pan",
+            buyBread
+        );
+
+    } else if (
+        building.type ===
+        "museum"
+    ) {
+
+        description.textContent =
+            "Fotografías, documentos y objetos que ayudan a reconstruir la memoria local.";
+
+        addAction(
+            actions,
+            "Investigar",
+            investigateMuseum
+        );
+
+    } else if (
+        building.type ===
+        "school"
+    ) {
+
+        description.textContent =
+            "Una escuela del pueblo. Se escuchan voces y movimiento durante el día.";
+
+    } else if (
+        building.type ===
+        "stadium"
+    ) {
+
+        description.textContent =
+            "Una cancha, tribunas y espacio para el deporte local.";
+
+    } else if (
+        building.type ===
+        "house"
+    ) {
+
+        description.textContent =
+            "Una casa de barrio. Una mesa, algunas sillas y objetos de la vida cotidiana.";
+
+        addAction(
+            actions,
+            "Preparar mate",
+            prepareMate
+        );
+
+    } else {
+
+        description.textContent =
+            "Un lugar de la vida cotidiana del pueblo.";
+
+    }
+
+    panel.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+/* =====================================================
+   ACCIONES INTERIORES
+===================================================== */
+
+function addAction(
+    container,
+    label,
+    callback
+) {
+
+    const button =
+        document.createElement(
+            "button"
+        );
+
+    button.textContent =
+        label;
+
+    button.onclick =
+        callback;
+
+    container.appendChild(
+        button
+    );
+
+}
+
+
+function buyBread() {
+
+    player.bread++;
+
+    inventory.push(
+        "Pan fresco"
+    );
+
+    updateInventory();
+
+    notify(
+        "Compraste pan fresco."
+    );
+
+}
+
+
+function prepareMate() {
+
+    player.mate++;
+
+    inventory.push(
+        "Mate preparado"
+    );
+
+    updateInventory();
+
+    notify(
+        "Preparaste un mate."
+    );
+
+}
+
+
+function listenRadio() {
+
+    showDialogue(
+        "Radio Ocarina",
+        "La radio está al aire. En un pueblo, una voz puede conectar a muchísima gente."
+    );
+
+}
+
+
+function investigateMuseum() {
+
+    showDialogue(
+        "Museo Local",
+        "Las fotografías y documentos permiten reconstruir fragmentos de la historia del territorio."
+    );
+
+}
+
+
+/* =====================================================
+   SALIR
+===================================================== */
+
+function exitBuilding() {
+
+    player.inside =
+        false;
+
+    player.currentBuilding =
+        null;
+
+    paused = false;
+
+    document
+        .getElementById(
+            "interaction-panel"
+        )
+        .classList.add(
+            "hidden"
+        );
+
+}
+
+
+document
+    .getElementById(
+        "interaction-close"
+    )
+    .addEventListener(
+        "click",
+        exitBuilding
+    );
+
+
+/* =====================================================
+   DIALOGO NPC
+===================================================== */
+
+function talkToNPC(
+    npc
+) {
+
+    const index =
+        Math.floor(
+            Math.random() *
+            npc.text.length
+        );
 
     showDialogue(
         npc.name,
-        text
+        npc.text[index]
     );
-
-
-    showSpeech(
-        npc,
-        text
-    );
-
 
     if (
         npc.mission &&
-        mission.stage === 0
+        !mission.active &&
+        !mission.completed
     ) {
 
-        mission.stage =
-            1;
-
-        mission.description =
-            "Encontrá una fotografía antigua y llevá la memoria del pueblo un paso más adelante.";
+        mission.active =
+            true;
 
         setMissionHUD();
 
         setTimeout(
             showMission,
-            350
+            400
         );
 
     }
@@ -3243,9 +3944,9 @@ function talkToNPC(npc) {
 }
 
 
-/* =========================================================
+/* =====================================================
    DIALOGO
-========================================================= */
+===================================================== */
 
 function showDialogue(
     name,
@@ -3259,7 +3960,6 @@ function showDialogue(
         .textContent =
         name;
 
-
     document
         .getElementById(
             "dialogue-text"
@@ -3267,665 +3967,16 @@ function showDialogue(
         .textContent =
         text;
 
-
     document
         .getElementById(
             "dialogue"
         )
-        .classList
-        .remove(
+        .classList.remove(
             "hidden"
         );
 
 }
 
-
-/* =========================================================
-   GLOBO
-========================================================= */
-
-function showSpeech(
-    npc,
-    text
-) {
-
-    const bubble =
-        document.getElementById(
-            "speech-bubble"
-        );
-
-
-    bubble.textContent =
-        text;
-
-
-    const sx =
-        npc.x -
-        camera.x;
-
-
-    const sy =
-        npc.y -
-        camera.y;
-
-
-    bubble.style.left =
-        Math.max(
-            10,
-            Math.min(
-                window.innerWidth - 280,
-                sx
-            )
-        ) +
-        "px";
-
-
-    bubble.style.top =
-        Math.max(
-            10,
-            sy - 80
-        ) +
-        "px";
-
-
-    bubble.classList.remove(
-        "hidden"
-    );
-
-
-    clearTimeout(
-        speechTimer
-    );
-
-
-    speechTimer =
-        setTimeout(
-            () => {
-
-                bubble.classList.add(
-                    "hidden"
-                );
-
-            },
-            4000
-        );
-
-}
-
-
-/* =========================================================
-   EDIFICIOS / INTERIORES
-========================================================= */
-
-function enterBuilding(
-    building
-) {
-
-    if (
-        building.locked
-    ) {
-
-        showToast(
-            "Todavía no podés entrar. Primero descubrí más del pueblo."
-        );
-
-        return;
-
-    }
-
-
-    currentBuilding =
-        building;
-
-
-    document
-        .getElementById(
-            "interior-title"
-        )
-        .textContent =
-        building.name;
-
-
-    const content =
-        document.getElementById(
-            "interior-content"
-        );
-
-
-    content.innerHTML =
-        "";
-
-
-    drawInteriorHTML(
-        content,
-        building
-    );
-
-
-    document
-        .getElementById(
-            "interior-panel"
-        )
-        .classList
-        .remove(
-            "hidden"
-        );
-
-}
-
-
-function drawInteriorHTML(
-    content,
-    building
-) {
-
-    if (
-        building.type ===
-        "bakery"
-    ) {
-
-        content.innerHTML = `
-
-            <div class="interior-object"
-                 style="
-                 position:absolute;
-                 left:15%;
-                 top:25%;
-                 font-size:60px;">
-                 🍞
-            </div>
-
-            <div style="
-                 position:absolute;
-                 left:35%;
-                 top:20%;
-                 font-size:22px;">
-                 Horno
-            </div>
-
-            <div style="
-                 position:absolute;
-                 left:65%;
-                 top:40%;
-                 font-size:55px;">
-                 🥖
-            </div>
-
-            <div style="
-                 position:absolute;
-                 left:30%;
-                 bottom:20%;
-                 font-size:20px;">
-                 Pan recién horneado
-            </div>
-
-            <button
-                onclick="buyBread()"
-                style="
-                position:absolute;
-                bottom:20px;
-                left:20px;
-                padding:12px 20px;">
-                Comprar pan — $30
-            </button>
-
-        `;
-
-    }
-
-
-    else if (
-        building.type ===
-        "radio"
-    ) {
-
-        content.innerHTML = `
-
-            <div style="
-                 position:absolute;
-                 left:15%;
-                 top:25%;
-                 font-size:70px;">
-                 🎙️
-            </div>
-
-            <div style="
-                 position:absolute;
-                 left:50%;
-                 top:30%;
-                 font-size:60px;">
-                 📻
-            </div>
-
-            <div style="
-                 position:absolute;
-                 left:30%;
-                 bottom:20%;
-                 font-size:20px;">
-                 Estudio de radio
-            </div>
-
-            <button
-                onclick="radioInteraction()"
-                style="
-                position:absolute;
-                bottom:20px;
-                left:20px;
-                padding:12px 20px;">
-                Escuchar la radio
-            </button>
-
-        `;
-
-    }
-
-
-    else if (
-        building.type ===
-        "stadium"
-    ) {
-
-        content.innerHTML = `
-
-            <div style="
-                 position:absolute;
-                 left:10%;
-                 top:20%;
-                 width:80%;
-                 height:55%;
-                 background:#4b8248;
-                 border:4px solid white;">
-
-                <div style="
-                    position:absolute;
-                    left:50%;
-                    top:0;
-                    bottom:0;
-                    border-left:3px solid white;">
-                </div>
-
-            </div>
-
-            <div style="
-                 position:absolute;
-                 bottom:15%;
-                 width:100%;
-                 text-align:center;
-                 font-size:22px;">
-                 Cancha del club
-            </div>
-
-        `;
-
-    }
-
-
-    else {
-
-        content.innerHTML = `
-
-            <div style="
-                padding:40px;
-                font-size:20px;
-                line-height:1.6;">
-                Un interior sencillo del pueblo.
-                Hay más cosas para descubrir
-                a medida que avanzás.
-            </div>
-
-        `;
-
-    }
-
-}
-
-
-/* =========================================================
-   SALIR
-========================================================= */
-
-document
-    .getElementById(
-        "exit-building"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            document
-                .getElementById(
-                    "interior-panel"
-                )
-                .classList
-                .add(
-                    "hidden"
-                );
-
-
-            currentBuilding =
-                null;
-
-        }
-    );
-
-
-/* =========================================================
-   PAN
-========================================================= */
-
-function buyBread() {
-
-    if (
-        player.money < 30
-    ) {
-
-        showToast(
-            "No tenés suficiente dinero."
-        );
-
-        return;
-
-    }
-
-
-    player.money -=
-        30;
-
-    player.bread +=
-        1;
-
-
-    inventory.push(
-        "Pan casero"
-    );
-
-
-    updateInventory();
-
-    showToast(
-        "Compraste pan recién hecho."
-    );
-
-}
-
-
-/* =========================================================
-   MATE
-========================================================= */
-
-function prepareMate() {
-
-    if (
-        player.bread <= 0
-    ) {
-
-        showToast(
-            "Necesitás algo para acompañar el mate."
-        );
-
-        return;
-
-    }
-
-
-    player.mate =
-        true;
-
-
-    inventory.push(
-        "Mate preparado"
-    );
-
-
-    updateInventory();
-
-    showToast(
-        "Preparaste el mate. Ahora sí, a caminar."
-    );
-
-}
-
-
-/* =========================================================
-   RADIO
-========================================================= */
-
-function radioInteraction() {
-
-    showDialogue(
-        "RADIO OCARINA",
-        "Una voz sale al aire. El pueblo empieza a despertarse."
-    );
-
-}
-
-
-/* =========================================================
-   OBJETOS
-========================================================= */
-
-function collectObject(
-    object
-) {
-
-    object.collected =
-        true;
-
-
-    inventory.push(
-        object.name
-    );
-
-
-    updateInventory();
-
-
-    if (
-        object.type ===
-        "photo"
-    ) {
-
-        if (
-            mission.stage === 1
-        ) {
-
-            mission.stage =
-                2;
-
-            mission.title =
-                "Una fotografía";
-
-            mission.description =
-                "Volvé con Don Pedro y mostrá lo que encontraste.";
-
-            setMissionHUD();
-
-        }
-
-    }
-
-
-    showToast(
-        "Encontraste: " +
-        object.name
-    );
-
-}
-
-
-/* =========================================================
-   INVENTARIO
-========================================================= */
-
-function toggleInventory() {
-
-    document
-        .getElementById(
-            "inventory-panel"
-        )
-        .classList
-        .toggle(
-            "hidden"
-        );
-
-}
-
-
-function updateInventory() {
-
-    const container =
-        document.getElementById(
-            "inventory-items"
-        );
-
-
-    let html =
-        "";
-
-
-    html +=
-        `<p>Dinero: $${player.money}</p>`;
-
-
-    html +=
-        `<p>Pan: ${player.bread}</p>`;
-
-
-    if (
-        player.mate
-    ) {
-
-        html +=
-            `<p>🧉 Mate preparado</p>`;
-
-    }
-
-
-    if (
-        inventory.length === 0
-    ) {
-
-        html +=
-            `<p>La mochila está vacía.</p>`;
-
-    } else {
-
-        html +=
-            inventory
-                .map(
-                    item =>
-                        `<p>• ${item}</p>`
-                )
-                .join("");
-
-    }
-
-
-    html += `
-
-        <button
-            onclick="prepareMate()">
-            Preparar mate
-        </button>
-
-    `;
-
-
-    container.innerHTML =
-        html;
-
-}
-
-
-/* =========================================================
-   MISION
-========================================================= */
-
-function setMissionHUD() {
-
-    const hud =
-        document.getElementById(
-            "mission-hud"
-        );
-
-
-    if (
-        mission.completed
-    ) {
-
-        hud.textContent =
-            "✓ Historia descubierta";
-
-        return;
-
-    }
-
-
-    if (
-        mission.stage === 0
-    ) {
-
-        hud.textContent =
-            "Explorá el pueblo";
-
-    }
-
-
-    else if (
-        mission.stage === 1
-    ) {
-
-        hud.textContent =
-            "Buscá una fotografía";
-
-    }
-
-
-    else if (
-        mission.stage === 2
-    ) {
-
-        hud.textContent =
-            "Volvé con Don Pedro";
-
-    }
-
-}
-
-
-function showMission() {
-
-    document
-        .getElementById(
-            "mission-title"
-        )
-        .textContent =
-        mission.title;
-
-
-    document
-        .getElementById(
-            "mission-description"
-        )
-        .textContent =
-        mission.description;
-
-
-    document
-        .getElementById(
-            "mission-panel"
-        )
-        .classList
-        .remove(
-            "hidden"
-        );
-
-}
-
-
-/* =========================================================
-   DIALOG CLOSE
-========================================================= */
 
 document
     .getElementById(
@@ -3939,13 +3990,220 @@ document
                 .getElementById(
                     "dialogue"
                 )
-                .classList
-                .add(
+                .classList.add(
                     "hidden"
                 );
 
         }
     );
+
+
+/* =====================================================
+   OBJETOS
+===================================================== */
+
+function collectObject(
+    object
+) {
+
+    object.collected =
+        true;
+
+    inventory.push(
+        object.name
+    );
+
+    updateInventory();
+
+    notify(
+        "Encontraste: " +
+        object.name
+    );
+
+
+    if (
+        object.type ===
+        "photo"
+    ) {
+
+        document
+            .getElementById(
+                "photo-count"
+            )
+            .textContent =
+            inventory.filter(
+                item =>
+                    item.includes(
+                        "Fotografía"
+                    )
+            ).length;
+
+    }
+
+
+    if (
+        object.type ===
+        "document"
+    ) {
+
+        document
+            .getElementById(
+                "document-count"
+            )
+            .textContent =
+            inventory.filter(
+                item =>
+                    item.includes(
+                        "Documento"
+                    )
+            ).length;
+
+    }
+
+
+    if (
+        mission.active &&
+        object.type ===
+        "photo"
+    ) {
+
+        mission.active =
+            false;
+
+        mission.completed =
+            true;
+
+        setMissionHUD();
+
+        setTimeout(
+            () => {
+
+                showDialogue(
+                    "MISIÓN COMPLETADA",
+
+                    "Encontraste una fotografía que puede ayudar a reconstruir la memoria del pueblo."
+                );
+
+            },
+            300
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   INVENTARIO
+===================================================== */
+
+function toggleInventory() {
+
+    document
+        .getElementById(
+            "inventory-panel"
+        )
+        .classList.toggle(
+            "hidden"
+        );
+
+}
+
+
+document
+    .getElementById(
+        "inventory-button"
+    )
+    .addEventListener(
+        "click",
+        toggleInventory
+    );
+
+
+document
+    .getElementById(
+        "inventory-close"
+    )
+    .addEventListener(
+        "click",
+        toggleInventory
+    );
+
+
+function updateInventory() {
+
+    const container =
+        document.getElementById(
+            "inventory-items"
+        );
+
+    document
+        .getElementById(
+            "bread-count"
+        )
+        .textContent =
+        player.bread;
+
+    document
+        .getElementById(
+            "mate-count"
+        )
+        .textContent =
+        player.mate;
+
+    if (
+        inventory.length === 0
+    ) {
+
+        container.textContent =
+            "Todavía no tenés objetos.";
+
+        return;
+
+    }
+
+    container.innerHTML =
+        inventory
+            .map(
+                item =>
+                    "• " + item
+            )
+            .join(
+                "<br>"
+            );
+
+}
+
+
+/* =====================================================
+   MISION
+===================================================== */
+
+function showMission() {
+
+    document
+        .getElementById(
+            "mission-title"
+        )
+        .textContent =
+        mission.title;
+
+    document
+        .getElementById(
+            "mission-description"
+        )
+        .textContent =
+        mission.description;
+
+    document
+        .getElementById(
+            "mission-panel"
+        )
+        .classList.remove(
+            "hidden"
+        );
+
+}
 
 
 document
@@ -3960,8 +4218,7 @@ document
                 .getElementById(
                     "mission-panel"
                 )
-                .classList
-                .add(
+                .classList.add(
                     "hidden"
                 );
 
@@ -3969,192 +4226,81 @@ document
     );
 
 
-document
-    .getElementById(
-        "inventory-close"
-    )
-    .addEventListener(
-        "click",
-        () => {
+function setMissionHUD() {
 
-            document
-                .getElementById(
-                    "inventory-panel"
-                )
-                .classList
-                .add(
-                    "hidden"
-                );
-
-        }
-    );
-
-
-/* =========================================================
-   TOAST
-========================================================= */
-
-function showToast(
-    message
-) {
-
-    const toast =
+    const hud =
         document.getElementById(
-            "toast"
+            "mission-hud"
         );
 
+    if (
+        mission.completed
+    ) {
 
-    toast.textContent =
-        message;
+        hud.textContent =
+            "✓ Memoria recuperada";
+
+    } else if (
+        mission.active
+    ) {
+
+        hud.textContent =
+            "Encontrá una fotografía antigua";
+
+    } else {
+
+        hud.textContent =
+            "Explorá el pueblo";
+
+    }
+
+}
 
 
-    toast.classList.remove(
-        "hidden"
+/* =====================================================
+   NOTIFICACION
+===================================================== */
+
+let notificationTimer;
+
+function notify(
+    text
+) {
+
+    const element =
+        document.getElementById(
+            "notification"
+        );
+
+    element.textContent =
+        text;
+
+    element.classList.add(
+        "show"
     );
-
 
     clearTimeout(
-        toastTimer
+        notificationTimer
     );
 
-
-    toastTimer =
+    notificationTimer =
         setTimeout(
             () => {
 
-                toast.classList.add(
-                    "hidden"
+                element.classList.remove(
+                    "show"
                 );
 
             },
-            2500
+            2400
         );
 
 }
 
 
-/* =========================================================
-   TIEMPO
-========================================================= */
-
-function updateTime(dt) {
-
-    worldMinutes +=
-        dt *
-        2;
-
-
-    if (
-        worldMinutes >=
-        24 * 60
-    ) {
-
-        worldMinutes =
-            0;
-
-    }
-
-
-    const hours =
-        Math.floor(
-            worldMinutes / 60
-        );
-
-
-    const minutes =
-        Math.floor(
-            worldMinutes % 60
-        );
-
-
-    document
-        .getElementById(
-            "clock"
-        )
-        .textContent =
-        String(hours).padStart(2, "0")
-        +
-        ":" +
-        String(minutes).padStart(2, "0");
-
-
-    drawLighting();
-
-}
-
-
-/* =========================================================
-   LUZ
-========================================================= */
-
-function drawLighting() {
-
-    const hour =
-        worldMinutes / 60;
-
-
-    let darkness =
-        0;
-
-
-    if (
-        hour < 7
-    ) {
-
-        darkness =
-            .35;
-
-    }
-
-
-    if (
-        hour >= 20
-    ) {
-
-        darkness =
-            .45;
-
-    }
-
-
-    if (
-        hour >= 22
-    ) {
-
-        darkness =
-            .62;
-
-    }
-
-
-    if (
-        hour >= 7 &&
-        hour < 9
-    ) {
-
-        darkness =
-            .12;
-
-    }
-
-
-    ctx.fillStyle =
-        `rgba(24,31,60,${darkness})`;
-
-
-    ctx.fillRect(
-        camera.x,
-        camera.y,
-        window.innerWidth,
-        window.innerHeight
-    );
-
-}
-
-
-/* =========================================================
+/* =====================================================
    MINIMAPA
-========================================================= */
+===================================================== */
 
 function drawMinimap() {
 
@@ -4165,11 +4311,9 @@ function drawMinimap() {
         minimap.height
     );
 
-
     const sx =
         minimap.width /
         WORLD_WIDTH;
-
 
     const sy =
         minimap.height /
@@ -4177,7 +4321,7 @@ function drawMinimap() {
 
 
     miniCtx.fillStyle =
-        "#b9a070";
+        "#a89a6c";
 
     miniCtx.fillRect(
         0,
@@ -4187,24 +4331,49 @@ function drawMinimap() {
     );
 
 
-    /* río */
+    /* ciudad */
 
     miniCtx.fillStyle =
-        "#426f7e";
+        "#77725e";
 
     miniCtx.fillRect(
-        0,
+        1450 * sx,
+        1000 * sy,
+        1800 * sx,
+        1250 * sy
+    );
+
+
+    /* chacras */
+
+    miniCtx.fillStyle =
+        "#78915a";
+
+    miniCtx.fillRect(
+        100 * sx,
+        400 * sy,
+        1250 * sx,
+        1900 * sy
+    );
+
+
+    /* rio */
+
+    miniCtx.fillStyle =
+        "#477f93";
+
+    miniCtx.fillRect(
+        river.x * sx,
         river.y * sy,
-        minimap.width,
+        river.width * sx,
         river.height * sy
     );
 
 
-    /* calles */
+    /* rutas */
 
     miniCtx.fillStyle =
-        "#6a6256";
-
+        "#464646";
 
     for (
         const road
@@ -4224,8 +4393,7 @@ function drawMinimap() {
     /* edificios */
 
     miniCtx.fillStyle =
-        "#684e3f";
-
+        "#9c6047";
 
     for (
         const b
@@ -4245,7 +4413,7 @@ function drawMinimap() {
     /* jugador */
 
     miniCtx.fillStyle =
-        "#ffdb4d";
+        "#ff4239";
 
     miniCtx.beginPath();
 
@@ -4262,132 +4430,123 @@ function drawMinimap() {
 }
 
 
-/* =========================================================
-   JOYSTICK
-========================================================= */
+/* =====================================================
+   DIBUJAR TODO
+===================================================== */
 
-const joystick = {
+function draw() {
 
-    dx: 0,
-    dy: 0
+    ctx.clearRect(
+        0,
+        0,
+        window.innerWidth,
+        window.innerHeight
+    );
 
-};
+    ctx.save();
 
-
-const joystickArea =
-    document.getElementById(
-        "joystick-area"
+    ctx.translate(
+        -camera.x,
+        -camera.y
     );
 
 
-const joystickElement =
-    document.getElementById(
-        "joystick"
-    );
+    drawGround();
+
+    drawBuildings();
+
+    drawTrafficLights();
+
+    drawVehicles();
+
+    drawAnimals();
+
+    drawObjects();
 
 
-let joystickActive =
-    false;
-
-
-function updateJoystick(
-    event
-) {
-
-    const rect =
-        joystickArea.getBoundingClientRect();
-
-
-    const centerX =
-        rect.left +
-        rect.width / 2;
-
-
-    const centerY =
-        rect.top +
-        rect.height / 2;
-
-
-    let dx =
-        event.clientX -
-        centerX;
-
-
-    let dy =
-        event.clientY -
-        centerY;
-
-
-    const max =
-        45;
-
-
-    const length =
-        Math.hypot(
-            dx,
-            dy
-        );
-
-
-    if (
-        length >
-        max
+    for (
+        const npc
+        of npcs
     ) {
 
-        dx =
-            dx / length *
-            max;
-
-        dy =
-            dy / length *
-            max;
+        drawNPC(
+            npc
+        );
 
     }
 
 
-    joystickElement.style.transform =
-        `translate(${dx}px, ${dy}px)`;
+    drawPlayer();
+
+    drawLighting();
+
+    drawRain();
 
 
-    joystick.dx =
-        dx / max;
+    ctx.restore();
 
-    joystick.dy =
-        dy / max;
+
+    drawMinimap();
 
 }
 
 
-joystickArea.addEventListener(
-    "pointerdown",
-    event => {
+/* =====================================================
+   TECLADO
+===================================================== */
 
-        joystickActive =
-            true;
+document.addEventListener(
+    "keydown",
+    e => {
 
-        joystickArea.setPointerCapture(
-            event.pointerId
-        );
+        const key =
+            e.key.toLowerCase();
 
-        updateJoystick(
-            event
-        );
-
-    }
-);
-
-
-joystickArea.addEventListener(
-    "pointermove",
-    event => {
+        keys[key] = true;
 
         if (
-            joystickActive
+            key === "e"
         ) {
 
-            updateJoystick(
-                event
-            );
+            interact();
+
+        }
+
+        if (
+            key === "m"
+        ) {
+
+            toggleInventory();
+
+        }
+
+        if (
+            key === "escape"
+        ) {
+
+            if (
+                player.inside
+            ) {
+
+                exitBuilding();
+
+            }
+
+            document
+                .getElementById(
+                    "dialogue"
+                )
+                .classList.add(
+                    "hidden"
+                );
+
+            document
+                .getElementById(
+                    "mission-panel"
+                )
+                .classList.add(
+                    "hidden"
+                );
 
         }
 
@@ -4395,46 +4554,107 @@ joystickArea.addEventListener(
 );
 
 
-joystickArea.addEventListener(
-    "pointerup",
-    resetJoystick
+document.addEventListener(
+    "keyup",
+    e => {
+
+        keys[
+            e.key.toLowerCase()
+        ] = false;
+
+    }
 );
 
 
-joystickArea.addEventListener(
-    "pointercancel",
-    resetJoystick
-);
+/* =====================================================
+   CONTROLES MOVILES
+===================================================== */
 
+document
+    .querySelectorAll(
+        ".move-btn"
+    )
+    .forEach(
+        button => {
 
-function resetJoystick() {
+            const key =
+                button.dataset.key;
 
-    joystickActive =
-        false;
+            button.addEventListener(
+                "touchstart",
+                e => {
 
-    joystick.dx =
-        0;
+                    e.preventDefault();
 
-    joystick.dy =
-        0;
+                    keys[key] = true;
 
-    joystickElement.style.transform =
-        "translate(0,0)";
+                },
+                {
+                    passive: false
+                }
+            );
 
-}
+            button.addEventListener(
+                "touchend",
+                e => {
 
+                    e.preventDefault();
 
-/* =========================================================
-   BOTONES CELULAR
-========================================================= */
+                    keys[key] = false;
+
+                },
+                {
+                    passive: false
+                }
+            );
+
+            button.addEventListener(
+                "mousedown",
+                () => {
+
+                    keys[key] = true;
+
+                }
+            );
+
+            button.addEventListener(
+                "mouseup",
+                () => {
+
+                    keys[key] = false;
+
+                }
+            );
+
+            button.addEventListener(
+                "mouseleave",
+                () => {
+
+                    keys[key] = false;
+
+                }
+            );
+
+        }
+    );
+
 
 document
     .getElementById(
         "mobile-interact"
     )
     .addEventListener(
-        "click",
-        interact
+        "touchstart",
+        e => {
+
+            e.preventDefault();
+
+            interact();
+
+        },
+        {
+            passive: false
+        }
     );
 
 
@@ -4443,14 +4663,23 @@ document
         "mobile-inventory"
     )
     .addEventListener(
-        "click",
-        toggleInventory
+        "touchstart",
+        e => {
+
+            e.preventDefault();
+
+            toggleInventory();
+
+        },
+        {
+            passive: false
+        }
     );
 
 
-/* =========================================================
-   START
-========================================================= */
+/* =====================================================
+   INICIO
+===================================================== */
 
 document
     .getElementById(
@@ -4463,164 +4692,75 @@ document
             gameStarted =
                 true;
 
-
             document
                 .getElementById(
                     "start-screen"
                 )
-                .classList
-                .add(
+                .classList.add(
                     "hidden"
                 );
 
-
-            showToast(
-                "Bienvenido a San Patricio del Chañar."
+            notify(
+                "Bienvenido a Chañar. Empezá a recorrer."
             );
 
         }
     );
 
 
-/* =========================================================
-   UPDATE
-========================================================= */
-
-function update(
-    dt
-) {
-
-    if (
-        !gameStarted
-    )
-        return;
-
-
-    updatePlayer(
-        dt
-    );
-
-
-    updateCamera();
-
-    updateTime(
-        dt
-    );
-
-
-    if (
-        mission.stage === 2
-    ) {
-
-        const pedro =
-            npcs.find(
-                n =>
-                    n.name ===
-                    "Don Pedro"
-            );
-
-
-        if (
-            distance(
-                player,
-                pedro
-            ) < 90
-        ) {
-
-            mission.stage =
-                3;
-
-            mission.completed =
-                true;
-
-            mission.title =
-                "La memoria comienza";
-
-            mission.description =
-                "Encontraste una primera pieza de la memoria del Chañar.";
-
-            setMissionHUD();
-
-            showMission();
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   DRAW
-========================================================= */
-
-function draw() {
-
-    ctx.clearRect(
-        0,
-        0,
-        window.innerWidth,
-        window.innerHeight
-    );
-
-
-    ctx.save();
-
-    ctx.translate(
-        -camera.x,
-        -camera.y
-    );
-
-
-    drawWorld();
-
-
-    ctx.restore();
-
-
-    drawMinimap();
-
-}
-
-
-/* =========================================================
+/* =====================================================
    LOOP
-========================================================= */
+===================================================== */
+
+let lastTime =
+    performance.now();
+
+let timeAccumulator = 0;
 
 function gameLoop(
-    timestamp
+    now
 ) {
 
+    const delta =
+        now -
+        lastTime;
+
+    lastTime =
+        now;
+
     if (
-        !lastTime
+        gameStarted
     ) {
 
-        lastTime =
-            timestamp;
+        timeAccumulator +=
+            delta;
+
+        if (
+            timeAccumulator >
+            50
+        ) {
+
+            updateTime();
+
+            updateVehicles();
+
+            updateNPCs();
+
+            updateAnimals();
+
+            updateTrafficLights();
+
+            timeAccumulator = 0;
+
+        }
+
+        updatePlayer();
+
+        updateCamera();
 
     }
 
-
-    const dt =
-        Math.min(
-            (timestamp -
-            lastTime) /
-            1000,
-            0.05
-        );
-
-
-    lastTime =
-        timestamp;
-
-
-    update(
-        dt
-    );
-
-
     draw();
-
 
     requestAnimationFrame(
         gameLoop
@@ -4629,18 +4769,18 @@ function gameLoop(
 }
 
 
-/* =========================================================
-   INICIO
-========================================================= */
+/* =====================================================
+   INICIALIZACION
+===================================================== */
 
-generateTrees();
-
-generateFlowers();
+chooseWeather();
 
 updateInventory();
 
 setMissionHUD();
 
-requestAnimationFrame(
-    gameLoop
+updateClockHUD();
+
+gameLoop(
+    performance.now()
 );
