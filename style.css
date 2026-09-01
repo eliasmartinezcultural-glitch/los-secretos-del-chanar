@@ -1,1199 +1,854 @@
-/* =====================================================
+/* =========================================================
    LOS SECRETOS DEL CHAÑAR
-   STYLE V8.0
-===================================================== */
+   V16.0
+   ESTILOS
+========================================================= */
 
 * {
-
-    box-sizing:
-        border-box;
-
-    margin:
-        0;
-
-    padding:
-        0;
-
-    -webkit-tap-highlight-color:
-        transparent;
-
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
 
 html,
 body {
 
-    width:
-        100%;
+    width: 100%;
+    height: 100%;
 
-    height:
-        100%;
+    overflow: hidden;
 
-    overflow:
-        hidden;
+    background: #17231b;
 
     font-family:
         Arial,
         Helvetica,
         sans-serif;
 
-    background:
-        #151515;
-
-    color:
-        white;
+    user-select: none;
 
 }
 
 
-body {
-
-    touch-action:
-        none;
-
-}
-
-
-/* =====================================================
-   JUEGO
-===================================================== */
-
-#game-container {
-
-    position:
-        fixed;
-
-    inset:
-        0;
-
-    overflow:
-        hidden;
-
-}
-
+/* =========================================================
+   CANVAS
+========================================================= */
 
 #game {
 
-    position:
-        absolute;
+    position: fixed;
 
-    inset:
-        0;
+    left: 0;
+    top: 0;
 
-    width:
-        100%;
+    width: 100%;
+    height: 100%;
 
-    height:
-        100%;
+    display: block;
 
-    display:
-        block;
+    background: #c9ac77;
 
 }
 
 
-/* =====================================================
-   PANTALLA INICIO
-===================================================== */
-
-#start-screen {
-
-    position:
-        fixed;
-
-    inset:
-        0;
-
-    z-index:
-        1000;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    background:
-        linear-gradient(
-            rgba(20,30,20,.78),
-            rgba(15,20,15,.92)
-        );
-
-}
-
-
-.start-card {
-
-    width:
-        min(520px, 90%);
-
-    padding:
-        42px;
-
-    text-align:
-        center;
-
-    border:
-        1px solid
-        rgba(255,255,255,.18);
-
-    border-radius:
-        24px;
-
-    background:
-        rgba(30,35,28,.92);
-
-    box-shadow:
-        0 25px 80px
-        rgba(0,0,0,.55);
-
-}
-
-
-.game-symbol {
-
-    font-size:
-        55px;
-
-    margin-bottom:
-        10px;
-
-}
-
-
-.start-card h1 {
-
-    font-size:
-        clamp(30px, 7vw, 55px);
-
-    line-height:
-        .95;
-
-    letter-spacing:
-        3px;
-
-}
-
-
-.version {
-
-    margin-top:
-        14px;
-
-    font-size:
-        12px;
-
-    letter-spacing:
-        4px;
-
-    opacity:
-        .65;
-
-}
-
-
-.intro {
-
-    margin:
-        25px 0;
-
-    line-height:
-        1.6;
-
-    color:
-        rgba(255,255,255,.78);
-
-}
-
-
-.start-card button {
-
-    width:
-        100%;
-
-    margin-top:
-        10px;
-
-    padding:
-        17px;
-
-    border:
-        0;
-
-    border-radius:
-        12px;
-
-    background:
-        #d5a84a;
-
-    color:
-        #211b10;
-
-    font-weight:
-        bold;
-
-    font-size:
-        17px;
-
-    cursor:
-        pointer;
-
-}
-
-
-#continue-button {
-
-    background:
-        rgba(255,255,255,.12);
-
-    color:
-        white;
-
-}
-
-
-/* =====================================================
+/* =========================================================
    HUD
-===================================================== */
+========================================================= */
 
-#top-hud {
+#hud {
 
-    position:
-        absolute;
+    position: fixed;
 
-    top:
-        15px;
+    top: 0;
+    left: 0;
 
-    left:
-        15px;
-
-    right:
-        15px;
-
-    display:
-        flex;
-
-    gap:
-        10px;
-
-    z-index:
-        20;
-
-    pointer-events:
-        none;
-
-}
-
-
-.hud-box {
-
-    min-width:
-        110px;
+    width: 100%;
 
     padding:
-        9px 13px;
+        14px 18px;
 
-    border-radius:
-        10px;
+    display: flex;
 
-    background:
-        rgba(20,25,20,.78);
+    justify-content: space-between;
 
-    backdrop-filter:
-        blur(8px);
+    align-items: flex-start;
 
-}
+    pointer-events: none;
 
-
-.hud-label {
-
-    display:
-        block;
-
-    font-size:
-        9px;
-
-    opacity:
-        .55;
-
-    letter-spacing:
-        1px;
+    z-index: 20;
 
 }
 
 
-.hud-box strong {
+.hud-left {
 
-    font-size:
-        14px;
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
 
 }
 
 
-/* =====================================================
-   MISIÓN HUD
-===================================================== */
+.game-title {
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+
+    text-shadow:
+        0 2px 4px rgba(0,0,0,.7);
+
+}
+
 
 #mission-hud {
 
-    position:
-        absolute;
+    display: inline-block;
 
-    top:
-        85px;
-
-    left:
-        50%;
-
-    transform:
-        translateX(-50%);
-
-    z-index:
-        20;
+    width: fit-content;
 
     padding:
-        9px 18px;
+        7px 11px;
 
-    border-radius:
-        20px;
+    border-radius: 8px;
 
     background:
-        rgba(20,25,20,.82);
+        rgba(20,30,22,.78);
 
-    font-size:
-        13px;
+    color: #f5e8c7;
+
+    font-size: 13px;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,.25);
 
 }
 
 
-/* =====================================================
-   ENERGÍA
-===================================================== */
+.hud-right {
 
-#energy-container {
+    display: flex;
 
-    position:
-        absolute;
+    gap: 8px;
 
-    top:
-        125px;
-
-    left:
-        18px;
-
-    z-index:
-        20;
-
-    font-size:
-        9px;
-
-    width:
-        130px;
+    pointer-events: auto;
 
 }
 
 
-#energy-bar {
+.hud-button {
 
-    height:
-        8px;
+    width: 42px;
+    height: 42px;
 
-    margin-top:
-        4px;
+    border: none;
 
-    border-radius:
-        8px;
-
-    overflow:
-        hidden;
+    border-radius: 10px;
 
     background:
-        rgba(0,0,0,.45);
+        rgba(20,30,22,.82);
+
+    color: white;
+
+    font-size: 20px;
+
+    cursor: pointer;
 
 }
 
 
-#energy-fill {
+.hud-button:active {
 
-    width:
-        100%;
-
-    height:
-        100%;
-
-    background:
-        #e0b54f;
-
-    transition:
-        width .2s;
+    transform: scale(.92);
 
 }
 
 
-/* =====================================================
-   MAPA
-===================================================== */
+/* =========================================================
+   MINIMAPA
+========================================================= */
 
-#map-container {
+#minimap-container {
 
-    position:
-        absolute;
+    position: fixed;
 
-    right:
-        15px;
+    right: 15px;
+    bottom: 15px;
 
-    top:
-        15px;
+    width: 220px;
+    height: 150px;
 
-    z-index:
-        20;
+    padding: 3px;
 
-    padding:
-        6px;
-
-    border-radius:
-        12px;
+    border-radius: 10px;
 
     background:
-        rgba(20,25,20,.8);
+        rgba(15,22,18,.85);
+
+    border:
+        2px solid rgba(255,255,255,.25);
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,.35);
+
+    z-index: 15;
 
 }
 
 
 #minimap {
 
-    width:
-        150px;
+    display: block;
 
-    height:
-        110px;
+    width: 100%;
+    height: 100%;
 
-    display:
-        block;
+    border-radius: 7px;
 
 }
 
 
-.map-title {
-
-    text-align:
-        center;
-
-    font-size:
-        8px;
-
-    letter-spacing:
-        2px;
-
-    opacity:
-        .6;
-
-}
-
-
-/* =====================================================
-   CONTROLES PC
-===================================================== */
-
-#control-help {
-
-    position:
-        absolute;
-
-    left:
-        15px;
-
-    bottom:
-        15px;
-
-    z-index:
-        20;
-
-    padding:
-        10px 13px;
-
-    line-height:
-        1.7;
-
-    font-size:
-        10px;
-
-    border-radius:
-        10px;
-
-    background:
-        rgba(20,25,20,.7);
-
-}
-
-
-#control-help strong {
-
-    color:
-        #e3bd63;
-
-}
-
-
-/* =====================================================
-   CONTROLES CELULAR
-===================================================== */
-
-#mobile-controls {
-
-    display:
-        none;
-
-    position:
-        absolute;
-
-    inset:
-        auto 0 20px 0;
-
-    z-index:
-        50;
-
-    justify-content:
-        space-between;
-
-    padding:
-        0 22px;
-
-    pointer-events:
-        none;
-
-}
-
-
-.dpad,
-.action-buttons {
-
-    pointer-events:
-        auto;
-
-}
-
-
-.move-btn,
-.action-buttons button {
-
-    width:
-        55px;
-
-    height:
-        55px;
-
-    margin:
-        3px;
-
-    border:
-        1px solid
-        rgba(255,255,255,.2);
-
-    border-radius:
-        14px;
-
-    background:
-        rgba(25,30,25,.78);
-
-    color:
-        white;
-
-    font-size:
-        20px;
-
-    backdrop-filter:
-        blur(8px);
-
-}
-
-
-.dpad {
-
-    text-align:
-        center;
-
-}
-
-
-.action-buttons {
-
-    display:
-        flex;
-
-    align-items:
-        flex-end;
-
-}
-
-
-#mobile-interact {
-
-    background:
-        rgba(207,160,66,.9) !important;
-
-    color:
-        #20190e !important;
-
-    font-weight:
-        bold;
-
-}
-
-
-/* =====================================================
+/* =========================================================
    INTERACCIÓN
-===================================================== */
+========================================================= */
 
 #interaction-hint {
 
-    position:
-        absolute;
+    position: fixed;
 
-    bottom:
-        105px;
+    left: 50%;
 
-    left:
-        50%;
+    bottom: 75px;
 
     transform:
         translateX(-50%);
 
-    z-index:
-        30;
-
     padding:
         9px 16px;
 
-    border-radius:
-        20px;
+    border-radius: 20px;
 
     background:
-        rgba(20,20,20,.85);
+        rgba(15,20,17,.88);
 
-    font-size:
-        12px;
+    color: white;
 
-}
+    font-size: 14px;
 
+    box-shadow:
+        0 4px 15px rgba(0,0,0,.3);
 
-#interaction-hint span {
-
-    color:
-        #e0b54f;
+    z-index: 30;
 
 }
 
 
-/* =====================================================
+#interaction-hint span:first-child {
+
+    color: #e9bd45;
+
+    margin-right: 6px;
+
+}
+
+
+/* =========================================================
    PANELES
-===================================================== */
+========================================================= */
 
 .panel {
 
-    position:
-        absolute;
+    position: fixed;
 
-    left:
-        50%;
-
-    top:
-        50%;
+    left: 50%;
+    top: 50%;
 
     transform:
         translate(-50%, -50%);
 
     width:
-        min(600px, 88%);
+        min(430px, 90vw);
 
-    z-index:
-        100;
+    max-height: 80vh;
 
-    padding:
-        22px;
+    overflow-y: auto;
 
-    border:
-        1px solid
-        rgba(255,255,255,.15);
+    padding: 22px;
 
-    border-radius:
-        18px;
+    border-radius: 16px;
 
     background:
-        rgba(25,30,25,.96);
+        rgba(28,35,29,.97);
+
+    color: white;
 
     box-shadow:
-        0 25px 80px
-        rgba(0,0,0,.55);
+        0 15px 50px rgba(0,0,0,.5);
+
+    border:
+        1px solid rgba(255,255,255,.15);
+
+    z-index: 100;
 
 }
 
 
 .panel-header {
 
-    display:
-        flex;
+    display: flex;
 
-    align-items:
-        center;
+    justify-content: space-between;
 
-    justify-content:
-        space-between;
+    align-items: center;
 
-    padding-bottom:
-        12px;
-
-    margin-bottom:
-        15px;
-
-    border-bottom:
-        1px solid
-        rgba(255,255,255,.1);
-
-    font-weight:
-        bold;
-
-    letter-spacing:
-        1px;
+    margin-bottom: 20px;
 
 }
 
 
-.panel-header button {
+.panel-header h2 {
 
-    border:
-        0;
+    font-size: 21px;
+
+}
+
+
+.panel-header button,
+#dialogue-close {
+
+    width: 34px;
+    height: 34px;
+
+    border: none;
+
+    border-radius: 50%;
 
     background:
-        none;
+        rgba(255,255,255,.12);
 
-    color:
-        white;
+    color: white;
 
-    font-size:
-        28px;
+    font-size: 23px;
 
-    cursor:
-        pointer;
+    cursor: pointer;
 
 }
 
 
-.dialogue-text {
+.panel h3 {
 
-    font-size:
-        18px;
+    margin-bottom: 10px;
 
-    line-height:
-        1.6;
-
-    color:
-        rgba(255,255,255,.88);
+    color: #f0d28a;
 
 }
 
 
-#mission-panel h2 {
+.panel p {
 
-    margin-bottom:
-        10px;
+    line-height: 1.6;
+
+    color: #ddd;
 
 }
 
 
-#mission-panel p {
+.hidden {
 
-    line-height:
-        1.6;
+    display: none !important;
 
-    opacity:
-        .8;
+}
+
+
+/* =========================================================
+   INVENTARIO
+========================================================= */
+
+#inventory-stats {
+
+    display: flex;
+
+    gap: 12px;
+
+    margin-bottom: 20px;
+
+    flex-wrap: wrap;
+
+}
+
+
+#inventory-stats div {
+
+    padding:
+        9px 12px;
+
+    border-radius: 9px;
+
+    background:
+        rgba(255,255,255,.08);
 
 }
 
 
 #inventory-items {
 
-    line-height:
-        2;
+    padding: 15px;
 
-}
-
-
-/* =====================================================
-   DESCUBRIMIENTO
-===================================================== */
-
-.discovery {
-
-    position:
-        absolute;
-
-    top:
-        160px;
-
-    left:
-        50%;
-
-    transform:
-        translateX(-50%);
-
-    z-index:
-        90;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        12px;
-
-    padding:
-        12px 20px;
-
-    border-radius:
-        14px;
+    border-radius: 10px;
 
     background:
-        rgba(20,25,20,.92);
+        rgba(0,0,0,.2);
 
-    box-shadow:
-        0 10px 40px
-        rgba(0,0,0,.3);
+    line-height: 1.9;
 
 }
 
 
-.discovery-icon {
+/* =========================================================
+   DIÁLOGOS
+========================================================= */
 
-    font-size:
-        27px;
+.dialogue {
 
-}
+    position: fixed;
 
+    inset: 0;
 
-.discovery small {
+    display: flex;
 
-    display:
-        block;
+    align-items: flex-end;
 
-    opacity:
-        .55;
-
-    font-size:
-        8px;
-
-    letter-spacing:
-        2px;
-
-}
-
-
-.discovery strong {
-
-    display:
-        block;
-
-    margin-top:
-        3px;
-
-}
-
-
-/* =====================================================
-   TOAST
-===================================================== */
-
-#toast {
-
-    position:
-        absolute;
-
-    bottom:
-        30px;
-
-    left:
-        50%;
-
-    transform:
-        translateX(-50%)
-        translateY(100px);
-
-    z-index:
-        200;
+    justify-content: center;
 
     padding:
-        11px 20px;
-
-    border-radius:
-        20px;
+        25px;
 
     background:
-        rgba(20,25,20,.95);
+        rgba(0,0,0,.12);
 
-    opacity:
-        0;
-
-    transition:
-        .3s;
-
-    pointer-events:
-        none;
+    z-index: 90;
 
 }
 
 
-#toast.show {
-
-    opacity:
-        1;
-
-    transform:
-        translateX(-50%)
-        translateY(0);
-
-}
-
-
-/* =====================================================
-   SISTEMA
-===================================================== */
-
-#system-buttons {
-
-    position:
-        absolute;
-
-    right:
-        15px;
-
-    bottom:
-        15px;
-
-    z-index:
-        30;
-
-    display:
-        flex;
-
-    gap:
-        7px;
-
-}
-
-
-#system-buttons button {
+.dialogue-box {
 
     width:
-        38px;
+        min(760px, 92vw);
 
-    height:
-        38px;
+    padding: 20px;
 
-    border:
-        0;
-
-    border-radius:
-        10px;
+    border-radius: 16px;
 
     background:
-        rgba(20,25,20,.75);
+        rgba(25,32,27,.97);
+
+    color: white;
+
+    box-shadow:
+        0 10px 40px rgba(0,0,0,.5);
+
+}
+
+
+.dialogue-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 15px;
+
+}
+
+
+#dialogue-name {
+
+    color: #e7c978;
+
+    font-size: 19px;
+
+}
+
+
+.dialogue-text {
+
+    font-size: 16px;
+
+    line-height: 1.6;
+
+    color: #f0f0f0;
+
+}
+
+
+.dialogue-footer {
+
+    margin-top: 15px;
+
+    font-size: 12px;
+
+    color: #aaa;
+
+}
+
+
+/* =========================================================
+   AYUDA
+========================================================= */
+
+.help-content {
+
+    line-height: 1.8;
+
+}
+
+
+.help-content hr {
+
+    margin:
+        15px 0;
+
+    border: none;
+
+    border-top:
+        1px solid rgba(255,255,255,.15);
+
+}
+
+
+/* =========================================================
+   PANTALLA INICIO
+========================================================= */
+
+.start-screen {
+
+    position: fixed;
+
+    inset: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #435d42 0%,
+            #243526 45%,
+            #111a13 100%
+        );
+
+    z-index: 200;
+
+}
+
+
+.start-content {
+
+    width:
+        min(520px, 90vw);
+
+    text-align: center;
+
+    color: white;
+
+    padding: 30px;
+
+}
+
+
+.start-symbol {
+
+    font-size: 55px;
+
+    margin-bottom: 15px;
+
+}
+
+
+.start-content h1 {
+
+    font-size:
+        clamp(32px, 8vw, 62px);
+
+    line-height: .95;
+
+    letter-spacing: 3px;
+
+    text-shadow:
+        0 5px 20px rgba(0,0,0,.5);
+
+}
+
+
+.start-subtitle {
+
+    margin-top: 15px;
+
+    color: #e2c879;
+
+    font-size: 18px;
+
+}
+
+
+.start-description {
+
+    max-width: 430px;
+
+    margin:
+        20px auto 28px;
+
+    line-height: 1.6;
+
+    color: #d5ddd5;
+
+}
+
+
+.start-button {
+
+    border: none;
+
+    padding:
+        15px 38px;
+
+    border-radius: 12px;
+
+    background:
+        #d3a941;
+
+    color: #1c241b;
+
+    font-size: 17px;
+
+    font-weight: 800;
+
+    letter-spacing: 1px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 6px 20px rgba(0,0,0,.3);
+
+}
+
+
+.start-button:hover {
+
+    transform:
+        translateY(-2px);
+
+}
+
+
+.start-button:active {
+
+    transform:
+        scale(.96);
+
+}
+
+
+.version {
+
+    margin-top: 25px;
+
+    font-size: 11px;
+
+    opacity: .5;
+
+}
+
+
+/* =========================================================
+   CONTROLES MOBILE
+========================================================= */
+
+#mobile-controls {
+
+    position: fixed;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    z-index: 40;
+
+}
+
+
+.joystick {
+
+    position: absolute;
+
+    left: 25px;
+    bottom: 25px;
+
+    width: 125px;
+    height: 125px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(20,25,21,.35);
+
+    border:
+        2px solid rgba(255,255,255,.2);
+
+    pointer-events: auto;
+
+    touch-action: none;
+
+}
+
+
+.joystick-knob {
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 58px;
+    height: 58px;
+
+    transform:
+        translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,255,255,.45);
+
+    border:
+        2px solid rgba(255,255,255,.5);
+
+}
+
+
+.action-button {
+
+    position: absolute;
+
+    right: 35px;
+    bottom: 42px;
+
+    width: 75px;
+    height: 75px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background:
+        rgba(211,169,65,.85);
 
     color:
-        white;
+        #182018;
 
-    cursor:
-        pointer;
+    font-size: 25px;
 
-}
+    font-weight: 900;
 
+    pointer-events: auto;
 
-/* =====================================================
-   OCULTO
-===================================================== */
-
-.hidden {
-
-    display:
-        none !important;
+    touch-action: manipulation;
 
 }
 
 
-/* =====================================================
-   CELULAR
-===================================================== */
+/* =========================================================
+   RESPONSIVE
+========================================================= */
 
 @media
 (max-width: 700px) {
 
-    #top-hud {
+    #minimap-container {
 
-        top:
-            8px;
+        width: 135px;
+        height: 92px;
 
-        left:
-            8px;
-
-        right:
-            8px;
+        right: 10px;
+        bottom: 10px;
 
     }
 
 
-    .hud-box {
-
-        min-width:
-            0;
-
-        flex:
-            1;
+    #hud {
 
         padding:
-            7px;
+            10px;
 
     }
 
 
-    .hud-box strong {
+    .game-title {
 
-        font-size:
-            11px;
-
-    }
-
-
-    #map-container {
-
-        top:
-            62px;
-
-        right:
-            8px;
-
-    }
-
-
-    #minimap {
-
-        width:
-            115px;
-
-        height:
-            85px;
-
-    }
-
-
-    #control-help {
-
-        display:
-            none;
-
-    }
-
-
-    #mobile-controls {
-
-        display:
-            flex;
+        font-size: 11px;
 
     }
 
 
     #mission-hud {
 
-        top:
-            105px;
-
-        max-width:
-            70%;
-
-        text-align:
-            center;
-
-        font-size:
-            11px;
+        font-size: 11px;
 
     }
 
 
-    #energy-container {
+    .hud-button {
 
-        top:
-            110px;
-
-        left:
-            8px;
+        width: 38px;
+        height: 38px;
 
     }
 
 
     #interaction-hint {
 
-        bottom:
-            145px;
+        bottom: 175px;
 
-    }
-
-
-    .panel {
-
-        width:
-            92%;
-
-        padding:
-            18px;
-
-    }
-
-
-    .dialogue-text {
-
-        font-size:
-            16px;
-
-    }
-
-
-    .start-card {
-
-        padding:
-            28px 22px;
-
-    }
-
-
-    .start-card h1 {
-
-        font-size:
-            31px;
+        font-size: 12px;
 
     }
 
 }
 
 
-/* =====================================================
-   PANTALLAS MUY PEQUEÑAS
-===================================================== */
+@media
+(min-width: 701px) {
+
+    #mobile-controls {
+
+        display: none;
+
+    }
+
+}
+
 
 @media
-(max-height: 600px) {
+(max-width: 700px) {
 
-    .move-btn,
-    .action-buttons button {
+    #help-panel {
 
         width:
-            45px;
-
-        height:
-            45px;
+            min(400px, 88vw);
 
     }
 
