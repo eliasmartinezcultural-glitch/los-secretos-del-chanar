@@ -1,779 +1,926 @@
-```javascript
-/* ============================================================
+/* =========================================================
    LOS SECRETOS DEL CHAÑAR
-   VERSIÓN 17.0
-   ------------------------------------------------------------
-   REPRESENTACIÓN TERRITORIAL + MUNDO VIVO
-   San Patricio del Chañar
-   ============================================================ */
+   V18.0
+   CHAÑAR VIVO
 
-"use strict";
-
-/* ============================================================
-   1. CANVAS
-   ============================================================ */
-
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
-
-const minimap = document.getElementById("minimap");
-const miniCtx = minimap ? minimap.getContext("2d") : null;
-
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-
-window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
+   Juego creado por Elías Martínez
+========================================================= */
 
 
-/* ============================================================
-   2. MUNDO
-   ============================================================ */
+/* =========================================================
+   CANVAS
+========================================================= */
+
+const canvas =
+    document.getElementById("game");
+
+const ctx =
+    canvas.getContext("2d");
+
+const minimap =
+    document.getElementById("minimap");
+
+const miniCtx =
+    minimap.getContext("2d");
+
+
+/* =========================================================
+   MUNDO
+========================================================= */
 
 const WORLD_WIDTH = 4200;
 const WORLD_HEIGHT = 3000;
 
 
-/* ============================================================
-   3. ESTADO DEL JUEGO
-   ============================================================ */
+/* =========================================================
+   ESTADO
+========================================================= */
 
 let gameStarted = false;
 
-let gameTime = 8 * 60; // 08:00
-let gameSpeed = 0.35;
+let worldTime = 0;
 
-let worldDay = 1;
-
-const keys = {};
-
-const camera = {
-    x: 0,
-    y: 0,
-    smooth: 0.10
-};
+let notificationTimer = null;
 
 
-/* ============================================================
-   4. JUGADOR
-   ============================================================ */
+/* =========================================================
+   JUGADOR
+========================================================= */
 
 const player = {
-    x: 2050,
-    y: 1420,
+
+    x: 2070,
+
+    y: 1460,
 
     width: 30,
-    height: 30,
 
-    speed: 4.2,
+    height: 38,
+
+    speed: 4.3,
 
     moving: false,
+
     frame: 0,
 
     direction: "down"
+
 };
 
 
-/* ============================================================
-   5. INVENTARIO
-   ============================================================ */
+/* =========================================================
+   CÁMARA
+========================================================= */
+
+const camera = {
+
+    x: 0,
+
+    y: 0,
+
+    smooth: 0.12
+
+};
+
+
+/* =========================================================
+   PROGRESO
+========================================================= */
+
+const progress = {
+
+    xp: 0,
+
+    photos: 0,
+
+    history: 0,
+
+    discoveries: 0,
+
+    zones: 1,
+
+    mission: 0
+
+};
+
+
+/* =========================================================
+   INVENTARIO
+========================================================= */
 
 const inventory = [];
 
 
-/* ============================================================
-   6. MISION
-   ============================================================ */
+/* =========================================================
+   ZONAS
+========================================================= */
 
-const mission = {
-    active: false,
-    completed: false,
+const zones = [
 
-    title: "La fotografía perdida",
+    {
+        id: "center",
+        name: "Centro del Chañar",
+        x: 1500,
+        y: 1050,
+        width: 1100,
+        height: 850,
+        unlocked: true
+    },
 
-    description:
-        "Don Pedro perdió una fotografía antigua. " +
-        "Recorré el pueblo y encontrala."
-};
+    {
+        id: "chacras",
+        name: "Zona de Chacras",
+        x: 300,
+        y: 1000,
+        width: 1050,
+        height: 1100,
+        unlocked: false,
+        requirement: 1
+    },
+
+    {
+        id: "river",
+        name: "Ribera del río Neuquén",
+        x: 0,
+        y: 2250,
+        width: 4200,
+        height: 500,
+        unlocked: false,
+        requirement: 2
+    },
+
+    {
+        id: "vineyards",
+        name: "Circuito Vitivinícola",
+        x: 2750,
+        y: 450,
+        width: 1250,
+        height: 900,
+        unlocked: false,
+        requirement: 3
+    },
+
+    {
+        id: "old",
+        name: "Memoria del Chañar",
+        x: 400,
+        y: 200,
+        width: 1000,
+        height: 600,
+        unlocked: false,
+        requirement: 4
+    }
+
+];
 
 
-/* ============================================================
-   7. EDIFICIOS
-   ============================================================ */
+/* =========================================================
+   EDIFICIOS
+========================================================= */
 
 const buildings = [
 
     {
         x: 1750,
-        y: 1120,
-        width: 500,
-        height: 250,
-        color: "#b86d4f",
-        name: "ESCUELA"
-    },
-
-    {
-        x: 2700,
-        y: 1050,
-        width: 470,
-        height: 250,
-        color: "#806b58",
-        name: "RADIO OCARINA"
-    },
-
-    {
-        x: 1050,
-        y: 1750,
-        width: 360,
-        height: 220,
-        color: "#a38368",
-        name: "ALMACÉN"
-    },
-
-    {
-        x: 2850,
-        y: 1900,
-        width: 380,
-        height: 230,
-        color: "#98725b",
-        name: "CASA"
-    },
-
-    {
-        x: 1850,
-        y: 650,
-        width: 430,
-        height: 230,
-        color: "#8e715d",
-        name: "MUSEO"
-    },
-
-    {
-        x: 3300,
-        y: 1500,
-        width: 430,
-        height: 250,
-        color: "#765a45",
-        name: "TALLER"
-    },
-
-    {
-        x: 750,
-        y: 1250,
+        y: 980,
         width: 350,
-        height: 220,
-        color: "#927257",
-        name: "PANADERÍA"
+        height: 210,
+        color: "#b97852",
+        name: "MUNICIPALIDAD",
+        zone: "center"
     },
 
     {
-        x: 2350,
-        y: 1750,
+        x: 2250,
+        y: 990,
+        width: 330,
+        height: 210,
+        color: "#9d765c",
+        name: "RADIO OCARINA",
+        zone: "center"
+    },
+
+    {
+        x: 1800,
+        y: 1510,
+        width: 370,
+        height: 220,
+        color: "#a88668",
+        name: "ESCUELA 273",
+        zone: "center"
+    },
+
+    {
+        x: 2380,
+        y: 1530,
+        width: 360,
+        height: 230,
+        color: "#80654e",
+        name: "CLUB SAN PATRICIO",
+        zone: "center"
+    },
+
+    {
+        x: 1250,
+        y: 1220,
+        width: 250,
+        height: 170,
+        color: "#9d8068",
+        name: "ALMACÉN",
+        zone: "center"
+    },
+
+    {
+        x: 3050,
+        y: 610,
         width: 420,
         height: 230,
-        color: "#83654e",
-        name: "FERRETERÍA"
+        color: "#80634c",
+        name: "BODEGA",
+        zone: "vineyards"
+    },
+
+    {
+        x: 560,
+        y: 1420,
+        width: 300,
+        height: 180,
+        color: "#9e7454",
+        name: "GALPÓN",
+        zone: "chacras"
+    },
+
+    {
+        x: 760,
+        y: 360,
+        width: 340,
+        height: 200,
+        color: "#89735d",
+        name: "ANTIGUA POSTA",
+        zone: "old"
     }
 
 ];
 
 
-/* ============================================================
-   8. ÁRBOLES / ALAMEDAS
-   ============================================================ */
+/* =========================================================
+   ÁRBOLES / ALAMEDAS
+========================================================= */
 
 const trees = [];
 
-
-/* Generador de árboles */
 
 function generateTrees() {
 
     trees.length = 0;
 
-    /* Alameda norte */
+    for (
+        let i = 0;
+        i < 90;
+        i++
+    ) {
 
-    for (let i = 0; i < 28; i++) {
+        const x =
+            100 +
+            Math.random() *
+            (WORLD_WIDTH - 200);
 
-        trees.push([
-            400 + i * 110,
-            430
-        ]);
+        const y =
+            100 +
+            Math.random() *
+            (WORLD_HEIGHT - 200);
 
-    }
-
-    /* Alameda sur */
-
-    for (let i = 0; i < 30; i++) {
-
-        trees.push([
-            450 + i * 110,
-            2450
-        ]);
-
-    }
-
-    /* Sector oeste */
-
-    for (let i = 0; i < 16; i++) {
-
-        trees.push([
-            350,
-            700 + i * 100
-        ]);
-
-    }
-
-    /* Sector este */
-
-    for (let i = 0; i < 16; i++) {
-
-        trees.push([
-            3900,
-            700 + i * 100
-        ]);
+        trees.push({
+            x,
+            y,
+            size:
+                0.8 +
+                Math.random() *
+                .6
+        });
 
     }
 
 }
 
+
 generateTrees();
 
 
-/* ============================================================
-   9. VIÑEDOS
-   ============================================================ */
-
-const vineyards = [
-
-    {
-        x: 450,
-        y: 850,
-        rows: 15,
-        cols: 24
-    },
-
-    {
-        x: 2900,
-        y: 500,
-        rows: 13,
-        cols: 22
-    },
-
-    {
-        x: 650,
-        y: 2150,
-        rows: 10,
-        cols: 20
-    }
-
-];
-
-
-/* ============================================================
-   10. CHACRAS
-   ============================================================ */
-
-const farms = [
-
-    {
-        x: 300,
-        y: 1250,
-        width: 600,
-        height: 750,
-        type: "frutales",
-        name: "Chacra frutícola"
-    },
-
-    {
-        x: 3200,
-        y: 500,
-        width: 650,
-        height: 500,
-        type: "viñedo",
-        name: "Finca vitivinícola"
-    }
-
-];
-
-
-/* ============================================================
-   11. NPC
-   ============================================================ */
+/* =========================================================
+   PERSONAJES
+========================================================= */
 
 const npcs = [
 
     {
-        x: 1550,
-        y: 1400,
-
-        name: "Don Pedro",
-
-        role: "Vecino",
-
-        color: "#6b4350",
-
-        text:
-            "Hace años que vivo acá. " +
-            "Este pueblo guarda más historias " +
-            "de las que imaginás.",
-
-        mission: true,
-
-        homeX: 1550,
-        homeY: 1400,
-
-        targetX: 1550,
-        targetY: 1400,
-
-        moving: false
-    },
-
-    {
-        x: 2450,
-        y: 1430,
-
-        name: "María",
-
-        role: "Fotógrafa",
-
-        color: "#704c61",
-
-        text:
-            "Si encontrás una fotografía antigua, " +
-            "guardala. Las imágenes también " +
-            "cuentan la historia del pueblo.",
-
-        homeX: 2450,
-        homeY: 1430,
-
-        targetX: 2450,
-        targetY: 1430,
-
-        moving: false
-    },
-
-    {
-        x: 2900,
-        y: 900,
-
-        name: "Julián",
-
-        role: "Locutor",
-
-        color: "#435c69",
-
-        text:
-            "La radio siempre fue una forma " +
-            "de unir a la gente del pueblo.",
-
-        homeX: 2900,
-        homeY: 900,
-
-        targetX: 2900,
-        targetY: 900,
-
-        moving: false
-    },
-
-    {
-        x: 850,
-        y: 1150,
-
-        name: "Rosa",
-
-        role: "Panadera",
-
-        color: "#8b6048",
-
-        text:
-            "A esta hora ya salió el pan. " +
-            "El olor llega hasta la calle.",
-
-        homeX: 850,
-        homeY: 1150,
-
-        targetX: 850,
-        targetY: 1150,
-
-        moving: false
-    },
-
-    {
-        x: 850,
-        y: 1550,
-
-        name: "Miguel",
-
-        role: "Productor",
-
-        color: "#536b45",
-
-        text:
-            "La chacra necesita agua, trabajo " +
-            "y paciencia. Todo empieza por ahí.",
-
-        homeX: 850,
-        homeY: 1550,
-
-        targetX: 850,
-        targetY: 1550,
-
-        moving: true
-    },
-
-    {
-        x: 3450,
+        id: "pedro",
+        x: 1650,
         y: 1350,
-
-        name: "Carlos",
-
-        role: "Mecánico",
-
-        color: "#554c42",
+        name: "Don Pedro",
+        type: "elder",
+        emoji: "👴",
 
         text:
-            "Si una máquina falla en plena cosecha, " +
-            "hay que arreglarla rápido.",
+            "Yo llegué cuando todavía había mucho viento, " +
+            "tierra y trabajo por hacer. El Chañar no siempre " +
+            "fue como lo ves ahora.",
 
-        homeX: 3450,
-        homeY: 1350,
+        mission: 0
 
-        targetX: 3450,
-        targetY: 1350,
-
-        moving: false
     },
 
     {
-        x: 3200,
-        y: 2100,
-
-        name: "Elena",
-
-        role: "Vecina",
-
-        color: "#715e76",
+        id: "maria",
+        x: 2150,
+        y: 1370,
+        name: "María",
+        type: "teacher",
+        emoji: "👩",
 
         text:
-            "El río tiene otro ritmo. " +
-            "Cuando quieras conocerlo, seguí hacia el sur.",
+            "La Escuela 273 comenzó a funcionar en 1975. " +
+            "La escuela fue mucho más que un edificio: " +
+            "era un lugar de encuentro para las familias.",
 
-        homeX: 3200,
-        homeY: 2100,
+        history: true
 
-        targetX: 3200,
-        targetY: 2100,
+    },
 
-        moving: true
+    {
+        id: "juan",
+        x: 2600,
+        y: 1360,
+        name: "Juan",
+        type: "farmer",
+        emoji: "👨‍🌾",
+
+        text:
+            "Acá el agua es parte de la historia. " +
+            "Sin riego no se entiende cómo este desierto " +
+            "terminó convertido en una zona productiva.",
+
+        mission: 1
+
+    },
+
+    {
+        id: "sofia",
+        x: 2350,
+        y: 1100,
+        name: "Sofía",
+        type: "radio",
+        emoji: "🎙️",
+
+        text:
+            "La radio tiene algo especial: permite que " +
+            "las historias de la gente circulen por todo el pueblo.",
+
+        history: true
+
+    },
+
+    {
+        id: "miguel",
+        x: 2800,
+        y: 1660,
+        name: "Miguel",
+        type: "football",
+        emoji: "⚽",
+
+        text:
+            "El Club Atlético San Patricio nació en 1976. " +
+            "Para muchos vecinos fue un lugar de encuentro " +
+            "después de la jornada de trabajo.",
+
+        history: true
+
+    },
+
+    {
+        id: "ana",
+        x: 3350,
+        y: 1050,
+        name: "Ana",
+        type: "wine",
+        emoji: "🍇",
+
+        text:
+            "El desarrollo vitivinícola moderno tomó fuerza " +
+            "a fines de los años 90. Los viñedos cambiaron " +
+            "para siempre el paisaje productivo del Chañar.",
+
+        mission: 3
+
     }
 
 ];
 
 
-/* ============================================================
-   12. TRACTOR
-   ============================================================ */
-
-const tractors = [
-
-    {
-        x: 500,
-        y: 1500,
-
-        width: 65,
-        height: 35,
-
-        speed: 1.1,
-
-        direction: 1,
-
-        minX: 400,
-        maxX: 900
-    },
-
-    {
-        x: 3150,
-        y: 750,
-
-        width: 65,
-        height: 35,
-
-        speed: 0.9,
-
-        direction: -1,
-
-        minX: 2900,
-        maxX: 3800
-    }
-
-];
-
-
-/* ============================================================
-   13. VEHÍCULOS
-   ============================================================ */
-
-const vehicles = [
-
-    {
-        x: 1200,
-        y: 1000,
-
-        width: 70,
-        height: 35,
-
-        type: "camioneta",
-
-        speed: 1.4,
-
-        direction: 1,
-
-        minX: 1000,
-        maxX: 1700
-    },
-
-    {
-        x: 3400,
-        y: 1200,
-
-        width: 80,
-        height: 38,
-
-        type: "camión",
-
-        speed: 1.0,
-
-        direction: -1,
-
-        minX: 2600,
-        maxX: 3800
-    },
-
-    {
-        x: 1600,
-        y: 2300,
-
-        width: 65,
-        height: 32,
-
-        type: "auto",
-
-        speed: 1.2,
-
-        direction: 1,
-
-        minX: 1200,
-        maxX: 2300
-    }
-
-];
-
-
-/* ============================================================
-   14. ANIMALES
-   ============================================================ */
+/* =========================================================
+   ANIMALES
+========================================================= */
 
 const animals = [
 
     {
         x: 500,
+        y: 1300,
+        type: "sheep"
+    },
+
+    {
+        x: 850,
         y: 1800,
-        type: "perro",
-        dx: 0.5,
-        dy: 0.2
+        type: "horse"
     },
 
     {
-        x: 700,
-        y: 1900,
-        type: "perro",
-        dx: -0.3,
-        dy: 0.3
+        x: 3200,
+        y: 900,
+        type: "horse"
     },
 
     {
-        x: 3300,
-        y: 2300,
-        type: "caballo",
-        dx: 0.2,
-        dy: 0
-    },
-
-    {
-        x: 3500,
-        y: 2350,
-        type: "caballo",
-        dx: -0.2,
-        dy: 0
+        x: 3600,
+        y: 700,
+        type: "sheep"
     }
 
 ];
 
 
-/* ============================================================
-   15. PERSONAS CAMINANDO
-   ============================================================ */
+/* =========================================================
+   TRACTORES
+========================================================= */
 
-const walkers = [
+const tractors = [
 
     {
-        x: 1300,
-        y: 930,
-        targetX: 1600,
-        targetY: 930,
-        speed: 0.6,
-        name: "Vecino"
+        x: 850,
+        y: 1550,
+        vx: 0.8,
+        vy: 0,
+        color: "#6c7835"
     },
 
     {
-        x: 2100,
-        y: 1500,
-        targetX: 2450,
-        targetY: 1500,
-        speed: 0.55,
-        name: "Vecina"
-    },
-
-    {
-        x: 2500,
-        y: 1000,
-        targetX: 2800,
-        targetY: 1000,
-        speed: 0.5,
-        name: "Trabajador"
+        x: 3200,
+        y: 1250,
+        vx: -0.6,
+        vy: 0,
+        color: "#8b6a35"
     }
 
 ];
 
 
-/* ============================================================
-   16. OBJETOS COLECCIONABLES
-   ============================================================ */
+/* =========================================================
+   OBJETOS
+========================================================= */
 
 const objects = [
 
     {
+        id: "photo1",
         x: 1450,
-        y: 1500,
-
+        y: 1450,
         type: "photo",
-
-        name: "Fotografía antigua",
-
-        description:
-            "Una fotografía que muestra una escena " +
-            "del antiguo pueblo.",
-
+        name: "Fotografía del viejo Chañar",
         collected: false
     },
 
     {
-        x: 2050,
-        y: 560,
-
+        id: "document1",
+        x: 1920,
+        y: 1300,
         type: "document",
-
-        name: "Documento antiguo",
-
-        description:
-            "Un documento relacionado con la historia " +
-            "del territorio.",
-
+        name: "Documento sobre la fundación",
         collected: false
     },
 
     {
-        x: 900,
-        y: 2100,
-
-        type: "photo",
-
-        name: "Fotografía de la chacra",
-
-        description:
-            "Una imagen de una antigua producción rural.",
-
+        id: "water1",
+        x: 1150,
+        y: 1950,
+        type: "history",
+        name: "Registro del riego",
         collected: false
     },
 
     {
+        id: "photo2",
         x: 3500,
-        y: 2200,
+        y: 700,
+        type: "photo",
+        name: "Fotografía de los viñedos",
+        collected: false
+    },
 
-        type: "artifact",
-
-        name: "Objeto encontrado",
-
-        description:
-            "Algo que parece tener relación con " +
-            "la historia del lugar.",
-
+    {
+        id: "old1",
+        x: 930,
+        y: 500,
+        type: "history",
+        name: "Memoria de la antigua posta",
         collected: false
     }
 
 ];
 
 
-/* ============================================================
-   17. UTILIDADES
-   ============================================================ */
+/* =========================================================
+   HISTORIA
+========================================================= */
+
+const historyEntries = [
+
+    {
+        id: "foundation",
+
+        title:
+            "21 de mayo de 1973",
+
+        text:
+            "San Patricio del Chañar fue fundado " +
+            "mediante el Decreto Provincial Nº 1339. " +
+            "La localidad comenzó a organizarse como " +
+            "un nuevo núcleo urbano ligado al desarrollo " +
+            "productivo de las chacras."
+
+    },
+
+    {
+        id: "irrigation",
+
+        title:
+            "El agua y el nacimiento del oasis",
+
+        text:
+            "Las obras de riego fueron fundamentales " +
+            "para transformar un territorio árido en " +
+            "una zona agrícola productiva. Las primeras " +
+            "bocatomas y obras de riego marcaron un " +
+            "momento decisivo."
+
+    },
+
+    {
+        id: "school",
+
+        title:
+            "La Escuela 273",
+
+        text:
+            "La Escuela Nº 273 comenzó a funcionar " +
+            "en marzo de 1975 y se convirtió en uno " +
+            "de los espacios fundamentales para la " +
+            "vida comunitaria."
+
+    },
+
+    {
+        id: "club",
+
+        title:
+            "Club Atlético San Patricio",
+
+        text:
+            "El Club Atlético San Patricio fue creado " +
+            "en 1976. El deporte acompañó desde temprano " +
+            "la construcción de identidad comunitaria."
+
+    },
+
+    {
+        id: "wine",
+
+        title:
+            "El nuevo paisaje vitivinícola",
+
+        text:
+            "Desde fines de la década de 1990 comenzaron " +
+            "a desarrollarse grandes proyectos vitivinícolas. " +
+            "Los viñedos y las bodegas se incorporaron al " +
+            "paisaje productivo del Chañar."
+
+    }
+
+];
+
+
+/* =========================================================
+   MISIONES
+========================================================= */
+
+const missions = [
+
+    {
+
+        id: 0,
+
+        title:
+            "La fotografía perdida",
+
+        description:
+            "Don Pedro necesita recuperar una fotografía " +
+            "que puede ayudar a reconstruir una historia " +
+            "del viejo Chañar.",
+
+        target:
+            "photo1",
+
+        reward:
+            100
+
+    },
+
+    {
+
+        id: 1,
+
+        title:
+            "El camino del agua",
+
+        description:
+            "Encontrá el antiguo registro del sistema " +
+            "de riego y descubrí por qué el agua fue " +
+            "fundamental para transformar el territorio.",
+
+        target:
+            "water1",
+
+        reward:
+            150
+
+    },
+
+    {
+
+        id: 2,
+
+        title:
+            "Las voces del pueblo",
+
+        description:
+            "Visitá la radio, la escuela y el club. " +
+            "Cada lugar conserva una parte de la memoria " +
+            "social del Chañar.",
+
+        target:
+            null,
+
+        reward:
+            200
+
+    },
+
+    {
+
+        id: 3,
+
+        title:
+            "El nuevo paisaje",
+
+        description:
+            "Llegá hasta la zona vitivinícola y descubrí " +
+            "cómo los viñedos transformaron el paisaje " +
+            "productivo.",
+
+        target:
+            "photo2",
+
+        reward:
+            250
+
+    },
+
+    {
+
+        id: 4,
+
+        title:
+            "Memoria del territorio",
+
+        description:
+            "Encontrá el antiguo registro de la zona " +
+            "histórica y reconstruí una parte de la " +
+            "memoria territorial del Chañar.",
+
+        target:
+            "old1",
+
+        reward:
+            350
+
+    }
+
+];
+
+
+/* =========================================================
+   TECLADO
+========================================================= */
+
+const keys = {};
+
+
+document.addEventListener(
+    "keydown",
+    function(e) {
+
+        const key =
+            e.key.toLowerCase();
+
+        keys[key] = true;
+
+
+        if (
+            key === "e"
+        ) {
+
+            interact();
+
+        }
+
+
+        if (
+            key === "m"
+        ) {
+
+            toggleInventory();
+
+        }
+
+
+        if (
+            key === "h"
+        ) {
+
+            toggleHistory();
+
+        }
+
+    }
+);
+
+
+document.addEventListener(
+    "keyup",
+    function(e) {
+
+        keys[
+            e.key.toLowerCase()
+        ] = false;
+
+    }
+);
+
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+function resizeCanvas() {
+
+    canvas.width =
+        window.innerWidth;
+
+    canvas.height =
+        window.innerHeight;
+
+}
+
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+
+resizeCanvas();
+
+
+/* =========================================================
+   UTILIDADES
+========================================================= */
 
 function distance(a, b) {
 
-    const ax = a.x;
-    const ay = a.y;
-
-    const bx = b.x;
-    const by = b.y;
-
     return Math.hypot(
-        ax - bx,
-        ay - by
+        a.x - b.x,
+        a.y - b.y
     );
+
 }
 
 
 function collision(a, b) {
 
     return (
-        a.x < b.x + b.width &&
-        a.x + a.width > b.x &&
-        a.y < b.y + b.height &&
-        a.y + a.height > b.y
+
+        a.x <
+        b.x + b.width &&
+
+        a.x + a.width >
+        b.x &&
+
+        a.y <
+        b.y + b.height &&
+
+        a.y + a.height >
+        b.y
+
     );
+
 }
 
 
-function random(min, max) {
+/* =========================================================
+   ZONA DEL JUGADOR
+========================================================= */
 
-    return Math.random() *
-        (max - min) +
-        min;
+function getCurrentZone() {
+
+    for (
+        const zone of zones
+    ) {
+
+        if (
+
+            player.x >= zone.x &&
+
+            player.x <=
+            zone.x + zone.width &&
+
+            player.y >= zone.y &&
+
+            player.y <=
+            zone.y + zone.height
+
+        ) {
+
+            return zone;
+
+        }
+
+    }
+
+    return zones[0];
+
 }
 
 
-/* ============================================================
-   18. MOVIMIENTO DEL JUGADOR
-   ============================================================ */
+/* =========================================================
+   MOVIMIENTO
+========================================================= */
 
 function canMove(x, y) {
 
     const test = {
 
-        x: x,
-        y: y,
+        x,
+        y,
 
-        width: player.width,
-        height: player.height
+        width:
+            player.width,
+
+        height:
+            player.height
+
     };
 
 
-    for (const building of buildings) {
+    /* EDIFICIOS */
 
-        if (collision(test, building)) {
+    for (
+        const building of buildings
+    ) {
+
+        const zone =
+            zones.find(
+                z =>
+                    z.id ===
+                    building.zone
+            );
+
+
+        if (
+            zone &&
+            !zone.unlocked
+        ) {
+
+            continue;
+
+        }
+
+
+        if (
+            collision(
+                test,
+                building
+            )
+        ) {
 
             return false;
 
@@ -782,10 +929,17 @@ function canMove(x, y) {
     }
 
 
-    /* No permitir entrar al río */
+    /* LÍMITES */
 
     if (
-        y + player.height > 2640
+        x < 0 ||
+        y < 0 ||
+        x >
+            WORLD_WIDTH -
+            player.width ||
+        y >
+            WORLD_HEIGHT -
+            player.height
     ) {
 
         return false;
@@ -794,12 +948,14 @@ function canMove(x, y) {
 
 
     return true;
+
 }
 
 
 function updatePlayer() {
 
     let dx = 0;
+
     let dy = 0;
 
 
@@ -808,8 +964,11 @@ function updatePlayer() {
         keys["arrowup"]
     ) {
 
-        dy -= player.speed;
-        player.direction = "up";
+        dy -=
+            player.speed;
+
+        player.direction =
+            "up";
 
     }
 
@@ -819,8 +978,11 @@ function updatePlayer() {
         keys["arrowdown"]
     ) {
 
-        dy += player.speed;
-        player.direction = "down";
+        dy +=
+            player.speed;
+
+        player.direction =
+            "down";
 
     }
 
@@ -830,8 +992,11 @@ function updatePlayer() {
         keys["arrowleft"]
     ) {
 
-        dx -= player.speed;
-        player.direction = "left";
+        dx -=
+            player.speed;
+
+        player.direction =
+            "left";
 
     }
 
@@ -841,18 +1006,25 @@ function updatePlayer() {
         keys["arrowright"]
     ) {
 
-        dx += player.speed;
-        player.direction = "right";
+        dx +=
+            player.speed;
+
+        player.direction =
+            "right";
 
     }
 
 
-    /* Movimiento diagonal normalizado */
+    if (
+        dx !== 0 &&
+        dy !== 0
+    ) {
 
-    if (dx !== 0 && dy !== 0) {
+        dx *=
+            0.707;
 
-        dx *= 0.7071;
-        dy *= 0.7071;
+        dy *=
+            0.707;
 
     }
 
@@ -862,9 +1034,12 @@ function updatePlayer() {
         dy !== 0;
 
 
-    if (player.moving) {
+    if (
+        player.moving
+    ) {
 
-        player.frame += 0.15;
+        player.frame +=
+            0.18;
 
     }
 
@@ -893,29 +1068,55 @@ function updatePlayer() {
     }
 
 
-    player.x = Math.max(
-        20,
-        Math.min(
-            WORLD_WIDTH - player.width - 20,
-            player.x
-        )
-    );
-
-
-    player.y = Math.max(
-        20,
-        Math.min(
-            WORLD_HEIGHT - player.height - 350,
-            player.y
-        )
-    );
+    checkZoneUnlocks();
 
 }
 
 
-/* ============================================================
-   19. CÁMARA
-   ============================================================ */
+/* =========================================================
+   DESBLOQUEO
+========================================================= */
+
+function checkZoneUnlocks() {
+
+    for (
+        const zone of zones
+    ) {
+
+        if (
+            zone.unlocked
+        ) {
+
+            continue;
+
+        }
+
+
+        if (
+            progress.mission >=
+            zone.requirement
+        ) {
+
+            zone.unlocked =
+                true;
+
+            progress.zones++;
+
+            notify(
+                "🗺️ Nueva zona desbloqueada: " +
+                zone.name
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   CÁMARA
+========================================================= */
 
 function updateCamera() {
 
@@ -932,7 +1133,8 @@ function updateCamera() {
         (
             targetX -
             camera.x
-        ) *
+        )
+        *
         camera.smooth;
 
 
@@ -940,31 +1142,17 @@ function updateCamera() {
         (
             targetY -
             camera.y
-        ) *
+        )
+        *
         camera.smooth;
-
-
-    const maxCameraX =
-        Math.max(
-            0,
-            WORLD_WIDTH -
-            canvas.width
-        );
-
-
-    const maxCameraY =
-        Math.max(
-            0,
-            WORLD_HEIGHT -
-            canvas.height
-        );
 
 
     camera.x =
         Math.max(
             0,
             Math.min(
-                maxCameraX,
+                WORLD_WIDTH -
+                canvas.width,
                 camera.x
             )
         );
@@ -974,7 +1162,8 @@ function updateCamera() {
         Math.max(
             0,
             Math.min(
-                maxCameraY,
+                WORLD_HEIGHT -
+                canvas.height,
                 camera.y
             )
         );
@@ -982,367 +1171,13 @@ function updateCamera() {
 }
 
 
-/* ============================================================
-   20. RELOJ
-   ============================================================ */
-
-function updateWorldTime() {
-
-    if (!gameStarted) return;
-
-    gameTime +=
-        gameSpeed / 60;
-
-    if (gameTime >= 1440) {
-
-        gameTime = 0;
-
-        worldDay++;
-
-    }
-
-}
-
-
-function getHour() {
-
-    return Math.floor(
-        gameTime / 60
-    );
-
-}
-
-
-function getMinutes() {
-
-    return Math.floor(
-        gameTime % 60
-    );
-
-}
-
-
-function getTimeText() {
-
-    const hour =
-        String(
-            getHour()
-        ).padStart(
-            2,
-            "0"
-        );
-
-    const minutes =
-        String(
-            getMinutes()
-        ).padStart(
-            2,
-            "0"
-        );
-
-    return `${hour}:${minutes}`;
-
-}
-
-
-/* ============================================================
-   21. MOVIMIENTO DE TRACTORES
-   ============================================================ */
-
-function updateTractors() {
-
-    for (
-        const tractor
-        of tractors
-    ) {
-
-        tractor.x +=
-            tractor.speed *
-            tractor.direction;
-
-
-        if (
-            tractor.x >
-            tractor.maxX
-        ) {
-
-            tractor.direction = -1;
-
-        }
-
-
-        if (
-            tractor.x <
-            tractor.minX
-        ) {
-
-            tractor.direction = 1;
-
-        }
-
-    }
-
-}
-
-
-/* ============================================================
-   22. MOVIMIENTO DE VEHÍCULOS
-   ============================================================ */
-
-function updateVehicles() {
-
-    for (
-        const vehicle
-        of vehicles
-    ) {
-
-        vehicle.x +=
-            vehicle.speed *
-            vehicle.direction;
-
-
-        if (
-            vehicle.x >
-            vehicle.maxX
-        ) {
-
-            vehicle.direction = -1;
-
-        }
-
-
-        if (
-            vehicle.x <
-            vehicle.minX
-        ) {
-
-            vehicle.direction = 1;
-
-        }
-
-    }
-
-}
-
-
-/* ============================================================
-   23. MOVIMIENTO DE ANIMALES
-   ============================================================ */
-
-function updateAnimals() {
-
-    for (
-        const animal
-        of animals
-    ) {
-
-        animal.x += animal.dx;
-        animal.y += animal.dy;
-
-
-        if (
-            animal.x < 300 ||
-            animal.x > 3800
-        ) {
-
-            animal.dx *= -1;
-
-        }
-
-
-        if (
-            animal.y < 1500 ||
-            animal.y > 2450
-        ) {
-
-            animal.dy *= -1;
-
-        }
-
-    }
-
-}
-
-
-/* ============================================================
-   24. PERSONAS CAMINANDO
-   ============================================================ */
-
-function updateWalkers() {
-
-    for (
-        const walker
-        of walkers
-    ) {
-
-        const dx =
-            walker.targetX -
-            walker.x;
-
-        const dy =
-            walker.targetY -
-            walker.y;
-
-        const d =
-            Math.hypot(
-                dx,
-                dy
-            );
-
-
-        if (d < 10) {
-
-            const oldX =
-                walker.targetX;
-
-            const oldY =
-                walker.targetY;
-
-
-            walker.targetX =
-                oldX +
-                random(
-                    -350,
-                    350
-                );
-
-
-            walker.targetY =
-                oldY +
-                random(
-                    -250,
-                    250
-                );
-
-        } else {
-
-            walker.x +=
-                dx / d *
-                walker.speed;
-
-            walker.y +=
-                dy / d *
-                walker.speed;
-
-        }
-
-    }
-
-}
-
-
-/* ============================================================
-   25. NPCs
-   ============================================================ */
-
-function updateNPCs() {
-
-    const hour = getHour();
-
-
-    for (
-        const npc
-        of npcs
-    ) {
-
-        /*
-         * Productores trabajan durante el día.
-         */
-
-        if (
-            npc.role === "Productor" &&
-            hour >= 7 &&
-            hour <= 18
-        ) {
-
-            npc.moving = true;
-
-        }
-
-
-        /*
-         * Por la noche vuelven aproximadamente
-         * a su zona de origen.
-         */
-
-        if (
-            hour >= 21 ||
-            hour < 7
-        ) {
-
-            npc.targetX =
-                npc.homeX;
-
-            npc.targetY =
-                npc.homeY;
-
-            npc.moving = true;
-
-        }
-
-
-        if (!npc.moving) {
-
-            continue;
-
-        }
-
-
-        const dx =
-            npc.targetX -
-            npc.x;
-
-        const dy =
-            npc.targetY -
-            npc.y;
-
-        const d =
-            Math.hypot(
-                dx,
-                dy
-            );
-
-
-        if (d < 15) {
-
-            npc.targetX =
-                npc.homeX +
-                random(
-                    -180,
-                    180
-                );
-
-            npc.targetY =
-                npc.homeY +
-                random(
-                    -180,
-                    180
-                );
-
-        } else {
-
-            npc.x +=
-                dx / d *
-                0.45;
-
-            npc.y +=
-                dy / d *
-                0.45;
-
-        }
-
-    }
-
-}
-
-
-/* ============================================================
-   26. FONDO TERRITORIAL
-   ============================================================ */
+/* =========================================================
+   MUNDO
+========================================================= */
 
 function drawWorld() {
 
-    /* Tierra */
+    /* TIERRA */
 
     ctx.fillStyle =
         "#c8aa76";
@@ -1355,169 +1190,238 @@ function drawWorld() {
     );
 
 
-    /* Desierto */
+    /* BARDA NORTE */
 
     ctx.fillStyle =
-        "#b99761";
+        "#8d735d";
 
-    ctx.fillRect(
+    ctx.beginPath();
+
+    ctx.moveTo(
         0,
-        0,
-        WORLD_WIDTH,
-        600
+        0
     );
 
+    ctx.lineTo(
+        WORLD_WIDTH,
+        0
+    );
 
-    /* Bardas */
+    ctx.lineTo(
+        WORLD_WIDTH,
+        420
+    );
 
-    drawMountains();
+    ctx.lineTo(
+        3400,
+        300
+    );
+
+    ctx.lineTo(
+        2800,
+        460
+    );
+
+    ctx.lineTo(
+        2200,
+        330
+    );
+
+    ctx.lineTo(
+        1500,
+        450
+    );
+
+    ctx.lineTo(
+        900,
+        300
+    );
+
+    ctx.lineTo(
+        0,
+        470
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
 
 
-    /* Caminos principales */
+    /* CALLES */
 
     ctx.fillStyle =
-        "#947653";
+        "#a4865d";
 
 
     ctx.fillRect(
         0,
-        1280,
+        1360,
         WORLD_WIDTH,
         150
     );
 
 
     ctx.fillRect(
-        2000,
+        1980,
         0,
-        170,
+        160,
         WORLD_HEIGHT
     );
 
 
-    /* Caminos secundarios */
+    ctx.fillRect(
+        1000,
+        900,
+        260,
+        WORLD_HEIGHT
+    );
+
+
+    /* PLAZA */
 
     ctx.fillStyle =
-        "#a4875e";
-
+        "#6d965b";
 
     ctx.fillRect(
-        850,
-        600,
-        100,
-        1900
+        1650,
+        1190,
+        650,
+        360
     );
 
 
-    ctx.fillRect(
-        2800,
-        500,
-        100,
-        2100
+    /* CAMINOS DE TIERRA */
+
+    ctx.strokeStyle =
+        "#8d704d";
+
+    ctx.lineWidth =
+        35;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        300,
+        1550
     );
 
+    ctx.quadraticCurveTo(
+        700,
+        1400,
+        1200,
+        1550
+    );
 
-    /* Plaza */
-
-    drawPlaza();
-
-
-    /* Río Neuquén */
-
-    drawRiver();
-
-
-    /* Chacras */
-
-    drawFarms();
+    ctx.stroke();
 
 
-    /* Viñedos */
+    /* CANALES */
 
-    for (
-        const vineyard
-        of vineyards
+    drawCanals();
+
+
+    /* VIÑEDOS */
+
+    if (
+        zones.find(
+            z => z.id === "vineyards"
+        ).unlocked
     ) {
 
         drawVineyard(
-            vineyard
+            2900,
+            700
+        );
+
+        drawVineyard(
+            3500,
+            850
         );
 
     }
 
 
-    /* Alamedas */
+    /* CHACRAS */
+
+    drawOrchards();
+
+
+    /* ÁRBOLES */
 
     for (
-        const tree
-        of trees
+        const tree of trees
     ) {
 
         drawTree(
-            tree[0],
-            tree[1]
+            tree.x,
+            tree.y,
+            tree.size
         );
 
     }
+
+
+    /* MONTAÑAS */
+
+    drawDistantMountains();
 
 }
 
 
-/* ============================================================
-   27. CERROS
-   ============================================================ */
+/* =========================================================
+   MONTAÑAS
+========================================================= */
 
-function drawMountains() {
+function drawDistantMountains() {
 
     ctx.fillStyle =
-        "#8b765d";
-
+        "rgba(98,83,68,.45)";
 
     ctx.beginPath();
 
     ctx.moveTo(
         0,
-        400
+        470
     );
 
     ctx.lineTo(
-        450,
-        100
+        500,
+        180
     );
 
     ctx.lineTo(
-        900,
-        380
+        950,
+        440
     );
 
     ctx.lineTo(
-        1350,
-        90
+        1500,
+        160
     );
 
     ctx.lineTo(
-        1800,
-        350
+        2050,
+        430
     );
 
     ctx.lineTo(
-        2250,
-        70
+        2600,
+        190
     );
 
     ctx.lineTo(
-        2700,
-        370
+        3300,
+        450
     );
 
     ctx.lineTo(
-        3200,
-        110
+        4000,
+        160
     );
 
     ctx.lineTo(
         WORLD_WIDTH,
-        360
+        450
     );
 
     ctx.lineTo(
@@ -1537,57 +1441,74 @@ function drawMountains() {
 }
 
 
-/* ============================================================
-   28. PLAZA
-   ============================================================ */
+/* =========================================================
+   CANALES
+========================================================= */
 
-function drawPlaza() {
-
-    ctx.fillStyle =
-        "#6f9557";
-
-
-    ctx.fillRect(
-        1550,
-        1150,
-        700,
-        420
-    );
-
-
-    /* Senderos */
+function drawCanals() {
 
     ctx.fillStyle =
-        "#b69b6d";
-
+        "#4e8794";
 
     ctx.fillRect(
-        1880,
-        1150,
-        40,
-        420
+        0,
+        1950,
+        WORLD_WIDTH,
+        35
     );
 
 
     ctx.fillRect(
-        1550,
-        1340,
-        700,
-        40
+        1350,
+        500,
+        30,
+        1700
     );
 
 
-    /* Fuente */
+    ctx.fillStyle =
+        "rgba(255,255,255,.15)";
+
+    ctx.fillRect(
+        0,
+        1955,
+        WORLD_WIDTH,
+        4
+    );
+
+}
+
+
+/* =========================================================
+   ÁRBOLES
+========================================================= */
+
+function drawTree(
+    x,
+    y,
+    size = 1
+) {
 
     ctx.fillStyle =
-        "#719da2";
+        "#65442e";
+
+    ctx.fillRect(
+        x - 7 * size,
+        y,
+        14 * size,
+        42 * size
+    );
+
+
+    ctx.fillStyle =
+        "#476d3c";
 
     ctx.beginPath();
 
     ctx.arc(
-        1900,
-        1340,
-        70,
+        x,
+        y,
+        32 * size,
         0,
         Math.PI * 2
     );
@@ -1595,164 +1516,56 @@ function drawPlaza() {
     ctx.fill();
 
 
-    /* Bancos */
-
-    for (
-        let i = 0;
-        i < 5;
-        i++
-    ) {
-
-        ctx.fillStyle =
-            "#634b3b";
-
-        ctx.fillRect(
-            1650 + i * 120,
-            1200,
-            60,
-            15
-        );
-
-    }
-
-}
-
-
-/* ============================================================
-   29. RÍO
-   ============================================================ */
-
-function drawRiver() {
-
     ctx.fillStyle =
-        "#4e8294";
+        "#5a7e43";
 
+    ctx.beginPath();
 
-    ctx.fillRect(
+    ctx.arc(
+        x - 16 * size,
+        y + 4 * size,
+        20 * size,
         0,
-        2650,
-        WORLD_WIDTH,
-        180
+        Math.PI * 2
     );
 
-
-    /* brillo */
-
-    ctx.fillStyle =
-        "rgba(255,255,255,0.18)";
-
-
-    for (
-        let i = 0;
-        i < 18;
-        i++
-    ) {
-
-        ctx.fillRect(
-            150 + i * 230,
-            2690 + (i % 3) * 30,
-            100,
-            5
-        );
-
-    }
+    ctx.fill();
 
 }
 
 
-/* ============================================================
-   30. CHACRAS
-   ============================================================ */
+/* =========================================================
+   CHACRAS
+========================================================= */
 
-function drawFarms() {
+function drawOrchards() {
 
-    for (
-        const farm
-        of farms
-    ) {
+    ctx.strokeStyle =
+        "#536c3f";
 
-        ctx.fillStyle =
-            "#78975a";
+    ctx.lineWidth =
+        2;
 
-
-        ctx.fillRect(
-            farm.x,
-            farm.y,
-            farm.width,
-            farm.height
-        );
-
-
-        /* Líneas de cultivo */
-
-        ctx.strokeStyle =
-            "rgba(60,90,50,0.45)";
-
-        ctx.lineWidth = 3;
-
-
-        for (
-            let y =
-                farm.y + 30;
-            y <
-            farm.y +
-            farm.height;
-            y += 45
-        ) {
-
-            ctx.beginPath();
-
-            ctx.moveTo(
-                farm.x,
-                y
-            );
-
-            ctx.lineTo(
-                farm.x +
-                farm.width,
-                y
-            );
-
-            ctx.stroke();
-
-        }
-
-    }
-
-}
-
-
-/* ============================================================
-   31. VIÑEDOS
-   ============================================================ */
-
-function drawVineyard(vineyard) {
 
     for (
         let row = 0;
-        row < vineyard.rows;
+        row < 14;
         row++
     ) {
 
         for (
             let col = 0;
-            col < vineyard.cols;
+            col < 18;
             col++
         ) {
 
             const x =
-                vineyard.x +
-                col * 35;
+                350 +
+                col * 42;
 
             const y =
-                vineyard.y +
-                row * 32;
-
-
-            ctx.strokeStyle =
-                "#48633d";
-
-            ctx.lineWidth = 2;
+                1100 +
+                row * 48;
 
 
             ctx.beginPath();
@@ -1764,22 +1577,21 @@ function drawVineyard(vineyard) {
 
             ctx.lineTo(
                 x,
-                y + 22
+                y + 25
             );
 
             ctx.stroke();
 
 
             ctx.fillStyle =
-                "#4d7642";
-
+                "#4d753e";
 
             ctx.beginPath();
 
             ctx.arc(
                 x,
                 y,
-                8,
+                11,
                 0,
                 Math.PI * 2
             );
@@ -1793,77 +1605,124 @@ function drawVineyard(vineyard) {
 }
 
 
-/* ============================================================
-   32. ÁRBOLES
-   ============================================================ */
+/* =========================================================
+   VIÑEDO
+========================================================= */
 
-function drawTree(x, y) {
+function drawVineyard(
+    x,
+    y
+) {
 
-    /* tronco */
+    for (
+        let row = 0;
+        row < 10;
+        row++
+    ) {
 
-    ctx.fillStyle =
-        "#63452f";
+        ctx.strokeStyle =
+            "#526b3d";
+
+        ctx.lineWidth =
+            3;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x,
+            y + row * 38
+        );
+
+        ctx.lineTo(
+            x + 900,
+            y + row * 38
+        );
+
+        ctx.stroke();
 
 
-    ctx.fillRect(
-        x - 7,
-        y,
-        14,
-        50
-    );
+        for (
+            let col = 0;
+            col < 28;
+            col++
+        ) {
+
+            const px =
+                x +
+                col * 34;
+
+            const py =
+                y +
+                row * 38;
 
 
-    /* copa */
+            ctx.fillStyle =
+                "#4b723b";
 
-    ctx.fillStyle =
-        "#477044";
+            ctx.beginPath();
 
+            ctx.arc(
+                px,
+                py,
+                7,
+                0,
+                Math.PI * 2
+            );
 
-    ctx.beginPath();
+            ctx.fill();
 
-    ctx.arc(
-        x,
-        y - 8,
-        34,
-        0,
-        Math.PI * 2
-    );
+        }
 
-    ctx.fill();
+    }
 
 }
 
 
-/* ============================================================
-   33. EDIFICIOS
-   ============================================================ */
+/* =========================================================
+   EDIFICIOS
+========================================================= */
 
 function drawBuildings() {
 
     for (
-        const building
-        of buildings
+        const building of buildings
     ) {
 
-        /* sombra */
+        const zone =
+            zones.find(
+                z =>
+                    z.id ===
+                    building.zone
+            );
+
+
+        if (
+            zone &&
+            !zone.unlocked
+        ) {
+
+            continue;
+
+        }
+
+
+        /* SOMBRA */
 
         ctx.fillStyle =
-            "rgba(0,0,0,0.20)";
-
+            "rgba(0,0,0,.22)";
 
         ctx.fillRect(
-            building.x + 10,
+            building.x + 9,
             building.y + 12,
             building.width,
             building.height
         );
 
 
-        /* edificio */
+        /* EDIFICIO */
 
         ctx.fillStyle =
             building.color;
-
 
         ctx.fillRect(
             building.x,
@@ -1873,28 +1732,27 @@ function drawBuildings() {
         );
 
 
-        /* techo */
+        /* TECHO */
 
         ctx.fillStyle =
-            "#49362d";
-
+            "#4a382d";
 
         ctx.beginPath();
 
         ctx.moveTo(
-            building.x - 20,
+            building.x - 15,
             building.y
         );
 
         ctx.lineTo(
             building.x +
             building.width / 2,
-            building.y - 65
+            building.y - 55
         );
 
         ctx.lineTo(
             building.x +
-            building.width + 20,
+            building.width + 15,
             building.y
         );
 
@@ -1903,305 +1761,280 @@ function drawBuildings() {
         ctx.fill();
 
 
-        /* puerta */
+        /* PUERTA */
 
         ctx.fillStyle =
-            "#46332b";
-
+            "#3c3029";
 
         ctx.fillRect(
             building.x +
             building.width / 2 -
-            22,
+            20,
 
             building.y +
             building.height -
-            75,
+            65,
 
-            44,
-            75
+            40,
+            65
         );
 
 
-        /* ventanas */
+        /* VENTANAS */
 
         ctx.fillStyle =
-            "#b9d3d2";
-
+            "#a9c5c2";
 
         ctx.fillRect(
-            building.x + 35,
-            building.y + 45,
-            48,
-            48
+            building.x + 30,
+            building.y + 35,
+            45,
+            40
         );
-
 
         ctx.fillRect(
             building.x +
             building.width -
-            83,
+            75,
 
-            building.y + 45,
+            building.y + 35,
 
-            48,
-            48
+            45,
+            40
         );
 
 
-        /* cartel */
+        /* CARTEL */
 
         ctx.fillStyle =
-            "rgba(0,0,0,0.30)";
-
+            "rgba(40,30,20,.75)";
 
         ctx.fillRect(
-            building.x + 15,
-            building.y + 10,
-            Math.min(
-                180,
-                building.width - 30
-            ),
+            building.x,
+            building.y +
+            building.height +
+            10,
+
+            building.width,
             30
         );
 
 
         ctx.fillStyle =
-            "white";
+            "#f4e8cb";
 
         ctx.font =
-            "bold 16px Arial";
+            "bold 13px Arial";
 
+        ctx.textAlign =
+            "center";
 
         ctx.fillText(
             building.name,
-            building.x + 25,
-            building.y + 31
+            building.x +
+            building.width / 2,
+
+            building.y +
+            building.height +
+            30
         );
+
+        ctx.textAlign =
+            "left";
 
     }
 
 }
 
 
-/* ============================================================
-   34. TRACTORES
-   ============================================================ */
+/* =========================================================
+   TRACTORES
+========================================================= */
 
-function drawTractors() {
+function updateTractors() {
 
     for (
-        const tractor
-        of tractors
+        const tractor of tractors
     ) {
 
-        const x =
-            tractor.x;
-
-        const y =
-            tractor.y;
+        tractor.x +=
+            tractor.vx;
 
 
-        /* ruedas */
+        if (
+            tractor.x > 3800 ||
+            tractor.x < 400
+        ) {
 
-        ctx.fillStyle =
-            "#242424";
+            tractor.vx *=
+                -1;
 
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x + 15,
-            y + 32,
-            12,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x + 55,
-            y + 32,
-            9,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-
-        /* cuerpo */
-
-        ctx.fillStyle =
-            "#567344";
-
-
-        ctx.fillRect(
-            x + 10,
-            y + 10,
-            48,
-            22
-        );
-
-
-        /* cabina */
-
-        ctx.fillStyle =
-            "#9ab0a2";
-
-
-        ctx.fillRect(
-            x + 25,
-            y - 2,
-            25,
-            20
-        );
+        }
 
     }
 
 }
 
 
-/* ============================================================
-   35. VEHÍCULOS
-   ============================================================ */
-
-function drawVehicles() {
-
-    for (
-        const vehicle
-        of vehicles
-    ) {
-
-        const x =
-            vehicle.x;
-
-        const y =
-            vehicle.y;
-
-
-        ctx.fillStyle =
-            vehicle.type === "camión"
-                ? "#69584b"
-                : "#40586a";
-
-
-        ctx.fillRect(
-            x,
-            y,
-            vehicle.width,
-            vehicle.height
-        );
-
-
-        /* ruedas */
-
-        ctx.fillStyle =
-            "#242424";
-
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x + 18,
-            y + vehicle.height,
-            8,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x + vehicle.width - 18,
-            y + vehicle.height,
-            8,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-    }
-
-}
-
-
-/* ============================================================
-   36. ANIMALES
-   ============================================================ */
-
-function drawAnimals() {
-
-    for (
-        const animal
-        of animals
-    ) {
-
-        ctx.fillStyle =
-            animal.type === "perro"
-                ? "#654936"
-                : "#76523b";
-
-
-        ctx.beginPath();
-
-        ctx.ellipse(
-            animal.x,
-            animal.y,
-            22,
-            12,
-            0,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-
-        /* cabeza */
-
-        ctx.beginPath();
-
-        ctx.arc(
-            animal.x + 18,
-            animal.y - 5,
-            9,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-    }
-
-}
-
-
-/* ============================================================
-   37. NPC
-   ============================================================ */
-
-function drawNPC(npc) {
-
-    /* cuerpo */
+function drawTractor(
+    tractor
+) {
 
     ctx.fillStyle =
-        npc.color;
+        "#333";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        tractor.x - 20,
+        tractor.y + 20,
+        13,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
 
 
     ctx.beginPath();
 
     ctx.arc(
+        tractor.x + 25,
+        tractor.y + 20,
+        17,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    ctx.fillStyle =
+        tractor.color;
+
+    ctx.fillRect(
+        tractor.x - 30,
+        tractor.y - 5,
+        65,
+        35
+    );
+
+
+    ctx.fillStyle =
+        "#8eb1ad";
+
+    ctx.fillRect(
+        tractor.x - 5,
+        tractor.y - 35,
+        35,
+        30
+    );
+
+
+    ctx.fillStyle =
+        "#55402c";
+
+    ctx.fillRect(
+        tractor.x + 35,
+        tractor.y + 5,
+        35,
+        12
+    );
+
+}
+
+
+/* =========================================================
+   ANIMALES
+========================================================= */
+
+function drawAnimal(animal) {
+
+    if (
+        animal.type === "sheep"
+    ) {
+
+        ctx.fillStyle =
+            "#e8e0ce";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            animal.x,
+            animal.y,
+            17,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        ctx.fillStyle =
+            "#333";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            animal.x + 14,
+            animal.y - 3,
+            7,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    if (
+        animal.type === "horse"
+    ) {
+
+        ctx.fillStyle =
+            "#684c38";
+
+        ctx.fillRect(
+            animal.x - 25,
+            animal.y - 10,
+            50,
+            25
+        );
+
+        ctx.fillRect(
+            animal.x + 15,
+            animal.y - 25,
+            20,
+            30
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   NPC
+========================================================= */
+
+function drawNPC(npc) {
+
+    const bob =
+        Math.sin(
+            performance.now() / 500 +
+            npc.x
+        ) * 1.5;
+
+
+    ctx.fillStyle =
+        "#5b3f45";
+
+    ctx.beginPath();
+
+    ctx.arc(
         npc.x,
-        npc.y,
+        npc.y + bob,
         15,
         0,
         Math.PI * 2
@@ -2210,17 +2043,14 @@ function drawNPC(npc) {
     ctx.fill();
 
 
-    /* cabeza */
-
     ctx.fillStyle =
-        "#dca884";
-
+        "#d7a77f";
 
     ctx.beginPath();
 
     ctx.arc(
         npc.x,
-        npc.y - 23,
+        npc.y - 23 + bob,
         10,
         0,
         Math.PI * 2
@@ -2229,35 +2059,30 @@ function drawNPC(npc) {
     ctx.fill();
 
 
-    /* nombre */
-
     ctx.fillStyle =
         "white";
 
     ctx.font =
         "13px Arial";
 
-
     ctx.fillText(
         npc.name,
-        npc.x - 32,
-        npc.y + 38
+        npc.x - 30,
+        npc.y + 43
     );
 
 
-    /* indicador */
+    /* INDICADOR */
 
     if (
-        npc.mission &&
-        !mission.completed
+        npc.mission !== undefined
     ) {
 
         ctx.fillStyle =
-            "#f4c542";
+            "#e5bb45";
 
         ctx.font =
-            "bold 24px Arial";
-
+            "bold 20px Arial";
 
         ctx.fillText(
             "!",
@@ -2270,64 +2095,14 @@ function drawNPC(npc) {
 }
 
 
-/* ============================================================
-   38. PERSONAS CAMINANDO
-   ============================================================ */
-
-function drawWalkers() {
-
-    for (
-        const walker
-        of walkers
-    ) {
-
-        ctx.fillStyle =
-            "#5c4960";
-
-
-        ctx.beginPath();
-
-        ctx.arc(
-            walker.x,
-            walker.y,
-            9,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-
-        ctx.fillStyle =
-            "#e0aa87";
-
-
-        ctx.beginPath();
-
-        ctx.arc(
-            walker.x,
-            walker.y - 14,
-            6,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-    }
-
-}
-
-
-/* ============================================================
-   39. OBJETOS
-   ============================================================ */
+/* =========================================================
+   OBJETOS
+========================================================= */
 
 function drawObjects() {
 
     for (
-        const object
-        of objects
+        const object of objects
     ) {
 
         if (
@@ -2339,85 +2114,90 @@ function drawObjects() {
         }
 
 
-        const pulse =
-            Math.sin(
-                Date.now() / 300
-            ) *
-            3;
+        let icon =
+            "✦";
+
+
+        if (
+            object.type ===
+            "photo"
+        ) {
+
+            icon =
+                "📷";
+
+        }
+
+
+        if (
+            object.type ===
+            "document"
+        ) {
+
+            icon =
+                "📜";
+
+        }
+
+
+        if (
+            object.type ===
+            "history"
+        ) {
+
+            icon =
+                "📖";
+
+        }
+
+
+        ctx.font =
+            "25px Arial";
+
+        ctx.fillText(
+            icon,
+            object.x,
+            object.y
+        );
 
 
         ctx.fillStyle =
-            "#f0c94b";
-
+            "rgba(255,220,100,.4)";
 
         ctx.beginPath();
 
         ctx.arc(
-            object.x,
+            object.x + 8,
             object.y - 8,
-            16 + pulse,
+            18 +
+            Math.sin(
+                performance.now()/300
+            ) * 4,
             0,
             Math.PI * 2
         );
 
-        ctx.fill();
-
-
-        ctx.fillStyle =
-            "#5c4434";
-
-
-        ctx.font =
-            "20px Arial";
-
-
-        if (
-            object.type === "photo"
-        ) {
-
-            ctx.fillText(
-                "▣",
-                object.x - 7,
-                object.y
-            );
-
-        } else if (
-            object.type === "document"
-        ) {
-
-            ctx.fillText(
-                "▤",
-                object.x - 7,
-                object.y
-            );
-
-        } else {
-
-            ctx.fillText(
-                "◆",
-                object.x - 7,
-                object.y
-            );
-
-        }
+        ctx.stroke();
 
     }
 
 }
 
 
-/* ============================================================
-   40. JUGADOR
-   ============================================================ */
+/* =========================================================
+   JUGADOR
+========================================================= */
 
 function drawPlayer() {
 
     const bob =
         player.moving
-            ? Math.sin(
+            ?
+            Math.sin(
                 player.frame * 8
             ) * 3
-            : 0;
+            :
+            0;
 
 
     const x =
@@ -2431,14 +2211,13 @@ function drawPlayer() {
     /* sombra */
 
     ctx.fillStyle =
-        "rgba(0,0,0,0.25)";
-
+        "rgba(0,0,0,.25)";
 
     ctx.beginPath();
 
     ctx.ellipse(
         x + 15,
-        y + 32,
+        y + 38,
         22,
         7,
         0,
@@ -2452,8 +2231,7 @@ function drawPlayer() {
     /* cuerpo */
 
     ctx.fillStyle =
-        "#263d50";
-
+        "#304759";
 
     ctx.fillRect(
         x,
@@ -2466,8 +2244,7 @@ function drawPlayer() {
     /* cabeza */
 
     ctx.fillStyle =
-        "#e0aa86";
-
+        "#d9a67d";
 
     ctx.beginPath();
 
@@ -2485,8 +2262,7 @@ function drawPlayer() {
     /* pelo */
 
     ctx.fillStyle =
-        "#30251f";
-
+        "#35271f";
 
     ctx.beginPath();
 
@@ -2500,54 +2276,44 @@ function drawPlayer() {
 
     ctx.fill();
 
+
+    /* mochila */
+
+    ctx.fillStyle =
+        "#72563b";
+
+    ctx.fillRect(
+        x - 5,
+        y + 5,
+        7,
+        20
+    );
+
 }
 
 
-/* ============================================================
-   41. INTERACCIÓN
-   ============================================================ */
+/* =========================================================
+   INTERACCIÓN
+========================================================= */
 
 function interact() {
 
     /* NPC */
 
     for (
-        const npc
-        of npcs
+        const npc of npcs
     ) {
 
         if (
             distance(
                 player,
                 npc
-            ) < 85
+            ) < 90
         ) {
 
             showDialogue(
-                npc.name,
-                npc.text
+                npc
             );
-
-
-            if (
-                npc.mission &&
-                !mission.active &&
-                !mission.completed
-            ) {
-
-                mission.active =
-                    true;
-
-                setMissionHUD();
-
-
-                setTimeout(
-                    showMission,
-                    300
-                );
-
-            }
-
 
             return;
 
@@ -2556,11 +2322,10 @@ function interact() {
     }
 
 
-    /* objetos */
+    /* OBJETOS */
 
     for (
-        const object
-        of objects
+        const object of objects
     ) {
 
         if (
@@ -2576,7 +2341,7 @@ function interact() {
             distance(
                 player,
                 object
-            ) < 75
+            ) < 80
         ) {
 
             collectObject(
@@ -2590,64 +2355,147 @@ function interact() {
     }
 
 
-    /* vehículos */
+    notify(
+        "No hay nada para interactuar acá."
+    );
 
-    for (
-        const vehicle
-        of vehicles
+}
+
+
+/* =========================================================
+   DIÁLOGOS
+========================================================= */
+
+function showDialogue(npc) {
+
+    const dialogue =
+        document.getElementById(
+            "dialogue"
+        );
+
+
+    document.getElementById(
+        "dialogue-name"
+    ).textContent =
+        npc.name;
+
+
+    document.getElementById(
+        "dialogue-text"
+    ).textContent =
+        npc.text;
+
+
+    document.getElementById(
+        "dialogue-avatar"
+    ).textContent =
+        npc.emoji;
+
+
+    dialogue.classList.remove(
+        "hidden"
+    );
+
+
+    /* MISIÓN */
+
+    if (
+        npc.mission !== undefined &&
+        progress.mission ===
+        npc.mission
     ) {
 
-        if (
-            distance(
-                player,
-                vehicle
-            ) < 80
-        ) {
-
-            showDialogue(
-                "Vehículo",
-                "Es parte de la vida cotidiana " +
-                "del pueblo."
-            );
-
-            return;
-
-        }
+        startMission(
+            npc.mission
+        );
 
     }
 
 
-    /* tractor */
+    /* HISTORIA */
 
-    for (
-        const tractor
-        of tractors
+    if (
+        npc.history
     ) {
 
-        if (
-            distance(
-                player,
-                tractor
-            ) < 90
-        ) {
-
-            showDialogue(
-                "Trabajador rural",
-                "Estamos trabajando en la chacra."
-            );
-
-            return;
-
-        }
+        addXP(
+            20
+        );
 
     }
 
 }
 
 
-/* ============================================================
-   42. COLECCIONAR
-   ============================================================ */
+/* =========================================================
+   MISIÓN
+========================================================= */
+
+function startMission(index) {
+
+    const mission =
+        missions[index];
+
+
+    if (
+        !mission
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        progress.mission >
+        index
+    ) {
+
+        return;
+
+    }
+
+
+    showMission(
+        mission
+    );
+
+}
+
+
+/* =========================================================
+   MOSTRAR MISIÓN
+========================================================= */
+
+function showMission(mission) {
+
+    document.getElementById(
+        "mission-title"
+    ).textContent =
+        mission.title;
+
+
+    document.getElementById(
+        "mission-description"
+    ).textContent =
+        mission.description;
+
+
+    document.getElementById(
+        "mission-panel"
+    ).classList.remove(
+        "hidden"
+    );
+
+
+    updateMissionHUD();
+
+}
+
+
+/* =========================================================
+   COLECCIONAR
+========================================================= */
 
 function collectObject(object) {
 
@@ -2660,255 +2508,256 @@ function collectObject(object) {
     );
 
 
-    updateInventory();
+    if (
+        object.type ===
+        "photo"
+    ) {
 
+        progress.photos++;
 
-    updateCounters();
+    }
 
 
     if (
-        mission.active &&
-        object.type === "photo"
+        object.type ===
+        "history" ||
+        object.type ===
+        "document"
     ) {
 
-        mission.completed =
-            true;
+        progress.history++;
 
-        mission.active =
-            false;
-
-
-        setMissionHUD();
-
-
-        setTimeout(
-            function() {
-
-                showDialogue(
-                    "MISIÓN COMPLETADA",
-
-                    "Encontraste la fotografía. " +
-                    "Tal vez sea una pequeña pieza " +
-                    "de una historia mucho más grande."
-                );
-
-            },
-            300
+        addHistoryItem(
+            object
         );
 
     }
 
-}
+
+    progress.discoveries++;
 
 
-/* ============================================================
-   43. CONTADORES
-   ============================================================ */
-
-function updateCounters() {
-
-    const photoCount =
-        document.getElementById(
-            "photo-count"
-        );
-
-
-    const documentCount =
-        document.getElementById(
-            "document-count"
-        );
-
-
-    if (photoCount) {
-
-        photoCount.textContent =
-            inventory.filter(
-                item =>
-                    item.includes(
-                        "Fotografía"
-                    )
-            ).length;
-
-    }
-
-
-    if (documentCount) {
-
-        documentCount.textContent =
-            inventory.filter(
-                item =>
-                    item.includes(
-                        "Documento"
-                    )
-            ).length;
-
-    }
-
-}
-
-
-/* ============================================================
-   44. DIÁLOGOS
-   ============================================================ */
-
-function showDialogue(
-    name,
-    text
-) {
-
-    const nameElement =
-        document.getElementById(
-            "dialogue-name"
-        );
-
-
-    const textElement =
-        document.getElementById(
-            "dialogue-text"
-        );
-
-
-    const dialogue =
-        document.getElementById(
-            "dialogue"
-        );
-
-
-    if (!dialogue) return;
-
-
-    if (nameElement) {
-
-        nameElement.textContent =
-            name;
-
-    }
-
-
-    if (textElement) {
-
-        textElement.textContent =
-            text;
-
-    }
-
-
-    dialogue.classList.remove(
-        "hidden"
+    addXP(
+        50
     );
 
-}
 
-
-/* ============================================================
-   45. MISIÓN
-   ============================================================ */
-
-function showMission() {
-
-    const title =
-        document.getElementById(
-            "mission-title"
-        );
-
-
-    const description =
-        document.getElementById(
-            "mission-description"
-        );
-
-
-    const panel =
-        document.getElementById(
-            "mission-panel"
-        );
-
-
-    if (!panel) return;
-
-
-    if (title) {
-
-        title.textContent =
-            mission.title;
-
-    }
-
-
-    if (description) {
-
-        description.textContent =
-            mission.description;
-
-    }
-
-
-    panel.classList.remove(
-        "hidden"
+    notify(
+        "📖 Descubriste: " +
+        object.name
     );
 
-}
 
+    /* MISIÓN */
 
-function setMissionHUD() {
-
-    const hud =
-        document.getElementById(
-            "mission-hud"
-        );
-
-
-    if (!hud) return;
+    const currentMission =
+        missions[
+            progress.mission
+        ];
 
 
     if (
-        mission.completed
+        currentMission &&
+        currentMission.target ===
+        object.id
     ) {
 
-        hud.textContent =
-            "✓ Misión completada";
+        completeMission();
+
+    }
+
+
+    updateHUD();
+
+}
+
+
+/* =========================================================
+   COMPLETAR MISIÓN
+========================================================= */
+
+function completeMission() {
+
+    const mission =
+        missions[
+            progress.mission
+        ];
+
+
+    if (
+        !mission
+    ) {
 
         return;
 
     }
 
 
-    if (
-        mission.active
-    ) {
-
-        hud.textContent =
-            "Misión: encontrar la fotografía";
-
-        return;
-
-    }
+    addXP(
+        mission.reward
+    );
 
 
-    hud.textContent =
-        "Explorá San Patricio del Chañar";
+    progress.mission++;
+
+
+    notify(
+        "🎯 Misión completada: " +
+        mission.title
+    );
+
+
+    checkZoneUnlocks();
+
+
+    updateMissionHUD();
 
 }
 
 
-/* ============================================================
-   46. INVENTARIO
-   ============================================================ */
+/* =========================================================
+   XP
+========================================================= */
 
-function toggleInventory() {
+function addXP(amount) {
+
+    progress.xp +=
+        amount;
+
+    updateHUD();
+
+}
+
+
+/* =========================================================
+   HISTORIA
+========================================================= */
+
+function addHistoryItem(object) {
+
+    const entry =
+        historyEntries[
+            Math.min(
+                progress.history,
+                historyEntries.length - 1
+            )
+        ];
+
+
+    if (
+        entry
+    ) {
+
+        notify(
+            "📜 Nueva historia desbloqueada"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   PANEL HISTÓRICO
+========================================================= */
+
+function toggleHistory() {
 
     const panel =
         document.getElementById(
-            "inventory-panel"
+            "history-panel"
         );
-
-
-    if (!panel) return;
 
 
     panel.classList.toggle(
         "hidden"
     );
+
+
+    if (
+        !panel.classList.contains(
+            "hidden"
+        )
+    ) {
+
+        renderHistory();
+
+    }
+
+}
+
+
+function renderHistory() {
+
+    const container =
+        document.getElementById(
+            "history-content"
+        );
+
+
+    let html =
+        "";
+
+
+    const unlocked =
+        Math.min(
+            progress.history + 1,
+            historyEntries.length
+        );
+
+
+    for (
+        let i = 0;
+        i < unlocked;
+        i++
+    ) {
+
+        const entry =
+            historyEntries[i];
+
+
+        html += `
+
+            <div class="history-entry">
+
+                <h3>
+                    ${entry.title}
+                </h3>
+
+                <p>
+                    ${entry.text}
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+
+    container.innerHTML =
+        html;
+
+}
+
+
+/* =========================================================
+   INVENTARIO
+========================================================= */
+
+function toggleInventory() {
+
+    document
+        .getElementById(
+            "inventory-panel"
+        )
+        .classList
+        .toggle(
+            "hidden"
+        );
+
+
+    updateInventory();
 
 }
 
@@ -2921,42 +2770,177 @@ function updateInventory() {
         );
 
 
-    if (!container) return;
-
-
     if (
         inventory.length === 0
     ) {
 
         container.innerHTML =
-            "Inventario vacío.";
+            "Todavía no encontraste objetos.";
+
+    }
+
+    else {
+
+        container.innerHTML =
+            inventory
+                .map(
+                    item =>
+                        "• " +
+                        item
+                )
+                .join(
+                    "<br>"
+                );
+
+    }
+
+
+    document.getElementById(
+        "inventory-xp"
+    ).textContent =
+        progress.xp;
+
+
+    document.getElementById(
+        "inventory-history"
+    ).textContent =
+        progress.history;
+
+
+    document.getElementById(
+        "inventory-zones"
+    ).textContent =
+        progress.zones;
+
+}
+
+
+/* =========================================================
+   HUD
+========================================================= */
+
+function updateHUD() {
+
+    document.getElementById(
+        "xp"
+    ).textContent =
+        progress.xp;
+
+
+    document.getElementById(
+        "photo-count"
+    ).textContent =
+        progress.photos;
+
+
+    document.getElementById(
+        "history-count"
+    ).textContent =
+        progress.history;
+
+
+    updateMissionHUD();
+
+}
+
+
+function updateMissionHUD() {
+
+    const hud =
+        document.getElementById(
+            "mission-hud"
+        );
+
+
+    const mission =
+        missions[
+            progress.mission
+        ];
+
+
+    if (
+        !mission
+    ) {
+
+        hud.textContent =
+            "🏆 Historia completada";
 
         return;
 
     }
 
 
-    container.innerHTML =
-        inventory
-            .map(
-                item =>
-                    "• " + item
-            )
-            .join(
-                "<br>"
-            );
+    hud.textContent =
+        "🎯 " +
+        mission.title;
 
 }
 
 
-/* ============================================================
-   47. MINIMAPA
-   ============================================================ */
+/* =========================================================
+   ZONA HUD
+========================================================= */
+
+function updateZoneHUD() {
+
+    const zone =
+        getCurrentZone();
+
+
+    document.getElementById(
+        "zone-name"
+    ).textContent =
+        zone.name;
+
+}
+
+
+/* =========================================================
+   NOTIFICACIONES
+========================================================= */
+
+function notify(text) {
+
+    const element =
+        document.getElementById(
+            "notification"
+        );
+
+
+    element.textContent =
+        text;
+
+
+    element.classList.remove(
+        "hidden"
+    );
+
+
+    clearTimeout(
+        notificationTimer
+    );
+
+
+    notificationTimer =
+        setTimeout(
+            function() {
+
+                element.classList.add(
+                    "hidden"
+                );
+
+            },
+            2800
+        );
+
+}
+
+
+/* =========================================================
+   MINIMAPA
+========================================================= */
 
 function drawMinimap() {
-
-    if (!miniCtx) return;
-
 
     miniCtx.clearRect(
         0,
@@ -2966,21 +2950,17 @@ function drawMinimap() {
     );
 
 
-    const scaleX =
+    const sx =
         minimap.width /
         WORLD_WIDTH;
 
-
-    const scaleY =
+    const sy =
         minimap.height /
         WORLD_HEIGHT;
 
 
-    /* fondo */
-
     miniCtx.fillStyle =
-        "#b99761";
-
+        "#c8aa76";
 
     miniCtx.fillRect(
         0,
@@ -2990,154 +2970,151 @@ function drawMinimap() {
     );
 
 
-    /* río */
-
-    miniCtx.fillStyle =
-        "#4e8294";
-
-
-    miniCtx.fillRect(
-        0,
-        2650 * scaleY,
-        minimap.width,
-        180 * scaleY
-    );
-
-
-    /* edificios */
-
-    miniCtx.fillStyle =
-        "#684c40";
-
+    /* ZONAS */
 
     for (
-        const building
-        of buildings
+        const zone of zones
     ) {
 
+        miniCtx.fillStyle =
+            zone.unlocked
+                ?
+                "#7e9b68"
+                :
+                "#6c6252";
+
+
         miniCtx.fillRect(
-            building.x * scaleX,
-            building.y * scaleY,
-            building.width * scaleX,
-            building.height * scaleY
+            zone.x * sx,
+            zone.y * sy,
+            zone.width * sx,
+            zone.height * sy
         );
 
     }
 
 
-    /* plaza */
+    /* AGUA */
 
     miniCtx.fillStyle =
-        "#679052";
-
+        "#4e8794";
 
     miniCtx.fillRect(
-        1550 * scaleX,
-        1150 * scaleY,
-        700 * scaleX,
-        420 * scaleY
-    );
-
-
-    /* jugador */
-
-    miniCtx.fillStyle =
-        "#ff3333";
-
-
-    miniCtx.beginPath();
-
-    miniCtx.arc(
-        player.x * scaleX,
-        player.y * scaleY,
-        5,
         0,
-        Math.PI * 2
+        1950 * sy,
+        minimap.width,
+        35 * sy
     );
 
-    miniCtx.fill();
 
-
-    /* NPC */
+    /* EDIFICIOS */
 
     miniCtx.fillStyle =
-        "#f1cf4c";
+        "#554237";
 
 
     for (
-        const npc
-        of npcs
+        const building of buildings
     ) {
 
+        const zone =
+            zones.find(
+                z =>
+                    z.id ===
+                    building.zone
+            );
+
+
+        if (
+            zone &&
+            !zone.unlocked
+        ) {
+
+            continue;
+
+        }
+
+
         miniCtx.fillRect(
-            npc.x * scaleX - 2,
-            npc.y * scaleY - 2,
+            building.x * sx,
+            building.y * sy,
+            building.width * sx,
+            building.height * sy
+        );
+
+    }
+
+
+    /* OBJETOS */
+
+    miniCtx.fillStyle =
+        "#e8c34f";
+
+
+    for (
+        const object of objects
+    ) {
+
+        if (
+            object.collected
+        ) {
+
+            continue;
+
+        }
+
+
+        miniCtx.fillRect(
+            object.x * sx,
+            object.y * sy,
             4,
             4
         );
 
     }
 
+
+    /* PLAYER */
+
+    miniCtx.fillStyle =
+        "#e74c3c";
+
+
+    miniCtx.beginPath();
+
+    miniCtx.arc(
+        player.x * sx,
+        player.y * sy,
+        4,
+        0,
+        Math.PI * 2
+    );
+
+    miniCtx.fill();
+
 }
 
 
-/* ============================================================
-   48. ILUMINACIÓN
-   ============================================================ */
+/* =========================================================
+   DÍA / NOCHE
+========================================================= */
 
 function drawLighting() {
 
-    const hour =
-        getHour();
+    worldTime +=
+        0.00025;
 
 
-    let darkness =
-        0;
-
-
-    if (
-        hour < 6
-    ) {
-
-        darkness =
-            0.35;
-
-    } else if (
-        hour < 8
-    ) {
-
-        darkness =
-            0.18;
-
-    } else if (
-        hour > 19 &&
-        hour < 22
-    ) {
-
-        darkness =
-            0.18;
-
-    } else if (
-        hour >= 22
-    ) {
-
-        darkness =
-            0.38;
-
-    }
-
-
-    if (
-        darkness <= 0
-    ) {
-
-        return;
-
-    }
+    const darkness =
+        (
+            Math.sin(
+                worldTime
+            ) + 1
+        ) / 2;
 
 
     ctx.fillStyle =
-        `rgba(20,30,65,${darkness})`;
+        `rgba(20,30,70,${darkness * .15})`;
 
 
     ctx.fillRect(
@@ -3150,410 +3127,469 @@ function drawLighting() {
 }
 
 
-/* ============================================================
-   49. HUD DEL RELOJ
-   ============================================================ */
+/* =========================================================
+   GUARDADO
+========================================================= */
 
-function drawClock() {
+function saveGame() {
 
-    ctx.save();
+    const data = {
 
-    ctx.setTransform(
-        1,
-        0,
-        0,
-        1,
-        0,
-        0
+        progress,
+
+        inventory,
+
+        player: {
+
+            x:
+                player.x,
+
+            y:
+                player.y
+
+        },
+
+        zones:
+            zones.map(
+                zone => ({
+                    id:
+                        zone.id,
+
+                    unlocked:
+                        zone.unlocked
+                })
+            ),
+
+        objects:
+            objects.map(
+                object => ({
+                    id:
+                        object.id,
+
+                    collected:
+                        object.collected
+                })
+            )
+
+    };
+
+
+    localStorage.setItem(
+        "chanar-save-v18",
+        JSON.stringify(
+            data
+        )
     );
-
-
-    ctx.fillStyle =
-        "rgba(0,0,0,0.55)";
-
-
-    ctx.fillRect(
-        20,
-        20,
-        135,
-        42
-    );
-
-
-    ctx.fillStyle =
-        "white";
-
-
-    ctx.font =
-        "bold 18px Arial";
-
-
-    ctx.fillText(
-        getTimeText(),
-        35,
-        47
-    );
-
-
-    ctx.font =
-        "12px Arial";
-
-
-    ctx.fillText(
-        "Día " + worldDay,
-        95,
-        47
-    );
-
-
-    ctx.restore();
 
 }
 
 
-/* ============================================================
-   50. INDICADOR DE INTERACCIÓN
-   ============================================================ */
+function loadGame() {
 
-function drawInteractionHint() {
+    const raw =
+        localStorage.getItem(
+            "chanar-save-v18"
+        );
 
-    let nearby = false;
 
-
-    for (
-        const npc
-        of npcs
+    if (
+        !raw
     ) {
 
-        if (
-            distance(
-                player,
-                npc
-            ) < 90
-        ) {
-
-            nearby = true;
-
-        }
+        return false;
 
     }
 
 
-    for (
-        const object
-        of objects
-    ) {
+    try {
+
+        const data =
+            JSON.parse(
+                raw
+            );
+
+
+        Object.assign(
+            progress,
+            data.progress
+        );
+
+
+        inventory.push(
+            ...(data.inventory || [])
+        );
+
 
         if (
-            !object.collected &&
-            distance(
-                player,
-                object
-            ) < 80
+            data.player
         ) {
 
-            nearby = true;
+            player.x =
+                data.player.x;
+
+            player.y =
+                data.player.y;
 
         }
 
+
+        if (
+            data.zones
+        ) {
+
+            for (
+                const saved of
+                data.zones
+            ) {
+
+                const zone =
+                    zones.find(
+                        z =>
+                            z.id ===
+                            saved.id
+                    );
+
+
+                if (
+                    zone
+                ) {
+
+                    zone.unlocked =
+                        saved.unlocked;
+
+                }
+
+            }
+
+        }
+
+
+        if (
+            data.objects
+        ) {
+
+            for (
+                const saved of
+                data.objects
+            ) {
+
+                const object =
+                    objects.find(
+                        o =>
+                            o.id ===
+                            saved.id
+                    );
+
+
+                if (
+                    object
+                ) {
+
+                    object.collected =
+                        saved.collected;
+
+                }
+
+            }
+
+        }
+
+
+        return true;
+
     }
 
+    catch(error) {
 
-    if (!nearby) return;
+        console.error(
+            "Error cargando partida:",
+            error
+        );
 
+        return false;
 
-    ctx.save();
-
-
-    ctx.setTransform(
-        1,
-        0,
-        0,
-        1,
-        0,
-        0
-    );
-
-
-    ctx.fillStyle =
-        "rgba(0,0,0,0.65)";
-
-
-    ctx.fillRect(
-        canvas.width / 2 - 90,
-        canvas.height - 85,
-        180,
-        40
-    );
-
-
-    ctx.fillStyle =
-        "white";
-
-
-    ctx.font =
-        "bold 16px Arial";
-
-
-    ctx.textAlign =
-        "center";
-
-
-    ctx.fillText(
-        "E  INTERACTUAR",
-        canvas.width / 2,
-        canvas.height - 60
-    );
-
-
-    ctx.restore();
+    }
 
 }
 
 
-/* ============================================================
-   51. TECLADO
-   ============================================================ */
+/* =========================================================
+   AUTOSAVE
+========================================================= */
 
-document.addEventListener(
-    "keydown",
-    function(e) {
-
-        const key =
-            e.key.toLowerCase();
+setInterval(
+    saveGame,
+    10000
+);
 
 
-        keys[key] = true;
+/* =========================================================
+   BOTONES
+========================================================= */
+
+document
+    .getElementById(
+        "start-button"
+    )
+    .addEventListener(
+        "click",
+        startGame
+    );
 
 
-        if (
-            key === "e"
-        ) {
+document
+    .getElementById(
+        "continue-button"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            loadGame();
+
+            startGame();
+
+        }
+    );
+
+
+function startGame() {
+
+    gameStarted =
+        true;
+
+
+    document
+        .getElementById(
+            "start-screen"
+        )
+        .classList
+        .add(
+            "hidden"
+        );
+
+
+    notify(
+        "🌿 Bienvenido a San Patricio del Chañar"
+    );
+
+}
+
+
+/* =========================================================
+   BOTONES MODALES
+========================================================= */
+
+document
+    .getElementById(
+        "dialogue-close"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            document
+                .getElementById(
+                    "dialogue"
+                )
+                .classList
+                .add(
+                    "hidden"
+                );
+
+        }
+    );
+
+
+document
+    .getElementById(
+        "mission-close"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            document
+                .getElementById(
+                    "mission-panel"
+                )
+                .classList
+                .add(
+                    "hidden"
+                );
+
+        }
+    );
+
+
+document
+    .getElementById(
+        "inventory-close"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            document
+                .getElementById(
+                    "inventory-panel"
+                )
+                .classList
+                .add(
+                    "hidden"
+                );
+
+        }
+    );
+
+
+document
+    .getElementById(
+        "history-close"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            document
+                .getElementById(
+                    "history-panel"
+                )
+                .classList
+                .add(
+                    "hidden"
+                );
+
+        }
+    );
+
+
+/* =========================================================
+   CONTROLES MÓVILES
+========================================================= */
+
+document
+    .querySelectorAll(
+        ".mobile-key"
+    )
+    .forEach(
+        function(button) {
+
+            const key =
+                button.dataset.key;
+
+
+            button.addEventListener(
+                "touchstart",
+                function(e) {
+
+                    e.preventDefault();
+
+                    keys[key] =
+                        true;
+
+                },
+                {
+                    passive: false
+                }
+            );
+
+
+            button.addEventListener(
+                "touchend",
+                function(e) {
+
+                    e.preventDefault();
+
+                    keys[key] =
+                        false;
+
+                },
+                {
+                    passive: false
+                }
+            );
+
+
+            button.addEventListener(
+                "touchcancel",
+                function() {
+
+                    keys[key] =
+                        false;
+
+                }
+            );
+
+        }
+    );
+
+
+document
+    .getElementById(
+        "mobile-interact"
+    )
+    .addEventListener(
+        "touchstart",
+        function(e) {
+
+            e.preventDefault();
 
             interact();
 
+        },
+        {
+            passive: false
         }
+    );
 
 
-        if (
-            key === "m"
-        ) {
+document
+    .getElementById(
+        "mobile-inventory"
+    )
+    .addEventListener(
+        "touchstart",
+        function(e) {
+
+            e.preventDefault();
 
             toggleInventory();
 
-        }
-
-
-        /* ESC */
-
-        if (
-            key === "escape"
-        ) {
-
-            closePanels();
-
-        }
-
-    }
-);
-
-
-document.addEventListener(
-    "keyup",
-    function(e) {
-
-        keys[
-            e.key.toLowerCase()
-        ] = false;
-
-    }
-);
-
-
-/* ============================================================
-   52. BOTONES
-   ============================================================ */
-
-const startButton =
-    document.getElementById(
-        "start-button"
-    );
-
-
-if (startButton) {
-
-    startButton.addEventListener(
-        "click",
-        function() {
-
-            gameStarted =
-                true;
-
-
-            const startScreen =
-                document.getElementById(
-                    "start-screen"
-                );
-
-
-            if (startScreen) {
-
-                startScreen.classList.add(
-                    "hidden"
-                );
-
-            }
-
+        },
+        {
+            passive: false
         }
     );
 
-}
 
+/* =========================================================
+   CICLO PRINCIPAL
+========================================================= */
 
-/* diálogo */
+function update() {
 
-const dialogueClose =
-    document.getElementById(
-        "dialogue-close"
-    );
-
-
-if (dialogueClose) {
-
-    dialogueClose.addEventListener(
-        "click",
-        function() {
-
-            const dialogue =
-                document.getElementById(
-                    "dialogue"
-                );
-
-
-            if (dialogue) {
-
-                dialogue.classList.add(
-                    "hidden"
-                );
-
-            }
-
-        }
-    );
-
-}
-
-
-/* misión */
-
-const missionClose =
-    document.getElementById(
-        "mission-close"
-    );
-
-
-if (missionClose) {
-
-    missionClose.addEventListener(
-        "click",
-        function() {
-
-            const panel =
-                document.getElementById(
-                    "mission-panel"
-                );
-
-
-            if (panel) {
-
-                panel.classList.add(
-                    "hidden"
-                );
-
-            }
-
-        }
-    );
-
-}
-
-
-/* inventario */
-
-const inventoryClose =
-    document.getElementById(
-        "inventory-close"
-    );
-
-
-if (inventoryClose) {
-
-    inventoryClose.addEventListener(
-        "click",
-        function() {
-
-            const panel =
-                document.getElementById(
-                    "inventory-panel"
-                );
-
-
-            if (panel) {
-
-                panel.classList.add(
-                    "hidden"
-                );
-
-            }
-
-        }
-    );
-
-}
-
-
-/* ============================================================
-   53. CERRAR PANELES
-   ============================================================ */
-
-function closePanels() {
-
-    const ids = [
-
-        "dialogue",
-        "mission-panel",
-        "inventory-panel"
-
-    ];
-
-
-    for (
-        const id
-        of ids
+    if (
+        !gameStarted
     ) {
 
-        const element =
-            document.getElementById(
-                id
-            );
-
-
-        if (element) {
-
-            element.classList.add(
-                "hidden"
-            );
-
-        }
+        return;
 
     }
 
+
+    updatePlayer();
+
+    updateCamera();
+
+    updateTractors();
+
+    updateZoneHUD();
+
+    saveGame();
+
 }
 
-
-/* ============================================================
-   54. DIBUJAR
-   ============================================================ */
 
 function draw() {
 
@@ -3574,29 +3610,37 @@ function draw() {
     );
 
 
-    /* mundo */
-
     drawWorld();
 
-
-    /* edificios */
-
     drawBuildings();
-
-
-    /* objetos */
 
     drawObjects();
 
 
-    /* personas */
+    for (
+        const animal of animals
+    ) {
 
-    drawWalkers();
+        drawAnimal(
+            animal
+        );
+
+    }
 
 
     for (
-        const npc
-        of npcs
+        const tractor of tractors
+    ) {
+
+        drawTractor(
+            tractor
+        );
+
+    }
+
+
+    for (
+        const npc of npcs
     ) {
 
         drawNPC(
@@ -3606,27 +3650,7 @@ function draw() {
     }
 
 
-    /* animales */
-
-    drawAnimals();
-
-
-    /* vehículos */
-
-    drawVehicles();
-
-
-    /* tractores */
-
-    drawTractors();
-
-
-    /* jugador */
-
     drawPlayer();
-
-
-    /* iluminación */
 
     drawLighting();
 
@@ -3634,41 +3658,7 @@ function draw() {
     ctx.restore();
 
 
-    /* interfaz */
-
     drawMinimap();
-
-    drawClock();
-
-    drawInteractionHint();
-
-}
-
-
-/* ============================================================
-   55. MOTOR
-   ============================================================ */
-
-function update() {
-
-    if (!gameStarted) return;
-
-
-    updatePlayer();
-
-    updateCamera();
-
-    updateWorldTime();
-
-    updateTractors();
-
-    updateVehicles();
-
-    updateAnimals();
-
-    updateWalkers();
-
-    updateNPCs();
 
 }
 
@@ -3679,7 +3669,6 @@ function gameLoop() {
 
     draw();
 
-
     requestAnimationFrame(
         gameLoop
     );
@@ -3687,20 +3676,34 @@ function gameLoop() {
 }
 
 
-/* ============================================================
-   56. INICIALIZACIÓN
-   ============================================================ */
+/* =========================================================
+   INICIO
+========================================================= */
+
+const hasSave =
+    localStorage.getItem(
+        "chanar-save-v18"
+    );
+
+
+if (
+    hasSave
+) {
+
+    document
+        .getElementById(
+            "continue-button"
+        )
+        .classList
+        .remove(
+            "hidden"
+        );
+
+}
+
+
+updateHUD();
 
 updateInventory();
 
-updateCounters();
-
-setMissionHUD();
-
 gameLoop();
-
-
-/* ============================================================
-   FIN — VERSIÓN 17.0
-   ============================================================ */
-```
