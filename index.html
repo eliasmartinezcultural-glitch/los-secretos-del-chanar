@@ -1,391 +1,272 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    >
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
 
-    <title>Los Secretos del Chañar — V18.0</title>
+<meta name="theme-color" content="#16251c">
 
-    <link rel="stylesheet" href="style.css">
+<title>Los Secretos del Chañar</title>
+
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- =====================================================
-         PANTALLA DE INICIO
-    ====================================================== -->
+<!-- =====================================================
+     JUEGO
+===================================================== -->
 
-    <section id="start-screen">
+<canvas id="game"></canvas>
 
-        <div class="start-card">
 
-            <div class="start-icon">🌿</div>
+<!-- =====================================================
+     PANTALLA DE INICIO
+===================================================== -->
 
-            <h1>LOS SECRETOS<br>DEL CHAÑAR</h1>
+<div id="start-screen" class="screen">
 
-            <p class="subtitle">
-                Una aventura por San Patricio del Chañar
-            </p>
+    <div class="title-card">
 
-            <p class="intro">
-                Caminá por el pueblo, conocé a sus habitantes,
-                entrá a lugares, descubrí historias y viví
-                pequeñas escenas de la vida cotidiana.
-            </p>
+        <div class="small-title">
+            UNA HISTORIA DE PUEBLO
+        </div>
 
-            <button id="start-button">
-                COMENZAR
-            </button>
+        <h1>
+            LOS SECRETOS<br>
+            DEL CHAÑAR
+        </h1>
 
-            <p class="creator">
-                Juego creado por <strong>Elías Martínez</strong>
-            </p>
+        <p>
+            Caminá. Conversá. Observá.
+            Descubrí.
+        </p>
 
-            <p class="version">
-                V18.0 · Pueblo Vivo
-            </p>
+        <button id="start-button">
+            COMENZAR
+        </button>
+
+        <div class="controls-info">
+
+            <span>PC: WASD / Flechas</span>
+            <span>Celular: joystick</span>
+            <span>E: interactuar</span>
 
         </div>
 
-    </section>
-
-
-    <!-- =====================================================
-         JUEGO
-    ====================================================== -->
-
-    <main id="game-container">
-
-        <canvas id="game"></canvas>
-
-
-        <!-- =================================================
-             HUD SUPERIOR
-        ================================================== -->
-
-        <div id="top-hud">
-
-            <div class="game-title">
-                LOS SECRETOS DEL CHAÑAR
-            </div>
-
-            <div id="location-hud">
-                Plaza Central
-            </div>
-
-            <div class="stats">
-
-                <span>
-                    ⭐ <b id="xp-count">0</b>
-                </span>
-
-                <span>
-                    📖 <b id="history-count">0</b>
-                </span>
-
-                <span>
-                    📸 <b id="photo-count">0</b>
-                </span>
-
-            </div>
-
+        <div class="created">
+            Juego creado por<br>
+            <strong>Elías Martínez</strong>
         </div>
 
+    </div>
 
-        <!-- =================================================
-             MISION / ESTADO
-        ================================================== -->
+</div>
 
-        <div id="mission-hud">
-            Explorá el pueblo
-        </div>
 
+<!-- =====================================================
+     HUD
+===================================================== -->
 
-        <!-- =================================================
-             MINIMAPA
-        ================================================== -->
+<div id="hud">
 
-        <div id="map-container">
+    <div id="location">
+        SAN PATRICIO DEL CHAÑAR
+    </div>
 
-            <div class="map-title">
-                MAPA
-            </div>
+    <div id="clock">
+        08:00
+    </div>
 
-            <canvas
-                id="minimap"
-                width="190"
-                height="130"
-            ></canvas>
+    <div id="mission-hud">
+        Explorá el pueblo
+    </div>
 
-        </div>
+</div>
 
 
-        <!-- =================================================
-             GLOBO DE INTERACCIÓN
-        ================================================== -->
+<!-- =====================================================
+     BOTONES
+===================================================== -->
 
-        <div
-            id="interaction-hint"
-            class="hidden"
-        >
-            <span id="interaction-icon">E</span>
-            <span id="interaction-text">
-                Interactuar
-            </span>
-        </div>
+<div id="top-buttons">
 
+    <button id="map-button">
+        🗺️
+    </button>
 
-        <!-- =================================================
-             GLOBO DE DIÁLOGO
-        ================================================== -->
+    <button id="inventory-button">
+        🎒
+    </button>
 
-        <div
-            id="speech-bubble"
-            class="hidden"
-        >
+</div>
 
-            <div id="speech-name">
-                Vecino
-            </div>
 
-            <div id="speech-text">
-                Hola.
-            </div>
+<!-- =====================================================
+     MINIMAPA
+===================================================== -->
 
-            <div class="speech-help">
-                E / tocar para continuar
-            </div>
+<div id="minimap-container">
 
-        </div>
+    <canvas id="minimap"
+            width="220"
+            height="150">
+    </canvas>
 
+</div>
 
-        <!-- =================================================
-             PANEL DE DIÁLOGO GRANDE
-        ================================================== -->
 
-        <section
-            id="dialogue"
-            class="panel hidden"
-        >
+<!-- =====================================================
+     CONTROLES CELULAR
+===================================================== -->
 
-            <div class="panel-content">
+<div id="mobile-controls">
 
-                <div
-                    id="dialogue-name"
-                    class="panel-title"
-                >
-                    Vecino
-                </div>
+    <div id="joystick">
 
-                <div id="dialogue-text">
-                    Hola.
-                </div>
+        <div id="joystick-stick"></div>
 
-                <button id="dialogue-close">
-                    CERRAR
-                </button>
+    </div>
 
-            </div>
+    <button id="mobile-interact">
+        E
+    </button>
 
-        </section>
+</div>
 
 
-        <!-- =================================================
-             MISIÓN
-        ================================================== -->
+<!-- =====================================================
+     INDICADOR DE INTERACCIÓN
+===================================================== -->
 
-        <section
-            id="mission-panel"
-            class="panel hidden"
-        >
+<div id="interaction-hint">
+    <span id="interaction-icon">E</span>
+    <span id="interaction-text">
+        Interactuar
+    </span>
+</div>
 
-            <div class="panel-content">
 
-                <div
-                    id="mission-title"
-                    class="panel-title"
-                >
-                    Misión
-                </div>
+<!-- =====================================================
+     DIÁLOGO
+===================================================== -->
 
-                <div id="mission-description">
-                    Explorá el pueblo.
-                </div>
+<div id="dialogue"
+     class="panel hidden">
 
-                <button id="mission-close">
-                    CERRAR
-                </button>
+    <div class="dialogue-character"
+         id="dialogue-name">
+        Vecino
+    </div>
 
-            </div>
+    <div id="dialogue-text">
+    </div>
 
-        </section>
+    <button id="dialogue-next">
+        CONTINUAR
+    </button>
 
+</div>
 
-        <!-- =================================================
-             INVENTARIO
-        ================================================== -->
 
-        <section
-            id="inventory-panel"
-            class="panel hidden"
-        >
+<!-- =====================================================
+     MISION
+===================================================== -->
 
-            <div class="panel-content">
+<div id="mission-panel"
+     class="panel hidden">
 
-                <div class="panel-title">
-                    📖 Diario del viajero
-                </div>
+    <div class="panel-title">
+        NUEVO OBJETIVO
+    </div>
 
-                <div id="inventory-items">
-                    Inventario vacío.
-                </div>
+    <h2 id="mission-title">
+    </h2>
 
-                <hr>
+    <p id="mission-description">
+    </p>
 
-                <div class="inventory-stat">
-                    ⭐ Experiencia:
-                    <span id="xp-panel">0</span>
-                </div>
+    <button id="mission-close">
+        ENTENDIDO
+    </button>
 
-                <div class="inventory-stat">
-                    📜 Historia:
-                    <span id="history-panel">0</span>
-                </div>
+</div>
 
-                <div class="inventory-stat">
-                    🗺️ Zonas:
-                    <span id="zones-panel">1</span>
-                </div>
 
-                <button id="inventory-close">
-                    CERRAR
-                </button>
+<!-- =====================================================
+     INVENTARIO
+===================================================== -->
 
-            </div>
+<div id="inventory-panel"
+     class="panel hidden">
 
-        </section>
+    <div class="panel-title">
+        MOCHILA
+    </div>
 
+    <div id="inventory-items">
+    </div>
 
-        <!-- =================================================
-             INTERIOR
-        ================================================== -->
+    <button id="inventory-close">
+        CERRAR
+    </button>
 
-        <section
-            id="interior-overlay"
-            class="hidden"
-        >
+</div>
 
-            <div id="interior-title">
-                Interior
-            </div>
 
-            <div id="interior-subtitle">
-                Explorá el lugar
-            </div>
+<!-- =====================================================
+     MAPA
+===================================================== -->
 
-        </section>
+<div id="map-panel"
+     class="panel hidden">
 
+    <div class="panel-title">
+        MAPA DEL CHAÑAR
+    </div>
 
-        <!-- =================================================
-             CONTROLES CELULAR
-        ================================================== -->
+    <div id="map-info">
 
-        <div id="mobile-controls">
+        <p>🏘️ Pueblo</p>
+        <p>🍇 Zona productiva</p>
+        <p>💧 Canales de riego</p>
+        <p>🌊 Río Neuquén</p>
+        <p>⚽ Club</p>
+        <p>🏫 Escuela</p>
+        <p>🛍️ Comercios</p>
 
-            <div class="dpad">
+    </div>
 
-                <button
-                    class="control up"
-                    data-key="arrowup"
-                >
-                    ▲
-                </button>
+    <button id="map-close">
+        CERRAR
+    </button>
 
-                <button
-                    class="control left"
-                    data-key="arrowleft"
-                >
-                    ◀
-                </button>
+</div>
 
-                <button
-                    class="control down"
-                    data-key="arrowdown"
-                >
-                    ▼
-                </button>
 
-                <button
-                    class="control right"
-                    data-key="arrowright"
-                >
-                    ▶
-                </button>
+<!-- =====================================================
+     MENSAJE DE DESCUBRIMIENTO
+===================================================== -->
 
-            </div>
+<div id="discovery"
+     class="discovery hidden">
 
+    <div id="discovery-title">
+        DESCUBRIMIENTO
+    </div>
 
-            <div class="action-buttons">
+    <div id="discovery-text">
+    </div>
 
-                <button
-                    id="mobile-interact"
-                    class="action-button"
-                >
-                    E
-                </button>
+</div>
 
-                <button
-                    id="mobile-inventory"
-                    class="action-button"
-                >
-                    🎒
-                </button>
 
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             AYUDA
-        ================================================== -->
-
-        <div id="controls-help">
-
-            <strong>WASD / FLECHAS</strong>
-            caminar
-
-            <span>•</span>
-
-            <strong>E</strong>
-            interactuar
-
-            <span>•</span>
-
-            <strong>M</strong>
-            inventario
-
-        </div>
-
-
-        <!-- =================================================
-             FIRMA
-        ================================================== -->
-
-        <div id="creator-watermark">
-            LOS SECRETOS DEL CHAÑAR · Elías Martínez
-        </div>
-
-    </main>
-
-
-    <script src="game.js"></script>
+<script src="game.js"></script>
 
 </body>
 </html>
-```
