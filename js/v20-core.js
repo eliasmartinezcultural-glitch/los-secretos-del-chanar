@@ -1,27 +1,16 @@
-/* LOS SECRETOS DEL CHAÑAR — V20 CORE */
-(function () {
-    "use strict";
-    const STORAGE_KEY = "chanar_save_v20";
-    const AUTOSAVE_MS = 30000;
-    const bus = {
-        events: Object.create(null),
-        on(name, fn) { (this.events[name] ||= []).push(fn); return () => { this.events[name] = (this.events[name] || []).filter(x => x !== fn); }; },
-        emit(name, payload) { (this.events[name] || []).forEach(fn => { try { fn(payload); } catch (e) { console.error("Evento V20:", name, e); } }); }
-    };
-    function snapshot() {
-        return { version: 20, savedAt: new Date().toISOString(), player: { x: player.x, y: player.y, direction: player.direction, bread: player.bread || 0, mate: player.mate || 0, inside: !!player.inside, currentBuilding: player.currentBuilding || null }, world: { day: world.day, hour: world.hour, minute: world.minute, weather: world.weather, rain: !!world.rain }, npcs: npcs.map(n => ({ id: n.id, x: n.x, y: n.y, destination: n.destination || null })) };
-    }
-    function notify(message) { const el = document.getElementById("notification"); if (!el) return; el.textContent = message; el.classList.add("show"); clearTimeout(notify.timer); notify.timer = setTimeout(() => el.classList.remove("show"), 1800); }
-    function save(reason = "manual") { try { const data = snapshot(); data.reason = reason; localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); bus.emit("save", data); notify("Partida guardada"); return true; } catch (e) { console.error(e); notify("No se pudo guardar la partida"); return false; } }
-    function load() { try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return false; const data = JSON.parse(raw); if (!data || data.version !== 20) return false; Object.assign(player, data.player || {}); Object.assign(world, data.world || {}); (data.npcs || []).forEach(saved => { const npc = npcs.find(n => n.id === saved.id); if (npc) Object.assign(npc, saved); }); bus.emit("load", data); notify("Partida cargada"); return true; } catch (e) { console.error(e); notify("La partida guardada está dañada"); return false; } }
-    function currentSchedule(npc) { const list = (window.CHANAR_NPC_SCHEDULES || {})[npc.id]; if (!list) return null; const hour = world.hour + ((world.minute || 0) / 60); return list.find(s => hour >= s.from && hour < s.to) || list[list.length - 1]; }
-    function applySchedules() { npcs.forEach(npc => { const slot = currentSchedule(npc); if (!slot) return; if (npc.destination !== slot.place) { npc.destination = slot.place; bus.emit("npc:schedule", { npc, slot }); } }); }
-    function updateHUD() { const clock = document.getElementById("clock"), day = document.getElementById("day-label"), weather = document.getElementById("weather-label"); if (clock) clock.textContent = `${String(world.hour).padStart(2, "0")}:${String(world.minute || 0).padStart(2, "0")}`; if (day) day.textContent = `Día ${world.day}`; const type = (window.weatherTypes || []).find(x => x.id === world.weather); if (weather && type) weather.textContent = `${type.icon} ${type.name}`; }
-    function seededRandom(seed) { let value = (seed >>> 0) || 1; return function () { value = (value * 1664525 + 1013904223) >>> 0; return value / 4294967296; }; }
-    window.ChanarV20 = { version: 20, bus, save, load, snapshot, applySchedules, currentSchedule, seededRandom };
-    window.addEventListener("keydown", event => { if (event.key === "F5") { event.preventDefault(); save("keyboard"); } if (event.key === "F9") { event.preventDefault(); load(); } });
-    let lastDay = world.day, lastHour = world.hour;
-    setInterval(() => { applySchedules(); updateHUD(); if (world.day !== lastDay || world.hour !== lastHour) { bus.emit("time:changed", { day: world.day, hour: world.hour, minute: world.minute }); lastDay = world.day; lastHour = world.hour; } }, 1000);
-    setInterval(() => save("autosave"), AUTOSAVE_MS);
-    window.addEventListener("beforeunload", () => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot())); } catch (_) {} });
+/* LOS SECRETOS DEL CHAÑAR — V23 CORE */
+(function(){"use strict";
+const STORAGE_KEY="chanar_save_v23",AUTOSAVE_MS=30000;
+const bus={events:Object.create(null),on(name,fn){(this.events[name]??=[]).push(fn);return()=>{this.events[name]=(this.events[name]||[]).filter(x=>x!==fn)}},emit(name,payload){(this.events[name]||[]).forEach(fn=>{try{fn(payload)}catch(e){console.error("Evento",name,e)}})}};
+function snapshot(){return{version:23,savedAt:new Date().toISOString(),player:{x:player.x,y:player.y,direction:player.direction,bread:player.bread||0,mate:player.mate||0,money:player.money||0,groceries:player.groceries||0,inside:!!player.inside,currentBuilding:player.currentBuilding||null},world:{day:world.day,hour:world.hour,minute:world.minute,weather:world.weather,rain:!!world.rain},npcs:(window.npcs||[]).map(n=>({id:n.id,x:n.x,y:n.y,destination:n.destination||null})),relationships:window.ChanarSocial?.relationships||{}}}
+function notify(message){const el=document.getElementById("notification");if(!el)return;el.textContent=message;el.classList.add("show");clearTimeout(notify.timer);notify.timer=setTimeout(()=>el.classList.remove("show"),2200)}
+function save(reason="manual"){try{const data=snapshot();data.reason=reason;localStorage.setItem(STORAGE_KEY,JSON.stringify(data));bus.emit("save",data);if(reason!=="autosave")notify("Partida guardada");return true}catch(e){console.error(e);notify("No se pudo guardar");return false}}
+function load(){try{const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return false;const data=JSON.parse(raw);if(!data||![20,23].includes(data.version))return false;Object.assign(player,data.player||{});Object.assign(world,data.world||{});(data.npcs||[]).forEach(s=>{const n=(window.npcs||[]).find(x=>x.id===s.id);if(n)Object.assign(n,s)});if(window.ChanarSocial&&data.relationships)Object.assign(window.ChanarSocial.relationships,data.relationships);bus.emit("load",data);notify("Partida cargada");return true}catch(e){console.error(e);notify("Partida guardada dañada");return false}}
+function currentSchedule(npc){const list=(window.CHANAR_NPC_SCHEDULES||{})[npc.id];if(!list)return null;const h=world.hour+(world.minute||0)/60;return list.find(s=>h>=s.from&&h<s.to)||list[list.length-1]}
+function applySchedules(){(window.npcs||[]).forEach(n=>{const slot=currentSchedule(n);if(slot&&n.destination!==slot.place){n.destination=slot.place;bus.emit("npc:schedule",{npc:n,slot})}})}
+function updateHUD(){const c=document.getElementById("clock"),d=document.getElementById("day-label"),w=document.getElementById("weather-label");if(c)c.textContent=`${String(world.hour).padStart(2,"0")}:${String(Math.floor(world.minute||0)).padStart(2,"0")}`;if(d)d.textContent=`Día ${world.day}`;const t=(window.weatherTypes||[]).find(x=>x.id===world.weather);if(w&&t)w.textContent=`${t.icon} ${t.name}`}
+function seededRandom(seed){let v=(seed>>>0)||1;return()=>{v=(v*1664525+1013904223)>>>0;return v/4294967296}}
+window.ChanarV20={version:23,bus,save,load,snapshot,applySchedules,currentSchedule,seededRandom,notify};
+window.addEventListener("keydown",e=>{if(e.key==="F5"){e.preventDefault();save("keyboard")}if(e.key==="F9"){e.preventDefault();load()}});
+let ld=world.day,lh=world.hour;setInterval(()=>{applySchedules();updateHUD();window.ChanarLife?.annotate();window.ChanarEconomy?.init();if(world.day!==ld||world.hour!==lh){bus.emit("time:changed",{day:world.day,hour:world.hour,minute:world.minute});ld=world.day;lh=world.hour}},1000);setInterval(()=>save("autosave"),AUTOSAVE_MS);window.addEventListener("beforeunload",()=>{try{localStorage.setItem(STORAGE_KEY,JSON.stringify(snapshot()))}catch(_){}});
 })();
