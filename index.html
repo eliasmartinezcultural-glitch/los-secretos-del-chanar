@@ -1,107 +1,159 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
 <meta charset="UTF-8">
 
-<meta name="viewport"
-      content="width=device-width,
-               initial-scale=1.0,
-               maximum-scale=1.0,
-               user-scalable=no">
+<meta
+    name="viewport"
+    content="width=device-width,
+    initial-scale=1.0,
+    maximum-scale=1.0,
+    user-scalable=no"
+>
 
-<title>Los Secretos del Chañar — V18.0</title>
+<title>Los Secretos del Chañar</title>
 
-<link rel="stylesheet"
-      href="style.css">
+<link
+    rel="stylesheet"
+    href="style.css"
+>
 
 </head>
 
 <body>
 
-<!-- =====================================================
-     JUEGO
-===================================================== -->
-
-<canvas id="game"></canvas>
-
-
-<!-- =====================================================
+<!-- ================================
      PANTALLA DE INICIO
-===================================================== -->
+================================ -->
 
 <div id="start-screen">
 
-    <div class="title-box">
+    <div class="start-box">
 
-        <div class="small-title">
-            UNA HISTORIA DEL TERRITORIO
+        <div class="game-logo">
+            LOS SECRETOS
+            <span>DEL CHAÑAR</span>
         </div>
 
-        <h1>
-            LOS SECRETOS<br>
-            DEL CHAÑAR
-        </h1>
-
-        <p>
-            Caminá. Escuchá. Descubrí.
+        <p class="subtitle">
+            Un pueblo guarda más historias
+            de las que aparenta.
         </p>
 
         <button id="start-button">
             COMENZAR
         </button>
 
-        <div class="version">
-            V18.0 — PUEBLO VIVO
-        </div>
-
-        <div class="creator">
-            Juego creado por <strong>Elías Martínez</strong>
-        </div>
+        <p class="creator">
+            Juego creado por
+            <strong>Elías Martínez</strong>
+        </p>
 
     </div>
 
 </div>
 
 
-<!-- =====================================================
-     HUD SUPERIOR
-===================================================== -->
+<!-- ================================
+     JUEGO
+================================ -->
+
+<canvas id="game"></canvas>
+
+
+<!-- ================================
+     HUD
+================================ -->
 
 <div id="hud">
 
-    <div class="hud-left">
+    <div class="hud-top">
 
-        <div class="location">
-            📍 <span id="location-name">
+        <div class="location-box">
+
+            <span id="location-name">
                 San Patricio del Chañar
             </span>
-        </div>
 
-        <div class="clock">
-            🕐 <span id="clock">
+            <small id="clock">
                 08:00
+            </small>
+
+        </div>
+
+
+        <div class="mission-box">
+
+            <span id="mission-hud">
+                Explorá el pueblo
             </span>
+
         </div>
 
     </div>
 
 
-    <div class="mission-hud"
-         id="mission-hud">
+    <div id="interaction-hint">
+        Acercate a una persona o lugar
+    </div>
 
-        Explorá el pueblo
+
+    <div id="status-message"></div>
+
+</div>
+
+
+<!-- ================================
+     MINIMAPA
+================================ -->
+
+<div id="map-container">
+
+    <canvas
+        id="minimap"
+        width="190"
+        height="130"
+    ></canvas>
+
+    <span>MAPA</span>
+
+</div>
+
+
+<!-- ================================
+     CONTROLES CELULAR
+================================ -->
+
+<div id="mobile-controls">
+
+    <div
+        id="joystick-area"
+        class="joystick-area"
+    >
+
+        <div
+            id="joystick"
+            class="joystick"
+        ></div>
 
     </div>
 
 
-    <div class="hud-right">
+    <div class="mobile-actions">
 
-        <button id="inventory-button">
-            🎒
+        <button
+            id="mobile-interact"
+            class="action-button"
+        >
+            E
         </button>
 
-        <button id="map-button">
-            🗺️
+        <button
+            id="mobile-inventory"
+            class="action-button"
+        >
+            M
         </button>
 
     </div>
@@ -109,72 +161,87 @@
 </div>
 
 
-<!-- =====================================================
-     MENSAJES
-===================================================== -->
+<!-- ================================
+     DIÁLOGO
+================================ -->
 
-<div id="notification"
-     class="notification hidden">
+<div
+    id="dialogue"
+    class="panel hidden"
+>
+
+    <div class="dialogue-avatar"></div>
+
+    <div class="dialogue-content">
+
+        <div
+            id="dialogue-name"
+            class="dialogue-name"
+        ></div>
+
+        <div
+            id="dialogue-text"
+            class="dialogue-text"
+        ></div>
+
+        <button
+            id="dialogue-close"
+        >
+            Cerrar
+        </button>
+
+    </div>
+
 </div>
 
 
-<!-- =====================================================
+<!-- ================================
      GLOBO DE DIÁLOGO
-===================================================== -->
+================================ -->
 
-<div id="dialogue"
-     class="dialogue hidden">
+<div
+    id="speech-bubble"
+    class="speech-bubble hidden"
+></div>
 
-    <div class="dialogue-name"
-         id="dialogue-name">
-        Vecino
-    </div>
 
-    <div class="dialogue-text"
-         id="dialogue-text">
-    </div>
+<!-- ================================
+     MISIÓN
+================================ -->
 
-    <div class="dialogue-options"
-         id="dialogue-options">
-    </div>
+<div
+    id="mission-panel"
+    class="panel hidden"
+>
 
-    <button id="dialogue-close">
-        Cerrar
+    <h2 id="mission-title"></h2>
+
+    <p id="mission-description"></p>
+
+    <button id="mission-close">
+        Continuar
     </button>
 
 </div>
 
 
-<!-- =====================================================
+<!-- ================================
      INVENTARIO
-===================================================== -->
+================================ -->
 
-<div id="inventory-panel"
-     class="panel hidden">
+<div
+    id="inventory-panel"
+    class="panel inventory hidden"
+>
 
-    <h2>🎒 Mochila</h2>
+    <h2>
+        Mochila
+    </h2>
 
-    <div id="inventory-items">
+    <div
+        id="inventory-items"
+    >
         Inventario vacío.
-    </div>
-
-    <div class="inventory-stats">
-
-        <div>
-            📷 Fotografías:
-            <span id="photo-count">0</span>
-        </div>
-
-        <div>
-            📜 Documentos:
-            <span id="document-count">0</span>
-        </div>
-
-        <div>
-            🥖 Pan:
-            <span id="bread-count">0</span>
-        </div>
-
     </div>
 
     <button id="inventory-close">
@@ -184,143 +251,40 @@
 </div>
 
 
-<!-- =====================================================
-     MAPA
-===================================================== -->
+<!-- ================================
+     INTERIOR
+================================ -->
 
-<div id="map-panel"
-     class="panel hidden">
+<div
+    id="interior-panel"
+    class="hidden"
+>
 
-    <h2>🗺️ Mapa del Chañar</h2>
+    <div class="interior-header">
 
-    <canvas id="minimap"
-            width="700"
-            height="480">
-    </canvas>
+        <span id="interior-title">
+            Interior
+        </span>
 
-    <div class="map-legend">
-
-        <span>🔴 Vos</span>
-        <span>🏠 Casas</span>
-        <span>🏪 Comercios</span>
-        <span>🌱 Chacras</span>
-        <span>⚽ Estadio</span>
-
-    </div>
-
-    <button id="map-close">
-        Cerrar mapa
-    </button>
-
-</div>
-
-
-<!-- =====================================================
-     MISIÓN
-===================================================== -->
-
-<div id="mission-panel"
-     class="panel hidden">
-
-    <h2 id="mission-title">
-        Los secretos del Chañar
-    </h2>
-
-    <p id="mission-description">
-    </p>
-
-    <div class="mission-progress">
-
-        <div>
-            Historia:
-            <span id="history-progress">
-                0
-            </span>
-        </div>
-
-        <div>
-            Descubrimientos:
-            <span id="discovery-progress">
-                0
-            </span>
-        </div>
-
-    </div>
-
-    <button id="mission-close">
-        Continuar
-    </button>
-
-</div>
-
-
-<!-- =====================================================
-     CONTROLES MÓVILES
-===================================================== -->
-
-<div id="mobile-controls">
-
-    <div id="joystick">
-
-        <button data-dir="up">
-            ▲
-        </button>
-
-        <button data-dir="left">
-            ◀
-        </button>
-
-        <button data-dir="down">
-            ▼
-        </button>
-
-        <button data-dir="right">
-            ▶
+        <button id="exit-building">
+            SALIR
         </button>
 
     </div>
 
-
-    <div class="mobile-actions">
-
-        <button id="mobile-interact">
-            E
-        </button>
-
-        <button id="mobile-inventory">
-            🎒
-        </button>
-
-        <button id="mobile-map">
-            🗺️
-        </button>
-
-    </div>
+    <div id="interior-content"></div>
 
 </div>
 
 
-<!-- =====================================================
-     CONTROLES
-===================================================== -->
+<!-- ================================
+     NOTIFICACIÓN
+================================ -->
 
-<div id="controls-help">
-
-    <span>WASD / Flechas</span>
-    <span>E Interactuar</span>
-    <span>M Mochila</span>
-
-</div>
-
-
-<!-- =====================================================
-     CRÉDITOS
-===================================================== -->
-
-<div id="credits">
-    Los Secretos del Chañar<br>
-    <small>Juego creado por Elías Martínez</small>
-</div>
+<div
+    id="toast"
+    class="toast hidden"
+></div>
 
 
 <script src="game.js"></script>
