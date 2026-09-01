@@ -1,8 +1,8 @@
-/* =====================================================
+```css
+/* =========================================================
    LOS SECRETOS DEL CHAÑAR
-   V18.0
-   ESTILO TERRITORIAL
-===================================================== */
+   V18.0 — PUEBLO VIVO
+========================================================= */
 
 * {
     box-sizing: border-box;
@@ -12,56 +12,28 @@
 
 html,
 body {
-
     width: 100%;
     height: 100%;
-
     overflow: hidden;
-
-    background:
-        #c7aa78;
-
+    background: #151515;
     font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-
+        Arial,
+        Helvetica,
+        sans-serif;
+    touch-action: none;
 }
 
-body {
-
-    user-select: none;
-
-}
-
-
-/* =====================================================
-   CANVAS
-===================================================== */
-
-#game {
-
-    position: fixed;
-
-    left: 0;
-    top: 0;
-
-    width: 100vw;
-    height: 100vh;
-
-    display: block;
-
-    background:
-        #c7aa78;
-
+button {
+    font-family: inherit;
+    cursor: pointer;
 }
 
 
-/* =====================================================
-   PANTALLA DE INICIO
-===================================================== */
+/* =========================================================
+   INICIO
+========================================================= */
 
-.screen {
+#start-screen {
 
     position: fixed;
 
@@ -76,1173 +48,1104 @@ body {
     justify-content: center;
 
     background:
-
         linear-gradient(
-            rgba(25,35,28,.70),
-            rgba(25,35,28,.82)
+            rgba(27, 42, 30, .72),
+            rgba(43, 34, 23, .82)
+        ),
+        radial-gradient(
+            circle at center,
+            #849b65,
+            #263426 70%
         );
 
-    backdrop-filter:
-        blur(4px);
-
+    padding: 20px;
 }
 
 
 .start-card {
 
-    width:
-        min(560px, 90vw);
+    width: min(
+        540px,
+        94vw
+    );
 
-    padding:
-        42px 35px;
+    padding: 38px 28px;
 
-    text-align:
-        center;
+    text-align: center;
 
-    color:
-        #f5ead2;
+    border-radius: 24px;
+
+    color: white;
+
+    background:
+        rgba(34, 31, 25, .92);
 
     border:
         1px solid
-        rgba(255,255,255,.25);
-
-    border-radius:
-        18px;
-
-    background:
-
-        linear-gradient(
-            145deg,
-            rgba(61,55,42,.96),
-            rgba(39,47,38,.96)
-        );
+        rgba(255,255,255,.18);
 
     box-shadow:
-        0 30px 80px
-        rgba(0,0,0,.55);
-
+        0 25px 80px
+        rgba(0,0,0,.45);
 }
 
 
-.game-logo {
+.start-icon {
 
-    font-size:
-        65px;
+    font-size: 48px;
 
-    margin-bottom:
-        10px;
-
+    margin-bottom: 12px;
 }
 
 
 .start-card h1 {
 
+    font-family:
+        Georgia,
+        serif;
+
     font-size:
-        clamp(34px,7vw,58px);
+        clamp(34px, 8vw, 62px);
 
-    line-height:
-        .92;
+    line-height: .92;
 
-    letter-spacing:
-        3px;
+    letter-spacing: 2px;
 
-    margin-bottom:
-        18px;
-
+    margin-bottom: 18px;
 }
 
 
 .subtitle {
 
-    font-size:
-        20px;
+    font-size: 18px;
 
-    color:
-        #d8b96e;
+    color: #d9c89b;
 
-    margin-bottom:
-        22px;
-
+    margin-bottom: 20px;
 }
 
 
 .intro {
 
-    max-width:
-        450px;
+    max-width: 430px;
 
     margin:
-        auto auto 28px;
+        0 auto 28px;
 
-    line-height:
-        1.6;
+    line-height: 1.55;
 
-    color:
-        #ded6c4;
-
+    color: #e4e0d7;
 }
 
 
-.main-button,
-.secondary-button {
+#start-button {
 
-    width:
-        min(330px, 80%);
+    border: 0;
 
     padding:
-        17px;
+        16px 42px;
 
-    border:
-        none;
-
-    border-radius:
-        9px;
-
-    font-family:
-        inherit;
-
-    font-size:
-        18px;
-
-    font-weight:
-        bold;
-
-    letter-spacing:
-        1px;
-
-    cursor:
-        pointer;
-
-}
-
-
-.main-button {
+    border-radius: 999px;
 
     background:
-        #d1a74a;
+        #d6a84f;
 
     color:
-        #302919;
+        #292015;
 
+    font-weight: 900;
+
+    font-size: 17px;
+
+    letter-spacing: 1px;
+
+    box-shadow:
+        0 8px 20px
+        rgba(0,0,0,.3);
+
+    transition:
+        transform .15s,
+        filter .15s;
 }
 
 
-.main-button:hover {
+#start-button:hover {
 
     transform:
         translateY(-2px);
 
-}
-
-
-.secondary-button {
-
-    margin-top:
-        10px;
-
-    background:
-        rgba(255,255,255,.12);
-
-    color:
-        white;
-
+    filter:
+        brightness(1.08);
 }
 
 
 .creator {
 
-    margin-top:
-        30px;
+    margin-top: 25px;
 
-    font-size:
-        13px;
+    font-size: 14px;
 
-    color:
-        #aaa;
-
+    color: #bbb4a8;
 }
 
 
-.creator strong {
+.version {
 
-    color:
-        #e2bd69;
+    margin-top: 8px;
 
+    font-size: 11px;
+
+    color: #777;
 }
 
 
-/* =====================================================
+/* =========================================================
+   GAME
+========================================================= */
+
+#game-container {
+
+    position: fixed;
+
+    inset: 0;
+
+    overflow: hidden;
+
+    background: #bda16d;
+}
+
+
+#game {
+
+    position: absolute;
+
+    inset: 0;
+
+    display: block;
+
+    width: 100%;
+
+    height: 100%;
+}
+
+
+/* =========================================================
    HUD
-===================================================== */
+========================================================= */
 
-#hud {
+#top-hud {
 
-    position:
-        fixed;
+    position: absolute;
 
-    top:
-        0;
+    top: 12px;
 
-    left:
-        0;
+    left: 12px;
 
-    right:
-        0;
+    right: 12px;
 
-    z-index:
-        100;
+    z-index: 50;
 
-    display:
-        grid;
+    display: flex;
 
-    grid-template-columns:
-        1fr auto 1fr;
+    align-items: center;
 
-    align-items:
-        center;
+    gap: 12px;
+
+    pointer-events: none;
+}
+
+
+.game-title {
 
     padding:
-        12px 18px;
+        9px 13px;
+
+    border-radius: 10px;
 
     background:
-        linear-gradient(
-            rgba(26,31,25,.88),
-            rgba(26,31,25,.58)
-        );
+        rgba(25,24,20,.78);
 
-    color:
-        white;
+    color: white;
 
-    pointer-events:
-        none;
+    font-weight: 900;
 
+    font-size: 12px;
+
+    letter-spacing: .7px;
 }
 
 
-.hud-title {
-
-    font-weight:
-        bold;
-
-    letter-spacing:
-        1px;
-
-}
-
-
-.zone-name {
-
-    font-size:
-        13px;
-
-    color:
-        #d4b45f;
-
-    margin-top:
-        3px;
-
-}
-
-
-.hud-center {
-
-    text-align:
-        center;
-
-}
-
-
-.mission-hud {
+#location-hud {
 
     padding:
-        7px 15px;
+        9px 13px;
 
-    border-radius:
-        20px;
-
-    background:
-        rgba(0,0,0,.35);
-
-    color:
-        #f1dfaa;
-
-    font-size:
-        14px;
-
-}
-
-
-.hud-right {
-
-    display:
-        flex;
-
-    justify-content:
-        flex-end;
-
-    gap:
-        15px;
-
-    font-size:
-        14px;
-
-}
-
-
-/* =====================================================
-   CONTROLES
-===================================================== */
-
-.controls {
-
-    position:
-        fixed;
-
-    left:
-        15px;
-
-    bottom:
-        15px;
-
-    z-index:
-        90;
-
-    padding:
-        8px 12px;
-
-    border-radius:
-        8px;
-
-    color:
-        rgba(255,255,255,.85);
+    border-radius: 10px;
 
     background:
-        rgba(20,25,20,.65);
+        rgba(255,255,255,.82);
 
-    font-family:
-        Arial,
-        sans-serif;
+    color: #3b3327;
 
-    font-size:
-        11px;
+    font-weight: bold;
 
-}
-
-
-/* =====================================================
-   MINIMAPA
-===================================================== */
-
-#minimap-container {
-
-    position:
-        fixed;
-
-    right:
-        15px;
-
-    top:
-        70px;
-
-    z-index:
-        90;
-
-    padding:
-        5px;
-
-    background:
-        rgba(24,28,23,.8);
-
-    border:
-        1px solid
-        rgba(255,255,255,.2);
-
-    border-radius:
-        7px;
-
-}
-
-
-#minimap {
-
-    display:
-        block;
-
-    width:
-        220px;
-
-    height:
-        150px;
-
-}
-
-
-#minimap-label {
-
-    position:
-        absolute;
-
-    right:
-        7px;
-
-    top:
-        7px;
-
-    font:
-        bold 10px Arial;
-
-    color:
-        white;
-
-    background:
-        rgba(0,0,0,.5);
-
-    padding:
-        3px 5px;
-
-}
-
-
-/* =====================================================
-   MODALES
-===================================================== */
-
-.modal {
-
-    position:
-        fixed;
-
-    inset:
-        0;
-
-    z-index:
-        500;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    background:
-        rgba(0,0,0,.55);
-
-    backdrop-filter:
-        blur(3px);
-
-}
-
-
-.modal-card {
-
-    position:
-        relative;
-
-    width:
-        min(560px, 90vw);
-
-    max-height:
-        80vh;
-
-    overflow:
-        auto;
-
-    padding:
-        32px;
-
-    border-radius:
-        14px;
-
-    background:
-        #e9dcc0;
-
-    color:
-        #332d23;
-
-    box-shadow:
-        0 20px 60px
-        rgba(0,0,0,.5);
-
-}
-
-
-.modal-card h2 {
-
-    margin-bottom:
-        15px;
-
-    color:
-        #4d412d;
-
-}
-
-
-.close-button {
-
-    position:
-        absolute;
-
-    top:
-        10px;
-
-    right:
-        12px;
-
-    width:
-        34px;
-
-    height:
-        34px;
-
-    border:
-        none;
-
-    border-radius:
-        50%;
-
-    background:
-        #594b39;
-
-    color:
-        white;
-
-    font-size:
-        22px;
-
-    cursor:
-        pointer;
-
-}
-
-
-.modal-icon {
-
-    font-size:
-        45px;
-
-    margin-bottom:
-        10px;
-
-}
-
-
-/* =====================================================
-   DIÁLOGOS
-===================================================== */
-
-.dialogue {
-
-    position:
-        fixed;
-
-    left:
-        50%;
-
-    bottom:
-        30px;
-
-    transform:
-        translateX(-50%);
-
-    z-index:
-        600;
-
-    width:
-        min(850px, 92vw);
-
-}
-
-
-.dialogue-card {
-
-    display:
-        flex;
-
-    gap:
-        20px;
-
-    padding:
-        20px;
-
-    border:
-        1px solid
-        rgba(255,255,255,.25);
-
-    border-radius:
-        14px;
-
-    background:
-        rgba(35,38,32,.96);
-
-    color:
-        white;
-
-    box-shadow:
-        0 20px 60px
-        rgba(0,0,0,.5);
-
-}
-
-
-.dialogue-avatar {
-
-    min-width:
-        70px;
-
-    height:
-        70px;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    border-radius:
-        50%;
-
-    background:
-        #a98a55;
-
-    font-size:
-        34px;
-
-}
-
-
-.dialogue-content {
-
-    flex:
-        1;
-
-}
-
-
-.dialogue-content h3 {
-
-    color:
-        #e1bc68;
-
-    margin-bottom:
-        8px;
-
-}
-
-
-.dialogue-content p {
-
-    line-height:
-        1.55;
-
-    color:
-        #eee;
-
-}
-
-
-.dialogue-button {
-
-    margin-top:
-        14px;
-
-    padding:
-        9px 18px;
-
-    border:
-        none;
-
-    border-radius:
-        7px;
-
-    background:
-        #d1a74a;
-
-    color:
-        #332a1c;
-
-    cursor:
-        pointer;
-
-    font-weight:
-        bold;
-
-}
-
-
-/* =====================================================
-   INVENTARIO
-===================================================== */
-
-.inventory-card {
-
-    line-height:
-        1.7;
-
-}
-
-
-#inventory-items {
-
-    padding:
-        15px;
-
-    margin:
-        15px 0;
-
-    border-radius:
-        8px;
-
-    background:
-        rgba(0,0,0,.06);
-
+    font-size: 12px;
 }
 
 
 .stats {
 
-    display:
-        grid;
+    margin-left: auto;
 
-    gap:
-        8px;
+    display: flex;
 
+    gap: 6px;
 }
 
 
-/* =====================================================
-   HISTORIA
-===================================================== */
-
-.history-card {
-
-    max-width:
-        700px;
-
-}
-
-
-.history-entry {
+.stats span {
 
     padding:
-        15px 0;
+        8px 10px;
 
-    border-bottom:
-        1px solid
-        rgba(0,0,0,.12);
+    border-radius: 9px;
 
+    background:
+        rgba(25,24,20,.78);
+
+    color: white;
+
+    font-size: 12px;
 }
 
 
-.history-entry h3 {
+/* =========================================================
+   MISIÓN HUD
+========================================================= */
 
-    color:
-        #80612c;
+#mission-hud {
 
-    margin-bottom:
-        5px;
+    position: absolute;
 
-}
+    top: 60px;
 
-
-.history-entry p {
-
-    line-height:
-        1.6;
-
-}
-
-
-/* =====================================================
-   NOTIFICACIÓN
-===================================================== */
-
-.notification {
-
-    position:
-        fixed;
-
-    left:
-        50%;
-
-    top:
-        100px;
+    left: 50%;
 
     transform:
         translateX(-50%);
 
-    z-index:
-        700;
+    z-index: 45;
 
     padding:
-        12px 22px;
+        8px 16px;
 
-    border-radius:
-        30px;
+    border-radius: 999px;
 
     background:
-        rgba(31,37,30,.94);
+        rgba(28,29,25,.82);
 
-    color:
-        #f0d27f;
+    color: white;
 
-    box-shadow:
-        0 8px 30px
-        rgba(0,0,0,.35);
+    font-size: 12px;
 
-    animation:
-        notificationIn
-        .3s ease;
-
+    pointer-events: none;
 }
 
 
-@keyframes notificationIn {
+/* =========================================================
+   MAPA
+========================================================= */
+
+#map-container {
+
+    position: absolute;
+
+    top: 70px;
+
+    right: 14px;
+
+    z-index: 40;
+
+    padding: 7px;
+
+    border-radius: 13px;
+
+    background:
+        rgba(28,27,23,.85);
+
+    border:
+        1px solid
+        rgba(255,255,255,.2);
+}
+
+
+.map-title {
+
+    color: white;
+
+    font-size: 10px;
+
+    font-weight: 900;
+
+    margin:
+        2px 4px 5px;
+}
+
+
+#minimap {
+
+    display: block;
+
+    width: 190px;
+
+    height: 130px;
+
+    border-radius: 8px;
+
+    image-rendering: auto;
+}
+
+
+/* =========================================================
+   INTERACTION HINT
+========================================================= */
+
+#interaction-hint {
+
+    position: absolute;
+
+    left: 50%;
+
+    bottom: 95px;
+
+    transform:
+        translateX(-50%);
+
+    z-index: 100;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding:
+        9px 15px;
+
+    border-radius: 999px;
+
+    background:
+        rgba(20,20,18,.9);
+
+    color: white;
+
+    box-shadow:
+        0 6px 20px
+        rgba(0,0,0,.35);
+
+    pointer-events: none;
+}
+
+
+#interaction-icon {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 27px;
+
+    height: 27px;
+
+    border-radius: 7px;
+
+    background: #d6a84f;
+
+    color: #231d14;
+
+    font-weight: 900;
+}
+
+
+#interaction-text {
+
+    font-size: 13px;
+
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   GLOBO DE DIÁLOGO
+========================================================= */
+
+#speech-bubble {
+
+    position: absolute;
+
+    left: 50%;
+
+    bottom: 155px;
+
+    transform:
+        translateX(-50%);
+
+    z-index: 120;
+
+    width: min(
+        430px,
+        88vw
+    );
+
+    padding:
+        13px 16px;
+
+    border-radius: 15px;
+
+    background:
+        rgba(255,250,235,.97);
+
+    color:
+        #29241d;
+
+    border:
+        2px solid
+        rgba(73,58,39,.25);
+
+    box-shadow:
+        0 12px 35px
+        rgba(0,0,0,.32);
+
+    animation:
+        bubbleIn .18s ease-out;
+}
+
+
+#speech-bubble::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+
+    bottom: -12px;
+
+    transform:
+        translateX(-50%);
+
+    border-left:
+        12px solid transparent;
+
+    border-right:
+        12px solid transparent;
+
+    border-top:
+        12px solid
+        #fff aebd;
+}
+
+
+#speech-name {
+
+    color: #765331;
+
+    font-size: 12px;
+
+    font-weight: 900;
+
+    text-transform: uppercase;
+
+    margin-bottom: 5px;
+}
+
+
+#speech-text {
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size: 17px;
+
+    line-height: 1.35;
+}
+
+
+.speech-help {
+
+    margin-top: 8px;
+
+    color: #8c8173;
+
+    font-size: 10px;
+}
+
+
+@keyframes bubbleIn {
 
     from {
         opacity: 0;
         transform:
-            translate(-50%,-15px);
+            translateX(-50%)
+            translateY(10px);
     }
 
     to {
         opacity: 1;
         transform:
-            translate(-50%,0);
+            translateX(-50%)
+            translateY(0);
     }
-
 }
 
 
-/* =====================================================
-   CRÉDITO
-===================================================== */
+/* =========================================================
+   PANELES
+========================================================= */
 
-#creator-credit {
+.panel {
 
-    position:
-        fixed;
+    position: absolute;
 
-    right:
-        15px;
+    inset: 0;
 
-    bottom:
-        12px;
+    z-index: 500;
 
-    z-index:
-        80;
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+        rgba(0,0,0,.48);
+}
+
+
+.panel-content {
+
+    width: min(
+        560px,
+        94vw
+    );
+
+    max-height: 82vh;
+
+    overflow: auto;
+
+    padding: 25px;
+
+    border-radius: 20px;
+
+    background:
+        #f4edda;
 
     color:
-        rgba(255,255,255,.45);
+        #302a21;
 
-    font:
-        10px Arial;
-
+    box-shadow:
+        0 25px 80px
+        rgba(0,0,0,.45);
 }
 
 
-/* =====================================================
-   MOBILE
-===================================================== */
+.panel-title {
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size: 26px;
+
+    font-weight: bold;
+
+    color:
+        #60472e;
+
+    margin-bottom: 15px;
+}
+
+
+#dialogue-text,
+#mission-description {
+
+    line-height: 1.6;
+
+    font-size: 16px;
+}
+
+
+.panel-content button {
+
+    margin-top: 22px;
+
+    padding:
+        11px 22px;
+
+    border: 0;
+
+    border-radius: 9px;
+
+    background:
+        #60472e;
+
+    color: white;
+
+    font-weight: bold;
+}
+
+
+#inventory-items {
+
+    line-height: 1.7;
+
+    margin-bottom: 15px;
+}
+
+
+.inventory-stat {
+
+    margin-top: 8px;
+
+    font-weight: bold;
+}
+
+
+.panel-content hr {
+
+    margin:
+        15px 0;
+
+    border: 0;
+
+    border-top:
+        1px solid
+        #d3c8b3;
+}
+
+
+/* =========================================================
+   INTERIOR
+========================================================= */
+
+#interior-overlay {
+
+    position: absolute;
+
+    top: 78px;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    z-index: 70;
+
+    padding:
+        9px 18px;
+
+    border-radius: 10px;
+
+    text-align: center;
+
+    color: white;
+
+    background:
+        rgba(35,29,23,.85);
+
+    pointer-events: none;
+}
+
+
+#interior-title {
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size: 18px;
+
+    font-weight: bold;
+}
+
+
+#interior-subtitle {
+
+    margin-top: 3px;
+
+    font-size: 10px;
+
+    opacity: .75;
+}
+
+
+/* =========================================================
+   CONTROLES MÓVILES
+========================================================= */
 
 #mobile-controls {
 
-    display:
-        none;
+    position: absolute;
 
-    position:
-        fixed;
+    left: 0;
 
-    inset:
-        auto 0 0 0;
+    right: 0;
 
-    z-index:
-        200;
+    bottom: 28px;
+
+    z-index: 300;
+
+    display: none;
+
+    justify-content: space-between;
+
+    align-items: flex-end;
 
     padding:
-        10px 15px 20px;
+        0 22px;
 
-    pointer-events:
-        none;
-
+    pointer-events: none;
 }
 
 
-.mobile-dpad {
+.dpad {
 
-    position:
-        relative;
+    position: relative;
 
-    width:
-        150px;
+    width: 145px;
 
-    height:
-        145px;
+    height: 145px;
 
+    pointer-events: auto;
 }
 
 
-.mobile-key,
-.action-key {
+.control {
 
-    position:
-        absolute;
+    position: absolute;
 
-    width:
-        52px;
+    width: 50px;
 
-    height:
-        52px;
+    height: 50px;
 
-    border:
-        1px solid
+    border: 1px solid
         rgba(255,255,255,.2);
 
-    border-radius:
-        12px;
+    border-radius: 13px;
 
     background:
-        rgba(30,35,30,.78);
+        rgba(30,30,27,.75);
+
+    color: white;
+
+    font-size: 20px;
+
+    backdrop-filter:
+        blur(5px);
+
+    -webkit-backdrop-filter:
+        blur(5px);
+}
+
+
+.control:active,
+.action-button:active {
+
+    transform:
+        scale(.92);
+
+    background:
+        rgba(214,168,79,.9);
 
     color:
-        white;
-
-    font-size:
-        18px;
-
-    pointer-events:
-        auto;
-
-    touch-action:
-        none;
-
+        #272016;
 }
 
 
-.mobile-key.up {
+.up {
 
-    left:
-        50px;
+    top: 0;
 
-    top:
-        0;
-
+    left: 48px;
 }
 
 
-.mobile-key.left {
+.left {
 
-    left:
-        0;
+    top: 48px;
 
-    top:
-        50px;
-
+    left: 0;
 }
 
 
-.mobile-key.down {
+.down {
 
-    left:
-        50px;
+    bottom: 0;
 
-    top:
-        50px;
-
+    left: 48px;
 }
 
 
-.mobile-key.right {
+.right {
 
-    left:
-        100px;
+    top: 48px;
 
-    top:
-        50px;
-
+    right: 0;
 }
 
 
-.mobile-actions {
+.action-buttons {
 
-    position:
-        absolute;
+    display: flex;
 
-    right:
-        18px;
+    gap: 12px;
 
-    bottom:
-        25px;
-
-    display:
-        flex;
-
-    gap:
-        12px;
-
+    pointer-events: auto;
 }
 
 
-.action-key {
+.action-button {
 
-    position:
-        relative;
+    width: 62px;
 
-    width:
-        62px;
+    height: 62px;
 
-    height:
-        62px;
+    border: 1px solid
+        rgba(255,255,255,.2);
 
+    border-radius: 50%;
+
+    background:
+        rgba(30,30,27,.8);
+
+    color: white;
+
+    font-weight: 900;
+
+    font-size: 20px;
+
+    box-shadow:
+        0 8px 20px
+        rgba(0,0,0,.25);
 }
 
 
-/* =====================================================
+/* =========================================================
+   AYUDA
+========================================================= */
+
+#controls-help {
+
+    position: absolute;
+
+    left: 50%;
+
+    bottom: 12px;
+
+    transform:
+        translateX(-50%);
+
+    z-index: 20;
+
+    color:
+        rgba(255,255,255,.82);
+
+    background:
+        rgba(25,25,22,.65);
+
+    padding:
+        6px 11px;
+
+    border-radius: 7px;
+
+    font-size: 10px;
+
+    pointer-events: none;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   FIRMA
+========================================================= */
+
+#creator-watermark {
+
+    position: absolute;
+
+    right: 12px;
+
+    bottom: 10px;
+
+    z-index: 20;
+
+    color:
+        rgba(255,255,255,.6);
+
+    font-size: 9px;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
    UTILIDAD
-===================================================== */
+========================================================= */
 
 .hidden {
 
-    display:
-        none !important;
-
+    display: none !important;
 }
 
 
-/* =====================================================
+/* =========================================================
    RESPONSIVE
-===================================================== */
+========================================================= */
 
 @media (
     max-width: 800px
 ) {
 
-    #hud {
+    #mobile-controls {
 
-        grid-template-columns:
-            1fr auto;
-
+        display: flex;
     }
 
-    .hud-center {
 
-        display:
-            none;
+    #controls-help {
 
+        display: none;
     }
 
-    .hud-right {
 
-        gap:
-            8px;
+    #creator-watermark {
 
+        bottom: 7px;
+
+        left: 50%;
+
+        right: auto;
+
+        transform:
+            translateX(-50%);
+
+        white-space: nowrap;
     }
 
-    #minimap-container {
 
-        top:
-            62px;
+    #map-container {
 
-        right:
-            8px;
+        top: 62px;
 
+        right: 8px;
     }
+
 
     #minimap {
 
-        width:
-            150px;
+        width: 135px;
 
-        height:
-            100px;
-
+        height: 92px;
     }
 
-    .controls {
 
-        display:
-            none;
+    .game-title {
 
+        display: none;
     }
 
-    #mobile-controls {
 
-        display:
-            block;
+    #location-hud {
 
+        font-size: 11px;
+
+        max-width: 180px;
+
+        overflow: hidden;
+
+        white-space: nowrap;
+
+        text-overflow: ellipsis;
     }
 
-    #creator-credit {
 
-        display:
-            none;
-
-    }
-
-    .start-card {
+    .stats span {
 
         padding:
-            30px 20px;
+            7px 8px;
 
+        font-size: 10px;
     }
 
-    .start-card h1 {
 
-        font-size:
-            38px;
+    #mission-hud {
 
+        top: 48px;
+
+        left: 8px;
+
+        transform: none;
+
+        max-width: 190px;
+
+        white-space: nowrap;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+    }
+
+
+    #speech-bubble {
+
+        bottom: 188px;
+
+        width: 90vw;
+    }
+
+
+    #interaction-hint {
+
+        bottom: 178px;
     }
 
 }
 
 
 @media (
-    max-width: 500px
+    max-height: 600px
 ) {
 
-    .dialogue {
+    #mobile-controls {
 
-        bottom:
-            15px;
-
+        bottom: 12px;
     }
 
-    .dialogue-card {
 
-        gap:
-            10px;
+    .dpad {
 
-        padding:
-            14px;
+        transform:
+            scale(.78);
 
+        transform-origin:
+            bottom left;
     }
 
-    .dialogue-avatar {
 
-        min-width:
-            48px;
+    .action-buttons {
 
-        width:
-            48px;
+        transform:
+            scale(.85);
 
-        height:
-            48px;
-
-        font-size:
-            24px;
-
-    }
-
-    .dialogue-content p {
-
-        font-size:
-            14px;
-
+        transform-origin:
+            bottom right;
     }
 
 }
+```
