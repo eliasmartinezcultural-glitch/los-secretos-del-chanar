@@ -1,1151 +1,1009 @@
-```css
-/* =========================================================
+/* =====================================================
    LOS SECRETOS DEL CHAÑAR
-   V18.0 — PUEBLO VIVO
-========================================================= */
+   V19.0
+   ESTILO — PUEBLO VIVO
+===================================================== */
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
 html,
 body {
+
     width: 100%;
     height: 100%;
+
     overflow: hidden;
-    background: #151515;
+
+    background:
+        #18251d;
+
     font-family:
         Arial,
         Helvetica,
         sans-serif;
+
+    color: white;
+
     touch-action: none;
 }
 
-button {
-    font-family: inherit;
-    cursor: pointer;
+
+/* =====================================================
+   CANVAS
+===================================================== */
+
+#game {
+
+    position: fixed;
+
+    left: 0;
+    top: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    display: block;
+
+    background:
+        #c9aa72;
+
+    touch-action: none;
 }
 
 
-/* =========================================================
+/* =====================================================
    INICIO
-========================================================= */
+===================================================== */
 
-#start-screen {
+.screen {
 
     position: fixed;
 
     inset: 0;
 
-    z-index: 1000;
-
     display: flex;
-
-    align-items: center;
 
     justify-content: center;
 
+    align-items: center;
+
+    z-index: 1000;
+
     background:
         linear-gradient(
-            rgba(27, 42, 30, .72),
-            rgba(43, 34, 23, .82)
-        ),
-        radial-gradient(
-            circle at center,
-            #849b65,
-            #263426 70%
+            rgba(15,30,20,.75),
+            rgba(15,30,20,.88)
         );
-
-    padding: 20px;
 }
 
 
-.start-card {
+.title-card {
 
-    width: min(
-        540px,
-        94vw
-    );
+    width:
+        min(92vw, 560px);
 
-    padding: 38px 28px;
+    padding:
+        42px 30px;
 
     text-align: center;
 
-    border-radius: 24px;
-
-    color: white;
-
     background:
-        rgba(34, 31, 25, .92);
+        rgba(28,42,31,.96);
 
     border:
         1px solid
         rgba(255,255,255,.18);
 
+    border-radius:
+        18px;
+
     box-shadow:
-        0 25px 80px
+        0 30px 80px
         rgba(0,0,0,.45);
 }
 
 
-.start-icon {
+.small-title {
 
-    font-size: 48px;
+    font-size: 12px;
 
-    margin-bottom: 12px;
+    letter-spacing:
+        4px;
+
+    opacity: .65;
+
+    margin-bottom:
+        14px;
 }
 
 
-.start-card h1 {
-
-    font-family:
-        Georgia,
-        serif;
+h1 {
 
     font-size:
-        clamp(34px, 8vw, 62px);
+        clamp(38px, 8vw, 72px);
 
-    line-height: .92;
+    line-height:
+        .92;
 
-    letter-spacing: 2px;
+    letter-spacing:
+        2px;
 
-    margin-bottom: 18px;
-}
-
-
-.subtitle {
-
-    font-size: 18px;
-
-    color: #d9c89b;
-
-    margin-bottom: 20px;
-}
-
-
-.intro {
-
-    max-width: 430px;
-
-    margin:
-        0 auto 28px;
-
-    line-height: 1.55;
-
-    color: #e4e0d7;
-}
-
-
-#start-button {
-
-    border: 0;
-
-    padding:
-        16px 42px;
-
-    border-radius: 999px;
-
-    background:
-        #d6a84f;
+    margin-bottom:
+        20px;
 
     color:
-        #292015;
-
-    font-weight: 900;
-
-    font-size: 17px;
-
-    letter-spacing: 1px;
-
-    box-shadow:
-        0 8px 20px
-        rgba(0,0,0,.3);
-
-    transition:
-        transform .15s,
-        filter .15s;
+        #f0d28c;
 }
 
 
-#start-button:hover {
+.title-card p {
+
+    color:
+        #d9ded5;
+
+    margin-bottom:
+        28px;
+
+    font-size:
+        17px;
+}
+
+
+button {
+
+    border: none;
+
+    border-radius:
+        10px;
+
+    padding:
+        13px 22px;
+
+    background:
+        #d3a84e;
+
+    color:
+        #20251e;
+
+    font-weight:
+        bold;
+
+    cursor:
+        pointer;
+
+    transition:
+        .2s;
+}
+
+
+button:hover {
 
     transform:
         translateY(-2px);
 
     filter:
-        brightness(1.08);
+        brightness(1.1);
 }
 
 
-.creator {
+#start-button {
 
-    margin-top: 25px;
+    font-size:
+        18px;
 
-    font-size: 14px;
+    padding:
+        16px 45px;
 
-    color: #bbb4a8;
+    margin-bottom:
+        25px;
 }
 
 
-.version {
+.controls-info {
 
-    margin-top: 8px;
+    display:
+        flex;
 
-    font-size: 11px;
+    flex-direction:
+        column;
 
-    color: #777;
+    gap:
+        5px;
+
+    font-size:
+        12px;
+
+    opacity:
+        .55;
 }
 
 
-/* =========================================================
-   GAME
-========================================================= */
+.created {
 
-#game-container {
+    margin-top:
+        25px;
 
-    position: fixed;
+    padding-top:
+        20px;
 
-    inset: 0;
+    border-top:
+        1px solid
+        rgba(255,255,255,.1);
 
-    overflow: hidden;
+    font-size:
+        11px;
 
-    background: #bda16d;
+    opacity:
+        .55;
 }
 
 
-#game {
-
-    position: absolute;
-
-    inset: 0;
-
-    display: block;
-
-    width: 100%;
-
-    height: 100%;
-}
-
-
-/* =========================================================
+/* =====================================================
    HUD
-========================================================= */
+===================================================== */
 
-#top-hud {
+#hud {
 
-    position: absolute;
+    position:
+        fixed;
 
-    top: 12px;
+    top:
+        15px;
 
-    left: 12px;
+    left:
+        15px;
 
-    right: 12px;
+    z-index:
+        20;
 
-    z-index: 50;
+    display:
+        flex;
 
-    display: flex;
+    flex-direction:
+        column;
 
-    align-items: center;
+    gap:
+        6px;
 
-    gap: 12px;
-
-    pointer-events: none;
+    pointer-events:
+        none;
 }
 
 
-.game-title {
+#location {
 
     padding:
-        9px 13px;
-
-    border-radius: 10px;
+        7px 12px;
 
     background:
-        rgba(25,24,20,.78);
+        rgba(20,30,22,.8);
 
-    color: white;
+    border-radius:
+        8px;
 
-    font-weight: 900;
+    font-size:
+        12px;
 
-    font-size: 12px;
-
-    letter-spacing: .7px;
+    letter-spacing:
+        1px;
 }
 
 
-#location-hud {
+#clock {
 
-    padding:
-        9px 13px;
+    font-size:
+        15px;
 
-    border-radius: 10px;
+    font-weight:
+        bold;
 
-    background:
-        rgba(255,255,255,.82);
-
-    color: #3b3327;
-
-    font-weight: bold;
-
-    font-size: 12px;
+    color:
+        #f3d88e;
 }
 
-
-.stats {
-
-    margin-left: auto;
-
-    display: flex;
-
-    gap: 6px;
-}
-
-
-.stats span {
-
-    padding:
-        8px 10px;
-
-    border-radius: 9px;
-
-    background:
-        rgba(25,24,20,.78);
-
-    color: white;
-
-    font-size: 12px;
-}
-
-
-/* =========================================================
-   MISIÓN HUD
-========================================================= */
 
 #mission-hud {
 
-    position: absolute;
-
-    top: 60px;
-
-    left: 50%;
-
-    transform:
-        translateX(-50%);
-
-    z-index: 45;
+    max-width:
+        270px;
 
     padding:
-        8px 16px;
-
-    border-radius: 999px;
+        8px 12px;
 
     background:
-        rgba(28,29,25,.82);
+        rgba(20,30,22,.72);
 
-    color: white;
+    border-left:
+        3px solid
+        #d5aa4b;
 
-    font-size: 12px;
+    border-radius:
+        5px;
 
-    pointer-events: none;
+    font-size:
+        12px;
 }
 
 
-/* =========================================================
-   MAPA
-========================================================= */
+/* =====================================================
+   BOTONES SUPERIORES
+===================================================== */
 
-#map-container {
+#top-buttons {
 
-    position: absolute;
+    position:
+        fixed;
 
-    top: 70px;
+    top:
+        15px;
 
-    right: 14px;
+    right:
+        15px;
 
-    z-index: 40;
+    z-index:
+        30;
 
-    padding: 7px;
+    display:
+        flex;
 
-    border-radius: 13px;
-
-    background:
-        rgba(28,27,23,.85);
-
-    border:
-        1px solid
-        rgba(255,255,255,.2);
+    gap:
+        8px;
 }
 
 
-.map-title {
+#top-buttons button {
 
-    color: white;
+    width:
+        42px;
 
-    font-size: 10px;
+    height:
+        42px;
 
-    font-weight: 900;
+    padding:
+        0;
 
-    margin:
-        2px 4px 5px;
+    border-radius:
+        50%;
+
+    background:
+        rgba(20,30,22,.85);
+
+    color:
+        white;
+
+    font-size:
+        19px;
+}
+
+
+/* =====================================================
+   MINIMAPA
+===================================================== */
+
+#minimap-container {
+
+    position:
+        fixed;
+
+    right:
+        15px;
+
+    top:
+        70px;
+
+    z-index:
+        20;
+
+    padding:
+        4px;
+
+    border-radius:
+        10px;
+
+    background:
+        rgba(20,30,22,.8);
+
+    box-shadow:
+        0 5px 20px
+        rgba(0,0,0,.3);
 }
 
 
 #minimap {
 
-    display: block;
+    display:
+        block;
 
-    width: 190px;
+    width:
+        220px;
 
-    height: 130px;
+    height:
+        150px;
 
-    border-radius: 8px;
-
-    image-rendering: auto;
+    border-radius:
+        7px;
 }
 
 
-/* =========================================================
-   INTERACTION HINT
-========================================================= */
+/* =====================================================
+   HINT
+===================================================== */
 
 #interaction-hint {
 
-    position: absolute;
+    position:
+        fixed;
 
-    left: 50%;
+    left:
+        50%;
 
-    bottom: 95px;
+    bottom:
+        25px;
 
     transform:
         translateX(-50%);
 
-    z-index: 100;
+    display:
+        none;
 
-    display: flex;
+    align-items:
+        center;
 
-    align-items: center;
-
-    gap: 9px;
+    gap:
+        8px;
 
     padding:
         9px 15px;
 
-    border-radius: 999px;
-
     background:
-        rgba(20,20,18,.9);
+        rgba(20,30,22,.9);
 
-    color: white;
+    border-radius:
+        20px;
 
-    box-shadow:
-        0 6px 20px
-        rgba(0,0,0,.35);
+    z-index:
+        50;
 
-    pointer-events: none;
+    font-size:
+        13px;
 }
 
 
 #interaction-icon {
 
-    display: inline-flex;
+    display:
+        flex;
 
-    align-items: center;
+    width:
+        25px;
 
-    justify-content: center;
+    height:
+        25px;
 
-    width: 27px;
+    justify-content:
+        center;
 
-    height: 27px;
+    align-items:
+        center;
 
-    border-radius: 7px;
-
-    background: #d6a84f;
-
-    color: #231d14;
-
-    font-weight: 900;
-}
-
-
-#interaction-text {
-
-    font-size: 13px;
-
-    font-weight: bold;
-}
-
-
-/* =========================================================
-   GLOBO DE DIÁLOGO
-========================================================= */
-
-#speech-bubble {
-
-    position: absolute;
-
-    left: 50%;
-
-    bottom: 155px;
-
-    transform:
-        translateX(-50%);
-
-    z-index: 120;
-
-    width: min(
-        430px,
-        88vw
-    );
-
-    padding:
-        13px 16px;
-
-    border-radius: 15px;
+    border-radius:
+        6px;
 
     background:
-        rgba(255,250,235,.97);
+        #d2a94e;
 
     color:
-        #29241d;
+        #222;
 
-    border:
-        2px solid
-        rgba(73,58,39,.25);
-
-    box-shadow:
-        0 12px 35px
-        rgba(0,0,0,.32);
-
-    animation:
-        bubbleIn .18s ease-out;
+    font-weight:
+        bold;
 }
 
 
-#speech-bubble::after {
-
-    content: "";
-
-    position: absolute;
-
-    left: 50%;
-
-    bottom: -12px;
-
-    transform:
-        translateX(-50%);
-
-    border-left:
-        12px solid transparent;
-
-    border-right:
-        12px solid transparent;
-
-    border-top:
-        12px solid
-        #fff aebd;
-}
-
-
-#speech-name {
-
-    color: #765331;
-
-    font-size: 12px;
-
-    font-weight: 900;
-
-    text-transform: uppercase;
-
-    margin-bottom: 5px;
-}
-
-
-#speech-text {
-
-    font-family:
-        Georgia,
-        serif;
-
-    font-size: 17px;
-
-    line-height: 1.35;
-}
-
-
-.speech-help {
-
-    margin-top: 8px;
-
-    color: #8c8173;
-
-    font-size: 10px;
-}
-
-
-@keyframes bubbleIn {
-
-    from {
-        opacity: 0;
-        transform:
-            translateX(-50%)
-            translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform:
-            translateX(-50%)
-            translateY(0);
-    }
-}
-
-
-/* =========================================================
+/* =====================================================
    PANELES
-========================================================= */
+===================================================== */
 
 .panel {
 
-    position: absolute;
+    position:
+        fixed;
 
-    inset: 0;
+    left:
+        50%;
 
-    z-index: 500;
+    top:
+        50%;
 
-    display: flex;
+    transform:
+        translate(-50%,-50%);
 
-    align-items: center;
+    width:
+        min(90vw, 500px);
 
-    justify-content: center;
+    max-height:
+        80vh;
 
-    padding: 20px;
+    overflow:
+        auto;
+
+    padding:
+        28px;
 
     background:
-        rgba(0,0,0,.48);
+        rgba(27,39,30,.97);
+
+    border:
+        1px solid
+        rgba(255,255,255,.15);
+
+    border-radius:
+        16px;
+
+    z-index:
+        200;
+
+    box-shadow:
+        0 30px 100px
+        rgba(0,0,0,.55);
 }
 
 
-.panel-content {
+.hidden {
 
-    width: min(
-        560px,
-        94vw
-    );
-
-    max-height: 82vh;
-
-    overflow: auto;
-
-    padding: 25px;
-
-    border-radius: 20px;
-
-    background:
-        #f4edda;
-
-    color:
-        #302a21;
-
-    box-shadow:
-        0 25px 80px
-        rgba(0,0,0,.45);
+    display:
+        none !important;
 }
 
 
 .panel-title {
 
-    font-family:
-        Georgia,
-        serif;
+    font-size:
+        11px;
 
-    font-size: 26px;
-
-    font-weight: bold;
+    letter-spacing:
+        3px;
 
     color:
-        #60472e;
+        #d6ad54;
 
-    margin-bottom: 15px;
+    margin-bottom:
+        12px;
 }
 
 
-#dialogue-text,
-#mission-description {
+.panel h2 {
 
-    line-height: 1.6;
+    margin-bottom:
+        12px;
 
-    font-size: 16px;
+    color:
+        #f2d99b;
 }
 
 
-.panel-content button {
+.panel p {
 
-    margin-top: 22px;
+    line-height:
+        1.55;
 
-    padding:
-        11px 22px;
+    color:
+        #dfe5dc;
 
-    border: 0;
-
-    border-radius: 9px;
-
-    background:
-        #60472e;
-
-    color: white;
-
-    font-weight: bold;
+    margin-bottom:
+        10px;
 }
 
 
-#inventory-items {
+.panel button {
 
-    line-height: 1.7;
-
-    margin-bottom: 15px;
+    margin-top:
+        18px;
 }
 
 
-.inventory-stat {
+/* =====================================================
+   DIALOGO
+===================================================== */
 
-    margin-top: 8px;
+#dialogue {
 
-    font-weight: bold;
-}
+    bottom:
+        25px;
 
-
-.panel-content hr {
-
-    margin:
-        15px 0;
-
-    border: 0;
-
-    border-top:
-        1px solid
-        #d3c8b3;
-}
-
-
-/* =========================================================
-   INTERIOR
-========================================================= */
-
-#interior-overlay {
-
-    position: absolute;
-
-    top: 78px;
-
-    left: 50%;
+    top:
+        auto;
 
     transform:
         translateX(-50%);
 
-    z-index: 70;
+    width:
+        min(92vw, 760px);
 
     padding:
-        9px 18px;
+        22px;
 
-    border-radius: 10px;
+}
 
-    text-align: center;
 
-    color: white;
+.dialogue-character {
+
+    font-size:
+        18px;
+
+    font-weight:
+        bold;
+
+    color:
+        #f0cf80;
+
+    margin-bottom:
+        10px;
+}
+
+
+#dialogue-text {
+
+    font-size:
+        16px;
+
+    line-height:
+        1.55;
+
+    min-height:
+        45px;
+
+    color:
+        #f2f4ed;
+}
+
+
+#dialogue-next {
+
+    float:
+        right;
+
+    margin-top:
+        15px;
+
+    padding:
+        8px 15px;
+
+    font-size:
+        11px;
+}
+
+
+/* =====================================================
+   DESCUBRIMIENTO
+===================================================== */
+
+.discovery {
+
+    position:
+        fixed;
+
+    left:
+        50%;
+
+    top:
+        22%;
+
+    transform:
+        translateX(-50%);
+
+    width:
+        min(90vw, 500px);
+
+    padding:
+        20px;
+
+    text-align:
+        center;
 
     background:
-        rgba(35,29,23,.85);
+        rgba(30,42,31,.95);
 
-    pointer-events: none;
+    border:
+        1px solid
+        #cba653;
+
+    border-radius:
+        12px;
+
+    z-index:
+        150;
+
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,.35);
+
+    animation:
+        discoveryIn .4s ease;
 }
 
 
-#interior-title {
+#discovery-title {
 
-    font-family:
-        Georgia,
-        serif;
+    font-size:
+        11px;
 
-    font-size: 18px;
+    letter-spacing:
+        3px;
 
-    font-weight: bold;
+    color:
+        #d7b458;
+
+    margin-bottom:
+        8px;
 }
 
 
-#interior-subtitle {
+#discovery-text {
 
-    margin-top: 3px;
+    font-size:
+        15px;
 
-    font-size: 10px;
-
-    opacity: .75;
+    line-height:
+        1.45;
 }
 
 
-/* =========================================================
-   CONTROLES MÓVILES
-========================================================= */
+@keyframes discoveryIn {
+
+    from {
+
+        opacity:
+            0;
+
+        transform:
+            translate(-50%,-15px);
+
+    }
+
+    to {
+
+        opacity:
+            1;
+
+        transform:
+            translate(-50%,0);
+
+    }
+
+}
+
+
+/* =====================================================
+   JOYSTICK
+===================================================== */
 
 #mobile-controls {
 
-    position: absolute;
+    position:
+        fixed;
 
-    left: 0;
+    inset:
+        0;
 
-    right: 0;
+    z-index:
+        60;
 
-    bottom: 28px;
-
-    z-index: 300;
-
-    display: none;
-
-    justify-content: space-between;
-
-    align-items: flex-end;
-
-    padding:
-        0 22px;
-
-    pointer-events: none;
+    pointer-events:
+        none;
 }
 
 
-.dpad {
+#joystick {
 
-    position: relative;
+    position:
+        absolute;
 
-    width: 145px;
+    left:
+        25px;
 
-    height: 145px;
+    bottom:
+        25px;
 
-    pointer-events: auto;
-}
+    width:
+        125px;
 
+    height:
+        125px;
 
-.control {
-
-    position: absolute;
-
-    width: 50px;
-
-    height: 50px;
-
-    border: 1px solid
-        rgba(255,255,255,.2);
-
-    border-radius: 13px;
+    border-radius:
+        50%;
 
     background:
-        rgba(30,30,27,.75);
+        rgba(20,30,22,.28);
 
-    color: white;
+    border:
+        2px solid
+        rgba(255,255,255,.18);
 
-    font-size: 20px;
+    pointer-events:
+        auto;
 
-    backdrop-filter:
-        blur(5px);
+    display:
+        flex;
 
-    -webkit-backdrop-filter:
-        blur(5px);
+    align-items:
+        center;
+
+    justify-content:
+        center;
 }
 
 
-.control:active,
-.action-button:active {
+#joystick-stick {
 
-    transform:
-        scale(.92);
+    width:
+        55px;
+
+    height:
+        55px;
+
+    border-radius:
+        50%;
 
     background:
-        rgba(214,168,79,.9);
-
-    color:
-        #272016;
-}
-
-
-.up {
-
-    top: 0;
-
-    left: 48px;
-}
-
-
-.left {
-
-    top: 48px;
-
-    left: 0;
-}
-
-
-.down {
-
-    bottom: 0;
-
-    left: 48px;
-}
-
-
-.right {
-
-    top: 48px;
-
-    right: 0;
-}
-
-
-.action-buttons {
-
-    display: flex;
-
-    gap: 12px;
-
-    pointer-events: auto;
-}
-
-
-.action-button {
-
-    width: 62px;
-
-    height: 62px;
-
-    border: 1px solid
-        rgba(255,255,255,.2);
-
-    border-radius: 50%;
-
-    background:
-        rgba(30,30,27,.8);
-
-    color: white;
-
-    font-weight: 900;
-
-    font-size: 20px;
+        rgba(225,190,105,.8);
 
     box-shadow:
-        0 8px 20px
-        rgba(0,0,0,.25);
+        0 4px 15px
+        rgba(0,0,0,.3);
 }
 
 
-/* =========================================================
-   AYUDA
-========================================================= */
+#mobile-interact {
 
-#controls-help {
+    position:
+        absolute;
 
-    position: absolute;
+    right:
+        28px;
 
-    left: 50%;
+    bottom:
+        42px;
 
-    bottom: 12px;
+    width:
+        70px;
 
-    transform:
-        translateX(-50%);
+    height:
+        70px;
 
-    z-index: 20;
-
-    color:
-        rgba(255,255,255,.82);
-
-    background:
-        rgba(25,25,22,.65);
+    border-radius:
+        50%;
 
     padding:
-        6px 11px;
+        0;
 
-    border-radius: 7px;
+    background:
+        rgba(213,170,78,.9);
 
-    font-size: 10px;
+    font-size:
+        22px;
 
-    pointer-events: none;
-
-    white-space: nowrap;
+    pointer-events:
+        auto;
 }
 
 
-/* =========================================================
-   FIRMA
-========================================================= */
+/* =====================================================
+   CELULAR
+===================================================== */
 
-#creator-watermark {
-
-    position: absolute;
-
-    right: 12px;
-
-    bottom: 10px;
-
-    z-index: 20;
-
-    color:
-        rgba(255,255,255,.6);
-
-    font-size: 9px;
-
-    pointer-events: none;
-}
-
-
-/* =========================================================
-   UTILIDAD
-========================================================= */
-
-.hidden {
-
-    display: none !important;
-}
-
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-
-@media (
-    max-width: 800px
-) {
+@media (min-width: 800px) {
 
     #mobile-controls {
 
-        display: flex;
+        display:
+            none;
+
     }
 
-
-    #controls-help {
-
-        display: none;
-    }
+}
 
 
-    #creator-watermark {
+@media (max-width: 799px) {
 
-        bottom: 7px;
-
-        left: 50%;
-
-        right: auto;
+    #minimap-container {
 
         transform:
-            translateX(-50%);
+            scale(.75);
 
-        white-space: nowrap;
+        transform-origin:
+            top right;
+
+        right:
+            5px;
+
+        top:
+            70px;
+
     }
 
+    #hud {
 
-    #map-container {
+        max-width:
+            230px;
 
-        top: 62px;
-
-        right: 8px;
     }
 
+    #location {
 
-    #minimap {
+        font-size:
+            10px;
 
-        width: 135px;
-
-        height: 92px;
     }
-
-
-    .game-title {
-
-        display: none;
-    }
-
-
-    #location-hud {
-
-        font-size: 11px;
-
-        max-width: 180px;
-
-        overflow: hidden;
-
-        white-space: nowrap;
-
-        text-overflow: ellipsis;
-    }
-
-
-    .stats span {
-
-        padding:
-            7px 8px;
-
-        font-size: 10px;
-    }
-
 
     #mission-hud {
 
-        top: 48px;
+        font-size:
+            10px;
 
-        left: 8px;
-
-        transform: none;
-
-        max-width: 190px;
-
-        white-space: nowrap;
-
-        overflow: hidden;
-
-        text-overflow: ellipsis;
     }
 
+    #dialogue {
 
-    #speech-bubble {
+        bottom:
+            15px;
 
-        bottom: 188px;
+        padding:
+            17px;
 
-        width: 90vw;
     }
 
+    #dialogue-text {
 
-    #interaction-hint {
+        font-size:
+            14px;
 
-        bottom: 178px;
     }
 
 }
 
 
-@media (
-    max-height: 600px
-) {
+/* =====================================================
+   ORIENTACIÓN
+===================================================== */
 
-    #mobile-controls {
+@media (orientation: landscape)
+       and (max-width: 799px) {
 
-        bottom: 12px;
+    #joystick {
+
+        width:
+            95px;
+
+        height:
+            95px;
+
     }
 
+    #joystick-stick {
 
-    .dpad {
+        width:
+            45px;
 
-        transform:
-            scale(.78);
+        height:
+            45px;
 
-        transform-origin:
-            bottom left;
     }
 
+    #mobile-interact {
 
-    .action-buttons {
+        width:
+            60px;
 
-        transform:
-            scale(.85);
+        height:
+            60px;
 
-        transform-origin:
-            bottom right;
     }
 
 }
-```
