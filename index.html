@@ -1,293 +1,342 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta charset="UTF-8">
 
-<meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width,
+        initial-scale=1.0,
+        maximum-scale=1.0,
+        user-scalable=no"
+    >
 
-<meta
-    name="viewport"
-    content="width=device-width,
-    initial-scale=1.0,
-    maximum-scale=1.0,
-    user-scalable=no"
->
+    <title>Los Secretos del Chañar</title>
 
-<title>Los Secretos del Chañar</title>
-
-<link
-    rel="stylesheet"
-    href="style.css"
->
-
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 </head>
 
 <body>
 
-<!-- ================================
-     PANTALLA DE INICIO
-================================ -->
+    <canvas id="game"></canvas>
 
-<div id="start-screen">
+    <!-- ==============================
+         PANTALLA DE INICIO
+    =============================== -->
 
-    <div class="start-box">
+    <section id="start-screen">
 
-        <div class="game-logo">
-            LOS SECRETOS
-            <span>DEL CHAÑAR</span>
+        <div class="start-card">
+
+            <div class="game-logo">
+                LOS SECRETOS<br>
+                <span>DEL CHAÑAR</span>
+            </div>
+
+            <p class="intro">
+                Una aventura por un pueblo,
+                sus historias, sus vecinos
+                y sus secretos.
+            </p>
+
+            <button id="start-button">
+                COMENZAR
+            </button>
+
+            <div class="controls-info">
+                PC: WASD / Flechas<br>
+                Celular: controles táctiles
+            </div>
+
+            <div class="creator">
+                Juego creado por<br>
+                <strong>Elías Martínez</strong>
+            </div>
+
         </div>
 
-        <p class="subtitle">
-            Un pueblo guarda más historias
-            de las que aparenta.
-        </p>
+    </section>
 
-        <button id="start-button">
-            COMENZAR
+
+    <!-- ==============================
+         HUD SUPERIOR
+    =============================== -->
+
+    <div id="hud">
+
+        <div class="hud-box">
+
+            <div id="clock">
+                08:00
+            </div>
+
+            <div id="day-label">
+                Día 1
+            </div>
+
+            <div id="weather-label">
+                ☀ Despejado
+            </div>
+
+        </div>
+
+
+        <div class="hud-box mission-box">
+
+            <small>OBJETIVO</small>
+
+            <div id="mission-hud">
+                Explorá el pueblo
+            </div>
+
+        </div>
+
+
+        <button
+            id="inventory-button"
+            class="hud-button"
+        >
+            🎒
         </button>
 
-        <p class="creator">
-            Juego creado por
-            <strong>Elías Martínez</strong>
-        </p>
-
     </div>
 
-</div>
 
+    <!-- ==============================
+         MINIMAPA
+    =============================== -->
 
-<!-- ================================
-     JUEGO
-================================ -->
+    <div id="map-container">
 
-<canvas id="game"></canvas>
-
-
-<!-- ================================
-     HUD
-================================ -->
-
-<div id="hud">
-
-    <div class="hud-top">
-
-        <div class="location-box">
-
-            <span id="location-name">
-                San Patricio del Chañar
-            </span>
-
-            <small id="clock">
-                08:00
-            </small>
-
-        </div>
-
-
-        <div class="mission-box">
-
-            <span id="mission-hud">
-                Explorá el pueblo
-            </span>
-
-        </div>
+        <canvas
+            id="minimap"
+            width="220"
+            height="150"
+        ></canvas>
 
     </div>
 
 
-    <div id="interaction-hint">
-        Acercate a una persona o lugar
-    </div>
+    <!-- ==============================
+         MENSAJE
+    =============================== -->
+
+    <div id="notification"></div>
 
 
-    <div id="status-message"></div>
-
-</div>
-
-
-<!-- ================================
-     MINIMAPA
-================================ -->
-
-<div id="map-container">
-
-    <canvas
-        id="minimap"
-        width="190"
-        height="130"
-    ></canvas>
-
-    <span>MAPA</span>
-
-</div>
-
-
-<!-- ================================
-     CONTROLES CELULAR
-================================ -->
-
-<div id="mobile-controls">
+    <!-- ==============================
+         DIALOGO
+    =============================== -->
 
     <div
-        id="joystick-area"
-        class="joystick-area"
+        id="dialogue"
+        class="panel hidden"
     >
 
-        <div
-            id="joystick"
-            class="joystick"
-        ></div>
+        <div class="dialogue-person">
+
+            <div id="dialogue-avatar">
+                👤
+            </div>
+
+            <div>
+
+                <div id="dialogue-name">
+                    Vecino
+                </div>
+
+                <div class="dialogue-role">
+                    Habitante de Chañar
+                </div>
+
+            </div>
+
+        </div>
+
+        <div id="dialogue-text">
+        </div>
+
+        <button id="dialogue-close">
+            Continuar
+        </button>
 
     </div>
 
 
-    <div class="mobile-actions">
+    <!-- ==============================
+         MISION
+    =============================== -->
 
-        <button
-            id="mobile-interact"
-            class="action-button"
-        >
-            E
-        </button>
+    <div
+        id="mission-panel"
+        class="panel hidden"
+    >
 
-        <button
-            id="mobile-inventory"
-            class="action-button"
-        >
-            M
+        <h2 id="mission-title">
+            Misión
+        </h2>
+
+        <p id="mission-description">
+        </p>
+
+        <button id="mission-close">
+            Entendido
         </button>
 
     </div>
 
-</div>
 
+    <!-- ==============================
+         INVENTARIO
+    =============================== -->
 
-<!-- ================================
-     DIÁLOGO
-================================ -->
+    <div
+        id="inventory-panel"
+        class="panel hidden"
+    >
 
-<div
-    id="dialogue"
-    class="panel hidden"
->
+        <h2>
+            Inventario
+        </h2>
 
-    <div class="dialogue-avatar"></div>
+        <div class="inventory-stats">
 
-    <div class="dialogue-content">
+            <div>
+                📷 Fotografías:
+                <strong id="photo-count">0</strong>
+            </div>
 
-        <div
-            id="dialogue-name"
-            class="dialogue-name"
-        ></div>
+            <div>
+                📜 Documentos:
+                <strong id="document-count">0</strong>
+            </div>
 
-        <div
-            id="dialogue-text"
-            class="dialogue-text"
-        ></div>
+            <div>
+                🥖 Pan:
+                <strong id="bread-count">0</strong>
+            </div>
 
-        <button
-            id="dialogue-close"
-        >
+            <div>
+                🧉 Mate:
+                <strong id="mate-count">0</strong>
+            </div>
+
+        </div>
+
+        <div id="inventory-items">
+        </div>
+
+        <button id="inventory-close">
             Cerrar
         </button>
 
     </div>
 
-</div>
 
-
-<!-- ================================
-     GLOBO DE DIÁLOGO
-================================ -->
-
-<div
-    id="speech-bubble"
-    class="speech-bubble hidden"
-></div>
-
-
-<!-- ================================
-     MISIÓN
-================================ -->
-
-<div
-    id="mission-panel"
-    class="panel hidden"
->
-
-    <h2 id="mission-title"></h2>
-
-    <p id="mission-description"></p>
-
-    <button id="mission-close">
-        Continuar
-    </button>
-
-</div>
-
-
-<!-- ================================
-     INVENTARIO
-================================ -->
-
-<div
-    id="inventory-panel"
-    class="panel inventory hidden"
->
-
-    <h2>
-        Mochila
-    </h2>
+    <!-- ==============================
+         INTERFAZ INTERIOR
+    =============================== -->
 
     <div
-        id="inventory-items"
+        id="interaction-panel"
+        class="panel hidden"
     >
-        Inventario vacío.
-    </div>
 
-    <button id="inventory-close">
-        Cerrar
-    </button>
+        <h2 id="interaction-title">
+            Lugar
+        </h2>
 
-</div>
+        <p id="interaction-description">
+        </p>
 
+        <div id="interaction-actions">
+        </div>
 
-<!-- ================================
-     INTERIOR
-================================ -->
-
-<div
-    id="interior-panel"
-    class="hidden"
->
-
-    <div class="interior-header">
-
-        <span id="interior-title">
-            Interior
-        </span>
-
-        <button id="exit-building">
-            SALIR
+        <button id="interaction-close">
+            Salir
         </button>
 
     </div>
 
-    <div id="interior-content"></div>
 
-</div>
+    <!-- ==============================
+         CONTROLES MOVILES
+    =============================== -->
+
+    <div id="mobile-controls">
+
+        <div class="dpad">
+
+            <button
+                class="move-btn"
+                data-key="arrowup"
+            >
+                ▲
+            </button>
+
+            <div>
+
+                <button
+                    class="move-btn"
+                    data-key="arrowleft"
+                >
+                    ◀
+                </button>
+
+                <button
+                    class="move-btn"
+                    data-key="arrowdown"
+                >
+                    ▼
+                </button>
+
+                <button
+                    class="move-btn"
+                    data-key="arrowright"
+                >
+                    ▶
+                </button>
+
+            </div>
+
+        </div>
 
 
-<!-- ================================
-     NOTIFICACIÓN
-================================ -->
+        <div class="action-buttons">
 
-<div
-    id="toast"
-    class="toast hidden"
-></div>
+            <button
+                id="mobile-interact"
+                class="action-btn"
+            >
+                E
+            </button>
+
+            <button
+                id="mobile-inventory"
+                class="action-btn"
+            >
+                🎒
+            </button>
+
+        </div>
+
+    </div>
 
 
-<script src="game.js"></script>
+    <!-- ==============================
+         CREDITO
+    =============================== -->
+
+    <div id="creator-watermark">
+        LOS SECRETOS DEL CHAÑAR<br>
+        <span>Elías Martínez</span>
+    </div>
+
+
+    <script src="game.js"></script>
 
 </body>
 </html>
