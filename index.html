@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -8,401 +9,448 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     >
 
-    <title>Los Secretos del Chañar — V17.0</title>
+    <title>
+        Los Secretos del Chañar
+    </title>
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
 
 <body>
 
-    <!-- =====================================================
-         JUEGO
-    ====================================================== -->
+<!-- =====================================================
+     JUEGO
+===================================================== -->
 
-    <main id="game-container">
-
-        <canvas id="game"></canvas>
+<canvas id="game"></canvas>
 
 
-        <!-- =================================================
-             HUD SUPERIOR
-        ================================================== -->
+<!-- =====================================================
+     PANTALLA DE INICIO
+===================================================== -->
 
-        <section id="top-hud">
+<section
+    id="start-screen"
+    class="screen"
+>
 
-            <div class="brand">
+    <div class="start-card">
 
-                <div class="brand-title">
-                    LOS SECRETOS DEL CHAÑAR
-                </div>
-
-                <div class="brand-subtitle">
-                    Una historia para descubrir
-                </div>
-
-            </div>
-
-
-            <div id="mission-hud">
-                Explorá el pueblo
-            </div>
-
-
-            <button
-                id="inventory-button"
-                class="hud-button"
-                type="button"
-            >
-                🎒
-                <span>Inventario</span>
-            </button>
-
-        </section>
-
-
-        <!-- =================================================
-             MINIMAPA
-        ================================================== -->
-
-        <div id="minimap-container">
-
-            <div class="map-title">
-                CHAÑAR
-            </div>
-
-            <canvas
-                id="minimap"
-                width="220"
-                height="150"
-            ></canvas>
-
+        <div class="game-logo">
+            🌿
         </div>
 
+        <h1>
+            LOS SECRETOS<br>
+            DEL CHAÑAR
+        </h1>
 
-        <!-- =================================================
-             INDICADOR DE INTERACCIÓN
-        ================================================== -->
+        <p class="subtitle">
+            Una aventura por San Patricio del Chañar
+        </p>
+
+        <p class="intro">
+            Explorá el pueblo, conocé a sus habitantes,
+            descubrí historias, recorré las chacras,
+            aprendé sobre su pasado y desbloqueá nuevos lugares.
+        </p>
+
+        <button
+            id="start-button"
+            class="main-button"
+        >
+            COMENZAR
+        </button>
+
+        <button
+            id="continue-button"
+            class="secondary-button hidden"
+        >
+            CONTINUAR
+        </button>
+
+        <p class="creator">
+            Juego creado por
+            <strong>Elías Martínez</strong>
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     HUD
+===================================================== -->
+
+<header id="hud">
+
+    <div class="hud-left">
+
+        <div class="hud-title">
+            LOS SECRETOS DEL CHAÑAR
+        </div>
 
         <div
-            id="interaction-hint"
-            class="interaction-hint hidden"
+            id="zone-name"
+            class="zone-name"
         >
-            <span class="key">E</span>
+            Plaza Central
+        </div>
 
-            <span>
-                Interactuar
+    </div>
+
+
+    <div class="hud-center">
+
+        <div
+            id="mission-hud"
+            class="mission-hud"
+        >
+            Explorá el pueblo
+        </div>
+
+    </div>
+
+
+    <div class="hud-right">
+
+        <div>
+            ⭐
+            <span id="xp">
+                0
             </span>
         </div>
 
-
-        <!-- =================================================
-             CONTROLES CELULAR
-        ================================================== -->
-
-        <section id="mobile-controls">
-
-            <div id="joystick">
-
-                <div
-                    id="joystick-knob"
-                ></div>
-
-            </div>
-
-
-            <div id="mobile-actions">
-
-                <button
-                    id="mobile-interact"
-                    class="mobile-action"
-                    type="button"
-                >
-                    E
-                </button>
-
-                <button
-                    id="mobile-inventory"
-                    class="mobile-action"
-                    type="button"
-                >
-                    🎒
-                </button>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             PANEL DE DIÁLOGO
-        ================================================== -->
-
-        <section
-            id="dialogue"
-            class="panel hidden"
-        >
-
-            <div class="dialogue-inner">
-
-                <div
-                    id="dialogue-name"
-                    class="dialogue-name"
-                >
-                    PERSONAJE
-                </div>
-
-
-                <div
-                    id="dialogue-text"
-                    class="dialogue-text"
-                >
-                    ...
-                </div>
-
-
-                <button
-                    id="dialogue-close"
-                    class="primary-button"
-                    type="button"
-                >
-                    Continuar
-                </button>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             PANEL DE MISIÓN
-        ================================================== -->
-
-        <section
-            id="mission-panel"
-            class="panel hidden"
-        >
-
-            <div class="mission-card">
-
-                <div class="panel-icon">
-                    📜
-                </div>
-
-                <div
-                    id="mission-title"
-                    class="panel-title"
-                >
-                    Misión
-                </div>
-
-
-                <div
-                    id="mission-description"
-                    class="panel-description"
-                >
-                    ...
-                </div>
-
-
-                <button
-                    id="mission-close"
-                    class="primary-button"
-                    type="button"
-                >
-                    Entendido
-                </button>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             INVENTARIO
-        ================================================== -->
-
-        <section
-            id="inventory-panel"
-            class="panel hidden"
-        >
-
-            <div class="inventory-card">
-
-                <div class="panel-header">
-
-                    <div>
-                        🎒 INVENTARIO
-                    </div>
-
-                    <button
-                        id="inventory-close"
-                        class="close-button"
-                        type="button"
-                    >
-                        ×
-                    </button>
-
-                </div>
-
-
-                <div class="inventory-stats">
-
-                    <div class="inventory-stat">
-
-                        <span class="stat-icon">
-                            📷
-                        </span>
-
-                        <span>
-                            Fotografías:
-                            <strong id="photo-count">
-                                0
-                            </strong>
-                        </span>
-
-                    </div>
-
-
-                    <div class="inventory-stat">
-
-                        <span class="stat-icon">
-                            📜
-                        </span>
-
-                        <span>
-                            Documentos:
-                            <strong id="document-count">
-                                0
-                            </strong>
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <div
-                    id="inventory-items"
-                    class="inventory-items"
-                >
-                    Inventario vacío.
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             INFORMACIÓN DEL JUGADOR
-        ================================================== -->
-
-        <div id="player-info">
-
-            <div class="player-status">
-
-                <span class="status-dot"></span>
-
-                <span>
-                    Explorador
-                </span>
-
-            </div>
-
+        <div>
+            📖
+            <span id="history-count">
+                0
+            </span>
         </div>
 
+        <div>
+            📸
+            <span id="photo-count">
+                0
+            </span>
+        </div>
 
-        <!-- =================================================
-             PANTALLA DE INICIO
-        ================================================== -->
+    </div>
 
-        <section id="start-screen">
-
-            <div class="start-background"></div>
-
-
-            <div class="start-content">
-
-                <div class="start-eyebrow">
-                    OCARINA PRODUCCIONES PRESENTA
-                </div>
+</header>
 
 
-                <h1>
-                    LOS SECRETOS
-                    <br>
-                    DEL CHAÑAR
-                </h1>
+<!-- =====================================================
+     AYUDA
+===================================================== -->
+
+<div
+    id="controls"
+    class="controls"
+>
+
+    <span>
+        WASD / FLECHAS
+    </span>
+
+    <span>
+        E — INTERACTUAR
+    </span>
+
+    <span>
+        M — INVENTARIO
+    </span>
+
+</div>
 
 
-                <p class="start-description">
-                    Recorré las calles, conocé a sus habitantes,
-                    descubrí fotografías, documentos y pequeñas
-                    historias escondidas en San Patricio del Chañar.
-                </p>
+<!-- =====================================================
+     MINIMAPA
+===================================================== -->
+
+<div
+    id="minimap-container"
+>
+
+    <canvas
+        id="minimap"
+        width="220"
+        height="150"
+    ></canvas>
+
+    <div
+        id="minimap-label"
+    >
+        MAPA
+    </div>
+
+</div>
 
 
-                <div class="start-location">
-                    📍 San Patricio del Chañar · Neuquén
-                </div>
+<!-- =====================================================
+     PANEL DE MISIÓN
+===================================================== -->
+
+<section
+    id="mission-panel"
+    class="modal hidden"
+>
+
+    <div class="modal-card">
+
+        <button
+            id="mission-close"
+            class="close-button"
+        >
+            ×
+        </button>
+
+        <div class="modal-icon">
+            🎯
+        </div>
+
+        <h2 id="mission-title">
+            Misión
+        </h2>
+
+        <p id="mission-description">
+        </p>
+
+    </div>
+
+</section>
 
 
-                <button
-                    id="start-button"
-                    type="button"
-                >
-                    COMENZAR
-                </button>
+<!-- =====================================================
+     DIÁLOGO
+===================================================== -->
 
+<section
+    id="dialogue"
+    class="dialogue hidden"
+>
 
-                <div class="controls-description">
-
-                    <div>
-                        <strong>PC</strong>
-                        WASD / Flechas · E interactuar · M inventario
-                    </div>
-
-                    <div>
-                        <strong>CELULAR</strong>
-                        Joystick · E interactuar · 🎒 inventario
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             NOTIFICACIONES
-        ================================================== -->
+    <div class="dialogue-card">
 
         <div
-            id="notification"
-            class="notification hidden"
+            id="dialogue-avatar"
+            class="dialogue-avatar"
         >
-            <div id="notification-title"></div>
-            <div id="notification-text"></div>
+            👤
         </div>
 
+        <div class="dialogue-content">
 
-        <!-- =================================================
-             PIE
-        ================================================== -->
+            <h3
+                id="dialogue-name"
+            >
+                Personaje
+            </h3>
 
-        <footer id="game-footer">
-            LOS SECRETOS DEL CHAÑAR · V17.0
-        </footer>
+            <p
+                id="dialogue-text"
+            >
+            </p>
 
-    </main>
+            <button
+                id="dialogue-close"
+                class="dialogue-button"
+            >
+                CONTINUAR
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
 
 
-    <!-- =====================================================
-         JAVASCRIPT
-    ====================================================== -->
+<!-- =====================================================
+     INVENTARIO
+===================================================== -->
 
-    <script src="game.js"></script>
+<section
+    id="inventory-panel"
+    class="modal hidden"
+>
+
+    <div class="modal-card inventory-card">
+
+        <button
+            id="inventory-close"
+            class="close-button"
+        >
+            ×
+        </button>
+
+        <h2>
+            📖 Diario del viajero
+        </h2>
+
+        <div
+            id="inventory-items"
+        >
+            Inventario vacío.
+        </div>
+
+        <hr>
+
+        <div class="stats">
+
+            <div>
+                ⭐ Experiencia:
+                <strong id="inventory-xp">
+                    0
+                </strong>
+            </div>
+
+            <div>
+                📜 Historia:
+                <strong id="inventory-history">
+                    0
+                </strong>
+            </div>
+
+            <div>
+                🗺️ Zonas:
+                <strong id="inventory-zones">
+                    1
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     BIBLIOTECA HISTÓRICA
+===================================================== -->
+
+<section
+    id="history-panel"
+    class="modal hidden"
+>
+
+    <div class="modal-card history-card">
+
+        <button
+            id="history-close"
+            class="close-button"
+        >
+            ×
+        </button>
+
+        <h2>
+            📜 Memoria del Chañar
+        </h2>
+
+        <div
+            id="history-content"
+        >
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     NOTIFICACIÓN
+===================================================== -->
+
+<div
+    id="notification"
+    class="notification hidden"
+>
+    Descubrimiento
+</div>
+
+
+<!-- =====================================================
+     CONTROLES MÓVILES
+===================================================== -->
+
+<div
+    id="mobile-controls"
+>
+
+    <div class="mobile-dpad">
+
+        <button
+            data-key="arrowup"
+            class="mobile-key up"
+        >
+            ▲
+        </button>
+
+        <button
+            data-key="arrowleft"
+            class="mobile-key left"
+        >
+            ◀
+        </button>
+
+        <button
+            data-key="arrowdown"
+            class="mobile-key down"
+        >
+            ▼
+        </button>
+
+        <button
+            data-key="arrowright"
+            class="mobile-key right"
+        >
+            ▶
+        </button>
+
+    </div>
+
+
+    <div class="mobile-actions">
+
+        <button
+            id="mobile-interact"
+            class="action-key"
+        >
+            E
+        </button>
+
+        <button
+            id="mobile-inventory"
+            class="action-key"
+        >
+            🎒
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     PIE
+===================================================== -->
+
+<div
+    id="creator-credit"
+>
+    LOS SECRETOS DEL CHAÑAR
+    ·
+    Elías Martínez
+</div>
+
+
+<script src="game.js"></script>
 
 </body>
 </html>
