@@ -1,0 +1,14 @@
+/* V28.12 — structured gameplay mission framework */
+(function(){'use strict';
+const M=window.ChanarV28Missions={version:'28.12',catalog:{},active:null,completed:[],knowledge:{},events:[]};
+M.add=function(id,data){if(!id||!data)return false;M.catalog[id]=Object.assign({id:id,title:id,category:'exploration',steps:[],reward:null,historyKey:null},data);return true};
+M.start=function(id){const m=M.catalog[id];if(!m)return null;M.active={id:id,step:0,startedAt:Date.now()};M.events.push({type:'start',id:id});return M.current()};
+M.current=function(){if(!M.active)return null;const m=M.catalog[M.active.id];return{id:m.id,title:m.title,category:m.category,description:m.description,step:M.active.step,total:m.steps.length,current:m.steps[M.active.step]||null}};
+M.do=function(action,target){if(!M.active)return false;const m=M.catalog[M.active.id],s=m.steps[M.active.step];if(!s||s.action!==action)return false;if(s.target&&s.target!==target)return false;M.active.step++;M.events.push({type:'step',id:m.id,action:action,target:target||null});if(M.active.step>=m.steps.length)M.finish(m.id);return true};
+M.finish=function(id){const m=M.catalog[id];if(!m)return false;if(M.completed.indexOf(id)<0)M.completed.push(id);if(m.historyKey)M.knowledge[m.historyKey]=true;M.events.push({type:'complete',id:id});M.active=null;return true};
+M.add('intro-explore',{title:'Conocé Chañar',category:'exploration',description:'Comenzá a reconocer el pueblo y sus habitantes.',steps:[{action:'enter_zone',target:'town',text:'Recorré una zona del pueblo.'},{action:'talk',target:'resident',text:'Hablá con un habitante.'},{action:'discover',target:'landmark',text:'Descubrí un lugar de interés.'}],reward:{type:'knowledge',value:1}});
+M.add('daily-life',{title:'Una mañana de pueblo',category:'daily',description:'Realizá una pequeña rutina cotidiana.',steps:[{action:'visit',target:'shop',text:'Visitá un comercio.'},{action:'buy',target:'bread',text:'Comprá algo para llevar.'},{action:'walk_home',target:'home',text:'Regresá al barrio.'}],reward:{type:'money',value:500}});
+M.add('historical-template',{title:'Rastros del pasado',category:'history',description:'Misión preparada para incorporar un episodio histórico documentado.',historyKey:'historical_rastro_01',steps:[{action:'find',target:'historical_clue',text:'Encontrá una pista histórica.'},{action:'talk',target:'historian',text:'Consultá a una persona que conozca la historia.'},{action:'archive',target:'document',text:'Incorporá el documento al archivo.'}],reward:{type:'knowledge',value:3}});
+M.status=function(){return{version:M.version,active:M.current(),completed:M.completed.slice(),knowledge:Object.assign({},M.knowledge)}};
+M.rule='Las misiones históricas se cargan desde hechos documentados; el framework separa gameplay de contenido histórico para evitar inventar acontecimientos.';
+})();
