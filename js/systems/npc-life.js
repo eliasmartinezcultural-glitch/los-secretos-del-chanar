@@ -1,53 +1,11 @@
-/* LOS SECRETOS DEL CHAÑAR — NPC LIFE V20.2 */
-(function () {
-    "use strict";
-
-    const ARRIVAL_DISTANCE = 18;
-    const WAIT_MS = 3500;
-    const memory = new Map();
-
-    function placeById(id) {
-        const b = (window.buildings || buildings || []).find(x => x.id === id);
-        if (!b) return null;
-        return { x: b.x + b.width / 2, y: b.y + b.height / 2 };
-    }
-
-    function targetFor(npc) {
-        const slot = window.ChanarV20?.currentSchedule
-            ? window.ChanarV20.currentSchedule(npc)
-            : null;
-        if (!slot) return null;
-        if (typeof slot.x === "number" && typeof slot.y === "number") return slot;
-        if (slot.place) return placeById(slot.place);
-        return null;
-    }
-
-    function updateNpc(npc, dt) {
-        const target = targetFor(npc);
-        if (!target) return;
-        const dx = target.x - npc.x;
-        const dy = target.y - npc.y;
-        const distance = Math.hypot(dx, dy);
-        const state = memory.get(npc.id) || { waitingUntil: 0 };
-        if (distance <= ARRIVAL_DISTANCE) {
-            if (!state.waitingUntil) state.waitingUntil = performance.now() + WAIT_MS;
-            memory.set(npc.id, state);
-            npc.vx = 0; npc.vy = 0;
-            return;
-        }
-        state.waitingUntil = 0;
-        memory.set(npc.id, state);
-        const speed = npc.speed || 45;
-        const step = Math.min(distance, speed * dt);
-        npc.x += dx / distance * step;
-        npc.y += dy / distance * step;
-        npc.direction = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up");
-    }
-
-    function update(dt) {
-        if (!Array.isArray(window.npcs || npcs)) return;
-        (window.npcs || npcs).forEach(npc => updateNpc(npc, dt));
-    }
-
-    window.ChanarNPCLife = { update, targetFor };
-})();
+/* LOS SECRETOS DEL CHAÑAR — NPC LIFE V27.6 */
+(function(){'use strict';
+const ARRIVAL=24,WAIT_MS=3500,SIZE={w:28,h:34},memory=new Map();
+function placeById(id){const b=(window.buildings||[]).find(x=>x.id===id);return b?{x:b.x+b.width/2,y:b.y+b.height/2}:null}
+function targetFor(npc){if(npc.chanarRoutine&&Number.isFinite(npc.chanarRoutine.targetX)&&Number.isFinite(npc.chanarRoutine.targetY))return{x:npc.chanarRoutine.targetX,y:npc.chanarRoutine.targetY,place:npc.chanarRoutine.destination};const slot=window.ChanarV20?.currentSchedule?.(npc);if(!slot)return null;if(Number.isFinite(slot.x)&&Number.isFinite(slot.y))return slot;if(slot.place)return placeById(slot.place);return null}
+function overlap(a,b){return a.x<b.x+b.width&&a.x+a.width>b.x&&a.y<b.y+b.height&&a.y+a.height>b.y}
+function blocked(x,y,target){if(x<0||y<0||x+SIZE.w>WORLD_WIDTH||y+SIZE.h>WORLD_HEIGHT)return true;const r={x,y,width:SIZE.w,height:SIZE.h};return (window.buildings||[]).some(b=>b.id!==target&&overlap(r,b))}
+function tryStep(n,dx,dy,target){const x=n.x+dx,y=n.y+dy;if(!blocked(x,y,target)){n.x=x;n.y=y;return true}return false}
+function updateNpc(npc,dt){const target=targetFor(npc);if(!target)return;const dx=target.x-npc.x,dy=target.y-npc.y,d=Math.hypot(dx,dy);let state=memory.get(npc.id);if(!state||state.targetX!==target.x||state.targetY!==target.y)state={targetX:target.x,targetY:target.y,waitingUntil:0};if(d<=ARRIVAL){npc.x=target.x;npc.y=target.y;npc.vx=0;npc.vy=0;npc.routineArrived=true;npc.routineActivity=npc.chanarRoutine?.state||npc.routineActivity;if(!state.waitingUntil)state.waitingUntil=performance.now()+WAIT_MS;memory.set(npc.id,state);return}state.waitingUntil=0;npc.routineArrived=false;memory.set(npc.id,state);const raw=Number(npc.speed);const speed=(Number.isFinite(raw)&&raw>0&&raw<5?raw*45:raw||45);const step=Math.min(d,speed*dt),ux=dx/d*step,uy=dy/d*step;let ok=tryStep(npc,ux,uy,target.place);if(!ok)ok=tryStep(npc,ux,0,target.place);if(!ok)ok=tryStep(npc,0,uy,target.place);if(!ok){const side=(Math.floor(performance.now()/250)+npc.id.length)%2?1:-1;ok=tryStep(npc,-uy*side,ux*side,target.place)}npc.moving=ok;npc.v27Blocked=!ok;if(ok)npc.direction=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up')}
+function update(dt){const list=window.npcs||[];if(!Array.isArray(list))return;list.forEach(n=>updateNpc(n,dt))}
+window.ChanarNPCLife={update,targetFor};})();
