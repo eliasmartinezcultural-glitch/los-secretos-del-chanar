@@ -1,13 +1,7 @@
-/* =====================================================
-   LOS SECRETOS DEL CHAÑAR
-   V18.0 — PUEBLO VIVO
-===================================================== */
-
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    -webkit-tap-highlight-color: transparent;
 }
 
 html,
@@ -19,29 +13,32 @@ body {
     overflow: hidden;
 
     background:
-        #172019;
+        #1d241f;
 
     font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
+        Georgia,
+        "Times New Roman",
+        serif;
 
-    color: white;
-
-    touch-action: none;
+    touch-action:
+        none;
 }
 
 
-/* =====================================================
+body {
+    position: relative;
+}
+
+
+/* ================================
    CANVAS
-===================================================== */
+================================ */
 
 #game {
 
     position: fixed;
 
-    left: 0;
-    top: 0;
+    inset: 0;
 
     width: 100vw;
     height: 100vh;
@@ -49,13 +46,13 @@ body {
     display: block;
 
     background:
-        #c9ac77;
+        #bda576;
 }
 
 
-/* =====================================================
+/* ================================
    START
-===================================================== */
+================================ */
 
 #start-screen {
 
@@ -63,89 +60,100 @@ body {
 
     inset: 0;
 
+    z-index: 1000;
+
     display: flex;
 
     justify-content: center;
+
     align-items: center;
 
     background:
         linear-gradient(
-            rgba(12,18,14,.65),
-            rgba(12,18,14,.85)
+            rgba(30,35,25,.78),
+            rgba(30,35,25,.88)
         );
 
-    z-index: 1000;
+    backdrop-filter:
+        blur(4px);
 }
 
 
-.title-box {
+.start-box {
 
     width:
-        min(90vw, 600px);
+        min(520px, 90vw);
 
     padding:
-        45px 30px;
+        42px 30px;
 
-    text-align: center;
+    text-align:
+        center;
+
+    color:
+        #f4ead4;
 
     background:
-        rgba(25,31,25,.94);
+        rgba(54,48,37,.94);
 
     border:
-        1px solid
-        rgba(255,255,255,.15);
-
-    border-radius:
-        18px;
+        2px solid
+        rgba(230,197,130,.6);
 
     box-shadow:
-        0 30px 100px
-        rgba(0,0,0,.55);
-
-    backdrop-filter:
-        blur(12px);
+        0 20px 70px
+        rgba(0,0,0,.5);
 }
 
 
-.small-title {
+.game-logo {
 
     font-size:
-        12px;
+        clamp(34px, 7vw, 64px);
+
+    font-weight:
+        bold;
 
     letter-spacing:
         4px;
 
-    opacity:
-        .7;
-
-    margin-bottom:
-        15px;
-}
-
-
-.title-box h1 {
-
-    font-size:
-        clamp(36px, 8vw, 72px);
-
     line-height:
-        .92;
-
-    letter-spacing:
-        -2px;
+        .95;
 
     margin-bottom:
         20px;
 }
 
 
-.title-box p {
+.game-logo span {
+
+    display:
+        block;
+
+    color:
+        #d7a85a;
+
+    font-size:
+        .55em;
+
+    letter-spacing:
+        7px;
+
+    margin-top:
+        10px;
+}
+
+
+.subtitle {
 
     font-size:
         18px;
 
-    opacity:
-        .8;
+    line-height:
+        1.5;
+
+    color:
+        #d9c9ab;
 
     margin-bottom:
         35px;
@@ -157,20 +165,17 @@ body {
     border:
         none;
 
+    padding:
+        16px 48px;
+
     background:
-        #d29a48;
+        #a56c3a;
 
     color:
-        #1c1710;
-
-    padding:
-        16px 45px;
-
-    border-radius:
-        50px;
+        white;
 
     font-size:
-        17px;
+        18px;
 
     font-weight:
         bold;
@@ -178,74 +183,439 @@ body {
     cursor:
         pointer;
 
-    box-shadow:
-        0 8px 20px
-        rgba(0,0,0,.25);
+    border-radius:
+        5px;
 
-    transition:
-        transform .2s;
+    box-shadow:
+        0 5px 15px
+        rgba(0,0,0,.3);
 }
 
 
 #start-button:active {
-
     transform:
-        scale(.95);
-}
-
-
-.version {
-
-    margin-top:
-        25px;
-
-    font-size:
-        11px;
-
-    opacity:
-        .45;
-
-    letter-spacing:
-        2px;
+        translateY(2px);
 }
 
 
 .creator {
 
     margin-top:
-        10px;
+        30px;
 
     font-size:
-        12px;
+        13px;
 
-    opacity:
-        .55;
+    color:
+        #aaa18e;
 }
 
 
-/* =====================================================
+/* ================================
    HUD
-===================================================== */
+================================ */
 
 #hud {
 
     position:
         fixed;
 
-    top:
+    inset:
         0;
 
-    left:
-        0;
+    pointer-events:
+        none;
 
-    width:
-        100%;
+    z-index:
+        50;
+}
 
-    min-height:
-        62px;
+
+.hud-top {
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
 
     padding:
-        10px 15px;
+        15px;
+
+    gap:
+        10px;
+}
+
+
+.location-box,
+.mission-box {
+
+    padding:
+        9px 13px;
+
+    color:
+        #fff;
+
+    background:
+        rgba(35,38,31,.76);
+
+    border:
+        1px solid
+        rgba(255,255,255,.16);
+
+    border-radius:
+        7px;
+
+    backdrop-filter:
+        blur(5px);
+
+    box-shadow:
+        0 4px 15px
+        rgba(0,0,0,.18);
+}
+
+
+.location-box span,
+.mission-box span {
+
+    display:
+        block;
+
+    font-size:
+        14px;
+
+    font-weight:
+        bold;
+}
+
+
+.location-box small {
+
+    display:
+        block;
+
+    margin-top:
+        3px;
+
+    color:
+        #dfc184;
+}
+
+
+#interaction-hint {
+
+    position:
+        absolute;
+
+    left:
+        50%;
+
+    bottom:
+        105px;
+
+    transform:
+        translateX(-50%);
+
+    padding:
+        9px 15px;
+
+    color:
+        white;
+
+    background:
+        rgba(35,35,30,.72);
+
+    border-radius:
+        20px;
+
+    font-size:
+        13px;
+
+    opacity:
+        .85;
+}
+
+
+#status-message {
+
+    position:
+        absolute;
+
+    left:
+        50%;
+
+    top:
+        82px;
+
+    transform:
+        translateX(-50%);
+
+    color:
+        #fff;
+
+    font-weight:
+        bold;
+
+    text-shadow:
+        0 2px 4px #000;
+
+}
+
+
+/* ================================
+   MAPA
+================================ */
+
+#map-container {
+
+    position:
+        fixed;
+
+    right:
+        15px;
+
+    bottom:
+        15px;
+
+    z-index:
+        60;
+
+    padding:
+        5px;
+
+    background:
+        rgba(28,31,26,.82);
+
+    border:
+        1px solid
+        rgba(255,255,255,.2);
+
+    border-radius:
+        7px;
+
+    pointer-events:
+        none;
+}
+
+
+#minimap {
+
+    display:
+        block;
+
+    width:
+        190px;
+
+    height:
+        130px;
+}
+
+
+#map-container span {
+
+    position:
+        absolute;
+
+    top:
+        5px;
+
+    left:
+        7px;
+
+    color:
+        white;
+
+    font-size:
+        9px;
+
+    background:
+        rgba(0,0,0,.45);
+
+    padding:
+        2px 4px;
+}
+
+
+/* ================================
+   PANELES
+================================ */
+
+.panel {
+
+    position:
+        fixed;
+
+    z-index:
+        300;
+
+    left:
+        50%;
+
+    bottom:
+        7%;
+
+    transform:
+        translateX(-50%);
+
+    width:
+        min(620px, 92vw);
+
+    padding:
+        25px;
+
+    background:
+        rgba(48,42,33,.97);
+
+    color:
+        #eee3cd;
+
+    border:
+        1px solid
+        #a98958;
+
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,.55);
+
+    border-radius:
+        8px;
+}
+
+
+.hidden {
+    display:
+        none !important;
+}
+
+
+/* ================================
+   DIALOGO
+================================ */
+
+.dialogue-name {
+
+    font-size:
+        20px;
+
+    font-weight:
+        bold;
+
+    color:
+        #e0b86f;
+
+    margin-bottom:
+        10px;
+}
+
+
+.dialogue-text {
+
+    font-size:
+        17px;
+
+    line-height:
+        1.55;
+
+    min-height:
+        55px;
+}
+
+
+.panel button {
+
+    margin-top:
+        18px;
+
+    padding:
+        10px 20px;
+
+    border:
+        none;
+
+    border-radius:
+        5px;
+
+    background:
+        #9b683c;
+
+    color:
+        white;
+
+    cursor:
+        pointer;
+}
+
+
+/* ================================
+   GLOBO
+================================ */
+
+.speech-bubble {
+
+    position:
+        fixed;
+
+    z-index:
+        200;
+
+    max-width:
+        260px;
+
+    padding:
+        9px 13px;
+
+    color:
+        #2f2a22;
+
+    background:
+        #f4ead2;
+
+    border:
+        2px solid
+        #765c3a;
+
+    border-radius:
+        12px;
+
+    font-size:
+        13px;
+
+    box-shadow:
+        0 4px 12px
+        rgba(0,0,0,.3);
+
+    pointer-events:
+        none;
+}
+
+
+/* ================================
+   INTERIOR
+================================ */
+
+#interior-panel {
+
+    position:
+        fixed;
+
+    inset:
+        0;
+
+    z-index:
+        500;
+
+    background:
+        #40382d;
+
+    color:
+        #f1e6d1;
+
+    padding:
+        20px;
+}
+
+
+.interior-header {
 
     display:
         flex;
@@ -256,430 +626,161 @@ body {
     align-items:
         center;
 
-    pointer-events:
-        none;
-
-    z-index:
-        50;
-}
-
-
-.hud-left,
-.hud-right {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        8px;
-}
-
-
-.location,
-.clock,
-.mission-hud {
-
-    background:
-        rgba(20,25,20,.82);
-
-    border:
-        1px solid
-        rgba(255,255,255,.12);
-
-    border-radius:
-        10px;
-
-    padding:
-        8px 12px;
-
-    font-size:
-        12px;
-
-    backdrop-filter:
-        blur(8px);
-}
-
-
-.mission-hud {
-
-    max-width:
-        45vw;
-
-    text-align:
-        center;
-}
-
-
-.hud-right button {
-
-    pointer-events:
-        auto;
-
-    width:
-        42px;
-
-    height:
-        42px;
-
-    border:
-        none;
-
-    border-radius:
-        12px;
-
-    background:
-        rgba(20,25,20,.85);
-
-    color:
-        white;
-
-    font-size:
-        20px;
-}
-
-
-/* =====================================================
-   PANELES
-===================================================== */
-
-.panel {
-
-    position:
-        fixed;
-
-    z-index:
-        200;
-
-    left:
-        50%;
-
-    top:
-        50%;
-
-    transform:
-        translate(-50%,-50%);
-
-    width:
-        min(90vw,700px);
-
-    max-height:
-        85vh;
-
-    overflow:
-        auto;
-
-    background:
-        rgba(24,29,24,.97);
-
-    border:
-        1px solid
-        rgba(255,255,255,.15);
-
-    border-radius:
-        18px;
-
-    padding:
-        25px;
-
-    box-shadow:
-        0 30px 100px
-        rgba(0,0,0,.6);
-
-    backdrop-filter:
-        blur(15px);
-}
-
-
-.panel h2 {
-
     margin-bottom:
         20px;
 }
 
 
-.panel button {
-
-    margin-top:
-        20px;
-
-    border:
-        none;
-
-    padding:
-        11px 20px;
-
-    border-radius:
-        10px;
-
-    background:
-        #d29a48;
-
-    color:
-        #20170d;
-
-    font-weight:
-        bold;
-}
-
-
-.hidden {
-
-    display:
-        none !important;
-}
-
-
-/* =====================================================
-   MINIMAPA
-===================================================== */
-
-#minimap {
-
-    width:
-        100%;
-
-    height:
-        auto;
-
-    border-radius:
-        12px;
-
-    background:
-        #c9ac77;
-}
-
-
-.map-legend {
-
-    display:
-        flex;
-
-    flex-wrap:
-        wrap;
-
-    gap:
-        10px;
-
-    margin-top:
-        15px;
+#interior-title {
 
     font-size:
-        12px;
-
-    opacity:
-        .8;
-}
-
-
-/* =====================================================
-   DIALOGO
-===================================================== */
-
-.dialogue {
-
-    position:
-        fixed;
-
-    left:
-        50%;
-
-    bottom:
-        35px;
-
-    transform:
-        translateX(-50%);
-
-    width:
-        min(90vw,760px);
-
-    z-index:
-        300;
-
-    padding:
-        20px;
-
-    border-radius:
-        16px;
-
-    background:
-        rgba(21,25,22,.96);
-
-    border:
-        1px solid
-        rgba(255,255,255,.18);
-
-    box-shadow:
-        0 20px 70px
-        rgba(0,0,0,.55);
-}
-
-
-.dialogue-name {
-
-    color:
-        #e5ae62;
-
-    font-size:
-        14px;
+        26px;
 
     font-weight:
         bold;
 
-    margin-bottom:
-        8px;
-}
-
-
-.dialogue-text {
-
-    font-size:
-        16px;
-
-    line-height:
-        1.5;
-
-    min-height:
-        45px;
-}
-
-
-.dialogue-options {
-
-    display:
-        flex;
-
-    flex-wrap:
-        wrap;
-
-    gap:
-        8px;
-
-    margin-top:
-        12px;
-}
-
-
-.dialogue-options button {
-
-    border:
-        1px solid
-        rgba(255,255,255,.2);
-
-    background:
-        rgba(255,255,255,.08);
-
     color:
-        white;
-
-    padding:
-        9px 12px;
-
-    border-radius:
-        8px;
+        #ddb66e;
 }
 
 
-.dialogue > button {
-
-    margin-top:
-        15px;
-
-    border:
-        none;
-
-    background:
-        #d29a48;
-
-    padding:
-        8px 15px;
-
-    border-radius:
-        8px;
-}
-
-
-/* =====================================================
-   NOTIFICACION
-===================================================== */
-
-.notification {
-
-    position:
-        fixed;
-
-    top:
-        80px;
-
-    left:
-        50%;
-
-    transform:
-        translateX(-50%);
-
-    z-index:
-        500;
+#exit-building {
 
     padding:
         10px 18px;
 
-    border-radius:
-        50px;
+    border:
+        none;
 
     background:
-        rgba(20,25,20,.94);
+        #8e5538;
 
-    border:
-        1px solid
-        rgba(255,255,255,.15);
+    color:
+        white;
 
-    font-size:
-        13px;
-
-    box-shadow:
-        0 10px 30px
-        rgba(0,0,0,.3);
+    border-radius:
+        5px;
 }
 
 
-/* =====================================================
-   CONTROLES MOVILES
-===================================================== */
+#interior-content {
+
+    width:
+        min(900px, 94vw);
+
+    height:
+        70vh;
+
+    margin:
+        auto;
+
+    background:
+        #80674e;
+
+    border:
+        4px solid
+        #4c3a29;
+
+    position:
+        relative;
+
+    overflow:
+        hidden;
+}
+
+
+/* ================================
+   INVENTARIO
+================================ */
+
+.inventory {
+
+    top:
+        50%;
+
+    bottom:
+        auto;
+
+    transform:
+        translate(-50%, -50%);
+}
+
+
+/* ================================
+   TOAST
+================================ */
+
+.toast {
+
+    position:
+        fixed;
+
+    left:
+        50%;
+
+    top:
+        50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    z-index:
+        900;
+
+    padding:
+        14px 22px;
+
+    background:
+        rgba(30,28,23,.94);
+
+    color:
+        #f2d28d;
+
+    border:
+        1px solid
+        #aa8148;
+
+    border-radius:
+        8px;
+
+    font-size:
+        16px;
+}
+
+
+/* ================================
+   MOBILE
+================================ */
 
 #mobile-controls {
+
+    display:
+        none;
 
     position:
         fixed;
 
     inset:
-        auto 0 0 0;
-
-    height:
-        170px;
+        0;
 
     z-index:
         100;
 
     pointer-events:
         none;
-
-    display:
-        none;
 }
 
 
-#joystick {
+.joystick-area {
 
     position:
         absolute;
 
     left:
-        20px;
+        25px;
 
     bottom:
-        20px;
+        25px;
 
     width:
         125px;
@@ -687,60 +788,47 @@ body {
     height:
         125px;
 
-    display:
-        grid;
+    border-radius:
+        50%;
 
-    grid-template:
-        "up up up"
-        "left center right"
-        "down down down";
+    background:
+        rgba(255,255,255,.10);
 
-    gap:
-        5px;
+    border:
+        2px solid
+        rgba(255,255,255,.2);
 
     pointer-events:
         auto;
 }
 
 
-#joystick button {
+.joystick {
 
-    border:
-        1px solid
-        rgba(255,255,255,.12);
+    position:
+        absolute;
 
-    background:
-        rgba(20,25,20,.7);
+    width:
+        55px;
 
-    color:
-        white;
+    height:
+        55px;
+
+    left:
+        35px;
+
+    top:
+        35px;
 
     border-radius:
-        12px;
+        50%;
 
-    font-size:
-        18px;
-}
+    background:
+        rgba(255,255,255,.45);
 
-
-#joystick button[data-dir="up"] {
-    grid-area:
-        up;
-}
-
-#joystick button[data-dir="left"] {
-    grid-area:
-        left;
-}
-
-#joystick button[data-dir="down"] {
-    grid-area:
-        down;
-}
-
-#joystick button[data-dir="right"] {
-    grid-area:
-        right;
+    border:
+        2px solid
+        rgba(255,255,255,.5);
 }
 
 
@@ -759,14 +847,14 @@ body {
         flex;
 
     gap:
-        10px;
+        12px;
 
     pointer-events:
         auto;
 }
 
 
-.mobile-actions button {
+.action-button {
 
     width:
         58px;
@@ -775,207 +863,115 @@ body {
         58px;
 
     border:
-        none;
+        2px solid
+        rgba(255,255,255,.3);
 
     border-radius:
         50%;
 
     background:
-        rgba(20,25,20,.82);
+        rgba(50,43,35,.78);
 
     color:
         white;
 
     font-size:
         20px;
+
+    font-weight:
+        bold;
 }
 
 
-/* =====================================================
-   AYUDA
-===================================================== */
+/* ================================
+   CELULAR
+================================ */
 
-#controls-help {
-
-    position:
-        fixed;
-
-    left:
-        15px;
-
-    bottom:
-        15px;
-
-    z-index:
-        30;
-
-    display:
-        flex;
-
-    gap:
-        8px;
-
-    font-size:
-        10px;
-
-    opacity:
-        .55;
-}
-
-
-#controls-help span {
-
-    background:
-        rgba(20,25,20,.65);
-
-    padding:
-        6px 9px;
-
-    border-radius:
-        6px;
-}
-
-
-/* =====================================================
-   CREDITOS
-===================================================== */
-
-#credits {
-
-    position:
-        fixed;
-
-    right:
-        12px;
-
-    bottom:
-        10px;
-
-    z-index:
-        30;
-
-    text-align:
-        right;
-
-    font-size:
-        10px;
-
-    opacity:
-        .4;
-}
-
-
-#credits small {
-
-    font-size:
-        9px;
-}
-
-
-/* =====================================================
-   MOVIL
-===================================================== */
-
-@media
-(max-width: 800px) {
+@media (
+    max-width: 800px
+) {
 
     #mobile-controls {
-
         display:
             block;
     }
 
 
-    #controls-help {
+    #map-container {
 
-        display:
-            none;
-    }
+        right:
+            10px;
 
-
-    #credits {
+        top:
+            75px;
 
         bottom:
-            180px;
+            auto;
 
-        font-size:
-            8px;
+        transform:
+            scale(.75);
+
+        transform-origin:
+            top right;
     }
 
 
-    .location {
-
-        max-width:
-            43vw;
-
-        overflow:
-            hidden;
-
-        white-space:
-            nowrap;
-
-        text-overflow:
-            ellipsis;
-    }
-
-
-    .mission-hud {
-
-        display:
-            none;
-    }
-
-
-    .dialogue {
+    #interaction-hint {
 
         bottom:
             165px;
 
+        font-size:
+            11px;
+
+        white-space:
+            nowrap;
+    }
+
+
+    .hud-top {
+
+        padding:
+            8px;
+    }
+
+
+    .location-box,
+    .mission-box {
+
+        font-size:
+            11px;
+
+        padding:
+            6px 9px;
+    }
+
+
+    .location-box span,
+    .mission-box span {
+
+        font-size:
+            11px;
+    }
+
+
+    .panel {
+
+        bottom:
+            15px;
+
+        padding:
+            18px;
+
         width:
-            92vw;
+            94vw;
     }
 
 
     .dialogue-text {
 
         font-size:
-            14px;
-    }
-
-}
-
-
-/* =====================================================
-   PANTALLAS MUY PEQUEÑAS
-===================================================== */
-
-@media
-(max-height: 600px) {
-
-    #mobile-controls {
-
-        height:
-            130px;
-    }
-
-
-    #joystick {
-
-        width:
-            95px;
-
-        height:
-            95px;
-    }
-
-
-    .mobile-actions button {
-
-        width:
-            48px;
-
-        height:
-            48px;
+            15px;
     }
 
 }
