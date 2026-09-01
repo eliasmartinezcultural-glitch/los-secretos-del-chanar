@@ -1,7 +1,6 @@
 /* =====================================================
    LOS SECRETOS DEL CHAÑAR
-   V19.0
-   ESTILO — PUEBLO VIVO
+   V18.0 — PUEBLO VIVO
 ===================================================== */
 
 * {
@@ -20,7 +19,7 @@ body {
     overflow: hidden;
 
     background:
-        #18251d;
+        #172019;
 
     font-family:
         Arial,
@@ -50,17 +49,15 @@ body {
     display: block;
 
     background:
-        #c9aa72;
-
-    touch-action: none;
+        #c9ac77;
 }
 
 
 /* =====================================================
-   INICIO
+   START
 ===================================================== */
 
-.screen {
+#start-screen {
 
     position: fixed;
 
@@ -69,106 +66,111 @@ body {
     display: flex;
 
     justify-content: center;
-
     align-items: center;
-
-    z-index: 1000;
 
     background:
         linear-gradient(
-            rgba(15,30,20,.75),
-            rgba(15,30,20,.88)
+            rgba(12,18,14,.65),
+            rgba(12,18,14,.85)
         );
+
+    z-index: 1000;
 }
 
 
-.title-card {
+.title-box {
 
     width:
-        min(92vw, 560px);
+        min(90vw, 600px);
 
     padding:
-        42px 30px;
+        45px 30px;
 
     text-align: center;
 
     background:
-        rgba(28,42,31,.96);
+        rgba(25,31,25,.94);
 
     border:
         1px solid
-        rgba(255,255,255,.18);
+        rgba(255,255,255,.15);
 
     border-radius:
         18px;
 
     box-shadow:
-        0 30px 80px
-        rgba(0,0,0,.45);
+        0 30px 100px
+        rgba(0,0,0,.55);
+
+    backdrop-filter:
+        blur(12px);
 }
 
 
 .small-title {
 
-    font-size: 12px;
+    font-size:
+        12px;
 
     letter-spacing:
         4px;
 
-    opacity: .65;
+    opacity:
+        .7;
 
     margin-bottom:
-        14px;
+        15px;
 }
 
 
-h1 {
+.title-box h1 {
 
     font-size:
-        clamp(38px, 8vw, 72px);
+        clamp(36px, 8vw, 72px);
 
     line-height:
         .92;
 
     letter-spacing:
-        2px;
+        -2px;
 
     margin-bottom:
         20px;
-
-    color:
-        #f0d28c;
 }
 
 
-.title-card p {
+.title-box p {
 
-    color:
-        #d9ded5;
+    font-size:
+        18px;
+
+    opacity:
+        .8;
 
     margin-bottom:
-        28px;
+        35px;
+}
+
+
+#start-button {
+
+    border:
+        none;
+
+    background:
+        #d29a48;
+
+    color:
+        #1c1710;
+
+    padding:
+        16px 45px;
+
+    border-radius:
+        50px;
 
     font-size:
         17px;
-}
-
-
-button {
-
-    border: none;
-
-    border-radius:
-        10px;
-
-    padding:
-        13px 22px;
-
-    background:
-        #d3a84e;
-
-    color:
-        #20251e;
 
     font-weight:
         bold;
@@ -176,67 +178,45 @@ button {
     cursor:
         pointer;
 
+    box-shadow:
+        0 8px 20px
+        rgba(0,0,0,.25);
+
     transition:
-        .2s;
+        transform .2s;
 }
 
 
-button:hover {
+#start-button:active {
 
     transform:
-        translateY(-2px);
-
-    filter:
-        brightness(1.1);
+        scale(.95);
 }
 
 
-#start-button {
-
-    font-size:
-        18px;
-
-    padding:
-        16px 45px;
-
-    margin-bottom:
-        25px;
-}
-
-
-.controls-info {
-
-    display:
-        flex;
-
-    flex-direction:
-        column;
-
-    gap:
-        5px;
-
-    font-size:
-        12px;
-
-    opacity:
-        .55;
-}
-
-
-.created {
+.version {
 
     margin-top:
         25px;
 
-    padding-top:
-        20px;
-
-    border-top:
-        1px solid
-        rgba(255,255,255,.1);
-
     font-size:
         11px;
+
+    opacity:
+        .45;
+
+    letter-spacing:
+        2px;
+}
+
+
+.creator {
+
+    margin-top:
+        10px;
+
+    font-size:
+        12px;
 
     opacity:
         .55;
@@ -253,110 +233,90 @@ button:hover {
         fixed;
 
     top:
-        15px;
+        0;
 
     left:
-        15px;
+        0;
 
-    z-index:
-        20;
+    width:
+        100%;
+
+    min-height:
+        62px;
+
+    padding:
+        10px 15px;
 
     display:
         flex;
 
-    flex-direction:
-        column;
+    justify-content:
+        space-between;
 
-    gap:
-        6px;
+    align-items:
+        center;
 
     pointer-events:
         none;
+
+    z-index:
+        50;
 }
 
 
-#location {
+.hud-left,
+.hud-right {
 
-    padding:
-        7px 12px;
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        8px;
+}
+
+
+.location,
+.clock,
+.mission-hud {
 
     background:
-        rgba(20,30,22,.8);
+        rgba(20,25,20,.82);
+
+    border:
+        1px solid
+        rgba(255,255,255,.12);
 
     border-radius:
-        8px;
-
-    font-size:
-        12px;
-
-    letter-spacing:
-        1px;
-}
-
-
-#clock {
-
-    font-size:
-        15px;
-
-    font-weight:
-        bold;
-
-    color:
-        #f3d88e;
-}
-
-
-#mission-hud {
-
-    max-width:
-        270px;
+        10px;
 
     padding:
         8px 12px;
 
-    background:
-        rgba(20,30,22,.72);
-
-    border-left:
-        3px solid
-        #d5aa4b;
-
-    border-radius:
-        5px;
-
     font-size:
         12px;
+
+    backdrop-filter:
+        blur(8px);
 }
 
 
-/* =====================================================
-   BOTONES SUPERIORES
-===================================================== */
+.mission-hud {
 
-#top-buttons {
+    max-width:
+        45vw;
 
-    position:
-        fixed;
-
-    top:
-        15px;
-
-    right:
-        15px;
-
-    z-index:
-        30;
-
-    display:
-        flex;
-
-    gap:
-        8px;
+    text-align:
+        center;
 }
 
 
-#top-buttons button {
+.hud-right button {
+
+    pointer-events:
+        auto;
 
     width:
         42px;
@@ -364,144 +324,20 @@ button:hover {
     height:
         42px;
 
-    padding:
-        0;
+    border:
+        none;
 
     border-radius:
-        50%;
+        12px;
 
     background:
-        rgba(20,30,22,.85);
+        rgba(20,25,20,.85);
 
     color:
         white;
 
     font-size:
-        19px;
-}
-
-
-/* =====================================================
-   MINIMAPA
-===================================================== */
-
-#minimap-container {
-
-    position:
-        fixed;
-
-    right:
-        15px;
-
-    top:
-        70px;
-
-    z-index:
-        20;
-
-    padding:
-        4px;
-
-    border-radius:
-        10px;
-
-    background:
-        rgba(20,30,22,.8);
-
-    box-shadow:
-        0 5px 20px
-        rgba(0,0,0,.3);
-}
-
-
-#minimap {
-
-    display:
-        block;
-
-    width:
-        220px;
-
-    height:
-        150px;
-
-    border-radius:
-        7px;
-}
-
-
-/* =====================================================
-   HINT
-===================================================== */
-
-#interaction-hint {
-
-    position:
-        fixed;
-
-    left:
-        50%;
-
-    bottom:
-        25px;
-
-    transform:
-        translateX(-50%);
-
-    display:
-        none;
-
-    align-items:
-        center;
-
-    gap:
-        8px;
-
-    padding:
-        9px 15px;
-
-    background:
-        rgba(20,30,22,.9);
-
-    border-radius:
         20px;
-
-    z-index:
-        50;
-
-    font-size:
-        13px;
-}
-
-
-#interaction-icon {
-
-    display:
-        flex;
-
-    width:
-        25px;
-
-    height:
-        25px;
-
-    justify-content:
-        center;
-
-    align-items:
-        center;
-
-    border-radius:
-        6px;
-
-    background:
-        #d2a94e;
-
-    color:
-        #222;
-
-    font-weight:
-        bold;
 }
 
 
@@ -514,6 +350,9 @@ button:hover {
     position:
         fixed;
 
+    z-index:
+        200;
+
     left:
         50%;
 
@@ -524,33 +363,65 @@ button:hover {
         translate(-50%,-50%);
 
     width:
-        min(90vw, 500px);
+        min(90vw,700px);
 
     max-height:
-        80vh;
+        85vh;
 
     overflow:
         auto;
 
-    padding:
-        28px;
-
     background:
-        rgba(27,39,30,.97);
+        rgba(24,29,24,.97);
 
     border:
         1px solid
         rgba(255,255,255,.15);
 
     border-radius:
-        16px;
+        18px;
 
-    z-index:
-        200;
+    padding:
+        25px;
 
     box-shadow:
         0 30px 100px
-        rgba(0,0,0,.55);
+        rgba(0,0,0,.6);
+
+    backdrop-filter:
+        blur(15px);
+}
+
+
+.panel h2 {
+
+    margin-bottom:
+        20px;
+}
+
+
+.panel button {
+
+    margin-top:
+        20px;
+
+    border:
+        none;
+
+    padding:
+        11px 20px;
+
+    border-radius:
+        10px;
+
+    background:
+        #d29a48;
+
+    color:
+        #20170d;
+
+    font-weight:
+        bold;
 }
 
 
@@ -561,49 +432,45 @@ button:hover {
 }
 
 
-.panel-title {
+/* =====================================================
+   MINIMAPA
+===================================================== */
 
-    font-size:
-        11px;
+#minimap {
 
-    letter-spacing:
-        3px;
+    width:
+        100%;
 
-    color:
-        #d6ad54;
+    height:
+        auto;
 
-    margin-bottom:
+    border-radius:
         12px;
+
+    background:
+        #c9ac77;
 }
 
 
-.panel h2 {
+.map-legend {
 
-    margin-bottom:
-        12px;
+    display:
+        flex;
 
-    color:
-        #f2d99b;
-}
+    flex-wrap:
+        wrap;
 
-
-.panel p {
-
-    line-height:
-        1.55;
-
-    color:
-        #dfe5dc;
-
-    margin-bottom:
+    gap:
         10px;
-}
-
-
-.panel button {
 
     margin-top:
-        18px;
+        15px;
+
+    font-size:
+        12px;
+
+    opacity:
+        .8;
 }
 
 
@@ -611,79 +478,7 @@ button:hover {
    DIALOGO
 ===================================================== */
 
-#dialogue {
-
-    bottom:
-        25px;
-
-    top:
-        auto;
-
-    transform:
-        translateX(-50%);
-
-    width:
-        min(92vw, 760px);
-
-    padding:
-        22px;
-
-}
-
-
-.dialogue-character {
-
-    font-size:
-        18px;
-
-    font-weight:
-        bold;
-
-    color:
-        #f0cf80;
-
-    margin-bottom:
-        10px;
-}
-
-
-#dialogue-text {
-
-    font-size:
-        16px;
-
-    line-height:
-        1.55;
-
-    min-height:
-        45px;
-
-    color:
-        #f2f4ed;
-}
-
-
-#dialogue-next {
-
-    float:
-        right;
-
-    margin-top:
-        15px;
-
-    padding:
-        8px 15px;
-
-    font-size:
-        11px;
-}
-
-
-/* =====================================================
-   DESCUBRIMIENTO
-===================================================== */
-
-.discovery {
+.dialogue {
 
     position:
         fixed;
@@ -691,96 +486,166 @@ button:hover {
     left:
         50%;
 
-    top:
-        22%;
+    bottom:
+        35px;
 
     transform:
         translateX(-50%);
 
     width:
-        min(90vw, 500px);
+        min(90vw,760px);
+
+    z-index:
+        300;
 
     padding:
         20px;
 
-    text-align:
-        center;
+    border-radius:
+        16px;
 
     background:
-        rgba(30,42,31,.95);
+        rgba(21,25,22,.96);
 
     border:
         1px solid
-        #cba653;
-
-    border-radius:
-        12px;
-
-    z-index:
-        150;
+        rgba(255,255,255,.18);
 
     box-shadow:
-        0 20px 60px
-        rgba(0,0,0,.35);
-
-    animation:
-        discoveryIn .4s ease;
+        0 20px 70px
+        rgba(0,0,0,.55);
 }
 
 
-#discovery-title {
-
-    font-size:
-        11px;
-
-    letter-spacing:
-        3px;
+.dialogue-name {
 
     color:
-        #d7b458;
+        #e5ae62;
+
+    font-size:
+        14px;
+
+    font-weight:
+        bold;
 
     margin-bottom:
         8px;
 }
 
 
-#discovery-text {
+.dialogue-text {
 
     font-size:
-        15px;
+        16px;
 
     line-height:
-        1.45;
+        1.5;
+
+    min-height:
+        45px;
 }
 
 
-@keyframes discoveryIn {
+.dialogue-options {
 
-    from {
+    display:
+        flex;
 
-        opacity:
-            0;
+    flex-wrap:
+        wrap;
 
-        transform:
-            translate(-50%,-15px);
+    gap:
+        8px;
 
-    }
+    margin-top:
+        12px;
+}
 
-    to {
 
-        opacity:
-            1;
+.dialogue-options button {
 
-        transform:
-            translate(-50%,0);
+    border:
+        1px solid
+        rgba(255,255,255,.2);
 
-    }
+    background:
+        rgba(255,255,255,.08);
 
+    color:
+        white;
+
+    padding:
+        9px 12px;
+
+    border-radius:
+        8px;
+}
+
+
+.dialogue > button {
+
+    margin-top:
+        15px;
+
+    border:
+        none;
+
+    background:
+        #d29a48;
+
+    padding:
+        8px 15px;
+
+    border-radius:
+        8px;
 }
 
 
 /* =====================================================
-   JOYSTICK
+   NOTIFICACION
+===================================================== */
+
+.notification {
+
+    position:
+        fixed;
+
+    top:
+        80px;
+
+    left:
+        50%;
+
+    transform:
+        translateX(-50%);
+
+    z-index:
+        500;
+
+    padding:
+        10px 18px;
+
+    border-radius:
+        50px;
+
+    background:
+        rgba(20,25,20,.94);
+
+    border:
+        1px solid
+        rgba(255,255,255,.15);
+
+    font-size:
+        13px;
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.3);
+}
+
+
+/* =====================================================
+   CONTROLES MOVILES
 ===================================================== */
 
 #mobile-controls {
@@ -789,12 +654,18 @@ button:hover {
         fixed;
 
     inset:
-        0;
+        auto 0 0 0;
+
+    height:
+        170px;
 
     z-index:
-        60;
+        100;
 
     pointer-events:
+        none;
+
+    display:
         none;
 }
 
@@ -805,10 +676,10 @@ button:hover {
         absolute;
 
     left:
-        25px;
+        20px;
 
     bottom:
-        25px;
+        20px;
 
     width:
         125px;
@@ -816,165 +687,277 @@ button:hover {
     height:
         125px;
 
-    border-radius:
-        50%;
+    display:
+        grid;
 
-    background:
-        rgba(20,30,22,.28);
+    grid-template:
+        "up up up"
+        "left center right"
+        "down down down";
 
-    border:
-        2px solid
-        rgba(255,255,255,.18);
+    gap:
+        5px;
 
     pointer-events:
         auto;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
 }
 
 
-#joystick-stick {
+#joystick button {
 
-    width:
-        55px;
-
-    height:
-        55px;
-
-    border-radius:
-        50%;
+    border:
+        1px solid
+        rgba(255,255,255,.12);
 
     background:
-        rgba(225,190,105,.8);
+        rgba(20,25,20,.7);
 
-    box-shadow:
-        0 4px 15px
-        rgba(0,0,0,.3);
+    color:
+        white;
+
+    border-radius:
+        12px;
+
+    font-size:
+        18px;
 }
 
 
-#mobile-interact {
+#joystick button[data-dir="up"] {
+    grid-area:
+        up;
+}
+
+#joystick button[data-dir="left"] {
+    grid-area:
+        left;
+}
+
+#joystick button[data-dir="down"] {
+    grid-area:
+        down;
+}
+
+#joystick button[data-dir="right"] {
+    grid-area:
+        right;
+}
+
+
+.mobile-actions {
 
     position:
         absolute;
 
     right:
-        28px;
+        20px;
 
     bottom:
-        42px;
+        30px;
 
-    width:
-        70px;
+    display:
+        flex;
 
-    height:
-        70px;
-
-    border-radius:
-        50%;
-
-    padding:
-        0;
-
-    background:
-        rgba(213,170,78,.9);
-
-    font-size:
-        22px;
+    gap:
+        10px;
 
     pointer-events:
         auto;
 }
 
 
+.mobile-actions button {
+
+    width:
+        58px;
+
+    height:
+        58px;
+
+    border:
+        none;
+
+    border-radius:
+        50%;
+
+    background:
+        rgba(20,25,20,.82);
+
+    color:
+        white;
+
+    font-size:
+        20px;
+}
+
+
 /* =====================================================
-   CELULAR
+   AYUDA
 ===================================================== */
 
-@media (min-width: 800px) {
+#controls-help {
+
+    position:
+        fixed;
+
+    left:
+        15px;
+
+    bottom:
+        15px;
+
+    z-index:
+        30;
+
+    display:
+        flex;
+
+    gap:
+        8px;
+
+    font-size:
+        10px;
+
+    opacity:
+        .55;
+}
+
+
+#controls-help span {
+
+    background:
+        rgba(20,25,20,.65);
+
+    padding:
+        6px 9px;
+
+    border-radius:
+        6px;
+}
+
+
+/* =====================================================
+   CREDITOS
+===================================================== */
+
+#credits {
+
+    position:
+        fixed;
+
+    right:
+        12px;
+
+    bottom:
+        10px;
+
+    z-index:
+        30;
+
+    text-align:
+        right;
+
+    font-size:
+        10px;
+
+    opacity:
+        .4;
+}
+
+
+#credits small {
+
+    font-size:
+        9px;
+}
+
+
+/* =====================================================
+   MOVIL
+===================================================== */
+
+@media
+(max-width: 800px) {
 
     #mobile-controls {
 
         display:
+            block;
+    }
+
+
+    #controls-help {
+
+        display:
             none;
-
     }
 
-}
 
-
-@media (max-width: 799px) {
-
-    #minimap-container {
-
-        transform:
-            scale(.75);
-
-        transform-origin:
-            top right;
-
-        right:
-            5px;
-
-        top:
-            70px;
-
-    }
-
-    #hud {
-
-        max-width:
-            230px;
-
-    }
-
-    #location {
-
-        font-size:
-            10px;
-
-    }
-
-    #mission-hud {
-
-        font-size:
-            10px;
-
-    }
-
-    #dialogue {
+    #credits {
 
         bottom:
-            15px;
+            180px;
 
-        padding:
-            17px;
-
+        font-size:
+            8px;
     }
 
-    #dialogue-text {
+
+    .location {
+
+        max-width:
+            43vw;
+
+        overflow:
+            hidden;
+
+        white-space:
+            nowrap;
+
+        text-overflow:
+            ellipsis;
+    }
+
+
+    .mission-hud {
+
+        display:
+            none;
+    }
+
+
+    .dialogue {
+
+        bottom:
+            165px;
+
+        width:
+            92vw;
+    }
+
+
+    .dialogue-text {
 
         font-size:
             14px;
-
     }
 
 }
 
 
 /* =====================================================
-   ORIENTACIÓN
+   PANTALLAS MUY PEQUEÑAS
 ===================================================== */
 
-@media (orientation: landscape)
-       and (max-width: 799px) {
+@media
+(max-height: 600px) {
+
+    #mobile-controls {
+
+        height:
+            130px;
+    }
+
 
     #joystick {
 
@@ -983,27 +966,16 @@ button:hover {
 
         height:
             95px;
-
     }
 
-    #joystick-stick {
+
+    .mobile-actions button {
 
         width:
-            45px;
+            48px;
 
         height:
-            45px;
-
-    }
-
-    #mobile-interact {
-
-        width:
-            60px;
-
-        height:
-            60px;
-
+            48px;
     }
 
 }
