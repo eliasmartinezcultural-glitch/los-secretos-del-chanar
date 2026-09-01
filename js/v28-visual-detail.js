@@ -1,0 +1,9 @@
+/* LOS SECRETOS DEL CHAÑAR — V28 VISUAL DETAIL */
+(function(){'use strict';
+const V=window.ChanarV28Visual=window.ChanarV28Visual||{version:'28.1',features:{}};
+V.features={animals:'detailed',vegetation:'detailed',buildings:'detailed',streets:'detailed',objects:'detailed',territory:'detailed'};
+V.animalProfile=function(type){const t=String(type||'').toLowerCase();if(t.includes('cow')||t.includes('vaca'))return{body:'bovine',head:'muzzle',ears:true,horns:true,legs:4,tail:true,udder:true,spots:true};if(t.includes('horse')||t.includes('caballo'))return{body:'equine',head:'muzzle',ears:true,mane:true,legs:4,tail:true};if(t.includes('dog')||t.includes('perro'))return{body:'canine',head:'muzzle',ears:true,legs:4,tail:true};if(t.includes('cat')||t.includes('gato'))return{body:'feline',head:'muzzle',ears:true,legs:4,tail:true};return{body:'animal',legs:4};};
+V.textureProfile=function(type){const t=String(type||'').toLowerCase();if(t.includes('tree')||t.includes('álamo')||t.includes('alamo'))return{trunk:true,branches:true,foliageLayers:3,irregularity:.35};if(t.includes('vine')||t.includes('viñedo')||t.includes('vid'))return{rows:true,posts:true,wires:true,leaves:true};if(t.includes('house')||t.includes('casa'))return{walls:true,roof:true,windows:true,door:true,shadow:true,wear:.25};if(t.includes('road')||t.includes('street')||t.includes('route'))return{edge:true,cracks:true,patches:true,shoulder:true};return{microDetail:2};};
+V.decorate=function(ctx,o){if(!ctx||!o)return;if(o.type==='cow'||o.kind==='cow'||o.type==='vaca'){ctx.save();ctx.globalAlpha=.18;ctx.ellipse(o.x,o.y+12,18,5,0,0,Math.PI*2);ctx.fill();ctx.restore();}else if(o.type==='tree'){ctx.save();ctx.globalAlpha=.12;ctx.beginPath();ctx.ellipse(o.x,o.y+o.size*.65,o.size*.75,o.size*.18,0,0,Math.PI*2);ctx.fill();ctx.restore();}};
+V.identity='San Patricio del Chañar: paisaje agrícola, chacras, viñedos, canales, álamos, viviendas bajas, calles y transición urbano-rural.';
+})();
