@@ -7,10 +7,12 @@
 
     const style = document.createElement('style');
     style.textContent = `
-      #v30-save-button{position:fixed;left:16px;bottom:16px;z-index:9000;width:46px;height:46px;border:1px solid rgba(255,255,255,.25);border-radius:12px;background:rgba(28,25,20,.86);color:#fff;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+      #v30-save-button{position:fixed;left:16px;bottom:16px;z-index:9000;width:46px;height:46px;border:1px solid rgba(255,255,255,.25);border-radius:12px;background:rgba(28,25,20,.86);color:#fff;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25);touch-action:manipulation}
       #v30-save-button:active{transform:translateY(1px)}
       #notification.v30-visible{opacity:1;pointer-events:auto}
       #notification{transition:opacity .18s ease}
+      @media (max-width:900px){#v30-save-button{left:auto;right:12px;bottom:132px}}
+      @media (max-width:500px){#v30-save-button{right:12px;bottom:122px;width:44px;height:44px;font-size:19px}}
     `;
     document.head.appendChild(style);
 
